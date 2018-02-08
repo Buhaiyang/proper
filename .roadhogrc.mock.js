@@ -298,4 +298,6 @@ const proxy = {
   },
 };
 
-export default noProxy ? {} : delay(proxy, 500);
+const proxyServer = 'http://localhost:8080';
+
+export default noProxy ? {"/*": proxyServer} : delay(proxy, 500);
