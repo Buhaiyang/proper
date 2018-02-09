@@ -2,6 +2,7 @@ import fetch from 'dva/fetch';
 import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
 import store from '../index';
+import prefix from '../config';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -43,6 +44,7 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
+  const newUrl = `${prefix}${url}`;
   const defaultOptions = {
     credentials: 'include',
   };
@@ -56,7 +58,7 @@ export default function request(url, options) {
     newOptions.body = JSON.stringify(newOptions.body);
   }
 
-  return fetch(url, newOptions)
+  return fetch(newUrl, newOptions)
     .then(checkStatus)
     .then((response) => {
       if (newOptions.method === 'DELETE' || response.status === 204) {
