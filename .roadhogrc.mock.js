@@ -176,6 +176,14 @@ const proxy = {
     hideInMenu:true,
     path: 'http://pro.ant.design/docs/getting-started',
     target: '_blank'
+  },{
+    name:'权限',
+    icon:'book',
+    path:'auth',
+    children: [{
+      name: '用户',
+      path: 'user',
+    }]
   }],
   // 支持值为 Object 和 Array
   'GET /api/currentUser': {
@@ -296,8 +304,176 @@ const proxy = {
       "path": "/base/category/list"
     });
   },
+  'GET /api/back/(.*)':'http://192.168.1.196:8090/back/',
+  'GET /api/auth/users':{
+    "count": 100,
+    "data":[{
+      "id": "1",
+        //{ "type": "string", "description": "用户ID" },
+      "username": "denggy",
+        // { "type": "string", "description": "用户名" },
+      "password": "123456",
+        // { "type": "string", "description": "密码" },
+      "name": "7954",
+        //{ "type": "string", "description": "显示名" },
+      "email": "1015182620@qq.com",
+        //{ "type": "string", "description": "邮箱" },
+      "phone": "15904015593",
+        //{ "type": "string", "description": "手机号" },
+      "enable": true,
+        //{ "type": "boolean", "description": "状态" },
+      "superuser": false,
+        //{ "type": "boolean", "description": "是否为超级用户" },
+    },{
+      "id": "2",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "3",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "4",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "5",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "6",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "7",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "8",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "9",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "10",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    },{
+      "id": "11",
+      "username": "zhangjianlin",
+      "password": "123456",
+      "name": "66666",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    }]
+  },
+  'GET /api/auth/users/:id':{
+    "id": "2",
+    "username": "zhangjianlin",
+    "password": "123456",
+    "name": "66666",
+    "email": "276595311@qq.com",
+    "phone": "15912345678",
+    "enable": true,
+    "superuser": false
+  },
+  'PUT /api/auth/users/:id': (req , res)=>{
+    res.send({
+      "id": "2",
+      "username": "limiao",
+      "password": "123456",
+      "name": "7777",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    });
+  },
+  'POST /api/auth/users':(req , res)=>{
+    res.send({
+      "id": "9",
+      "username": "laolaolao",
+      "password": "123456",
+      "name": "laolaolao",
+      "email": "276595311@qq.com",
+      "phone": "15912345678",
+      "enable": true,
+      "superuser": false
+    })
+  },
+  'DELETE /api/auth/users':'',
+  'GET /api/auth/users/:id/roles':[
+    {"id":"ggjs","name":"高管角色"},
+    {"id":"nqjs","name":"内勤角色"},
+    {"id":"glyjs","name":"管理员角色"},
+  ],
+  'GET /api/auth/roles':[
+    {"id":"ggjs","name":"高管角色"},
+    {"id":"nqjs","name":"内勤角色"},
+    {"id":"glyjs","name":"管理员角色"},
+    {"id":"oer2","name":"其他角色"},
+    {"id":"oer1","name":"其他角色2"},
+  ],
+  'GET /api/auth/users/:id/user-groups':[
+    {"id":"ggyh","name":"高管用户"},
+  ],
+  'GET /api/auth/user-groups':[
+    {"id":"ggyh","name":"高管用户"},
+    {"id":"nqyh","name":"内勤用户"},
+    {"id":"glyyh","name":"管理员用户"},
+  ],
 };
 
+// export default noProxy ? {} : delay(proxy, 0);
 const proxyServer = 'http://localhost:8080';
 
 export default noProxy ? {"/*": proxyServer} : delay(proxy, 500);

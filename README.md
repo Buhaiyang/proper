@@ -104,11 +104,12 @@ $ pro new
   *   命名规范
   
        `models`文件夹中不允许建立 `文件夹` 并且文件必须是`.js`文件 ,命名方式 `全小写` 或 `驼峰命名`。
+               名称应该与相关业务pages下的文件夹与文件夹下的Page文件组成驼峰命名 如 page文件路径 pages/Auth/User.js  那么页面User.js 相应的model名为authUser.js
        
        `pages` 文件夹的命名必须 `首字母大写` ，名称采用`一个单词`，一般是你业务模块的名称。
                文件夹中`.js`、`.less`文件必须 `首字母大写`。 ###注:`驼峰命名`  时也要求`首字母大写` 。文件夹与`.js`文件名称与你后台菜单管理中的path相对应### 
                
-       `services` 根据你的业务模块建立相应文件夹与之对应。
+       `services` 文件夹中的 services 名称 必须以 model名称后+大写的'S'命名 以注明这是一个service文件 例如：如model名称 authUser.js 那么service名称 authUserS.js
   *   编码规范
   
         #####`.js`文件中一律使用`ES5`、`ES6`形式声明类、变量、方法、回调函数等。

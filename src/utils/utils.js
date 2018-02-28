@@ -1,5 +1,6 @@
 import moment from 'moment';
 import pathToRegexp from 'path-to-regexp';
+
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
 }
@@ -174,27 +175,30 @@ function getFlatMenuData(menus) {
   });
   return keys;
 }
+
 function exchangePath2Router(path) {
-  const result = []
-  path.split('/').map((item,index)=>{
-    if(item.indexOf('-')>0){
+  const result = [];
+  path.split('/').forEach((item) => {
+    if (item.indexOf('-') > 0) {
       let arr = '';
-      item.split('-').forEach((sItem)=>{
-        arr+=firstUpperCase(sItem)
+      item.split('-').forEach((sItem) => {
+        arr += firstUpperCase(sItem);
       });
-      if(arr){
+      if (arr) {
         result.push(arr);
       }
-    }else{
+    } else {
       result.push(firstUpperCase(item));
     }
-  })
+  });
   const routePath = result.join('/');
-  return routePath
+  return routePath;
 }
+
 function firstUpperCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
 export function formatter(data, parentPath = '') {
   return data.map((item) => {
     let { path } = item;
@@ -211,18 +215,19 @@ export function formatter(data, parentPath = '') {
     return result;
   });
 }
-export function getRouterDataFromMenuData(res,dynamicWrapper) {
+
+export function getRouterDataFromMenuData(res, dynamicWrapper) {
   let routerConfig = null;
   const menuData = getFlatMenuData(res);
-  if(!routerConfig){
-    routerConfig = {}
-    for(var k in menuData){
+  if (!routerConfig) {
+    routerConfig = {};
+    for (const k in menuData) {
       const menu = menuData[k];
-      if(!menu.hideInMenu && (!menu.children || menu.subRoute)){
+      if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
         const path = exchangePath2Router(k);
         routerConfig[`/${k}`] = {
-          component:dynamicWrapper(()=>import(`../pages/${path}`))
-        }
+          component: dynamicWrapper(()=>import(`../pages/${path}`))
+        };
         // if(menu.subRoute && menu.subRoute.length){
         //   menu.subRoute.forEach((sr)=>{
         //     let key = `${k}/${sr.path}`;
@@ -257,5 +262,23 @@ export function getRouterDataFromMenuData(res,dynamicWrapper) {
     };
     routerData[path] = router;
   });
-  return routerData
+  return routerData;
+}
+/* 节流函数 */
+export function throttle(func, context, delay, text, mustApplyTime) {
+  const fn = func;
+  clearTimeout(fn.timer);
+  fn.cur = Date.now();// 记录当前时间
+  if (!fn.start) { // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
+    fn.start = fn.cur;
+  }
+  if (fn.cur - fn.start > mustApplyTime) {
+    // 当前时间与上一次函数被执行的时间作差，与mustApplyTime比较，若大于，则必须执行一次函数，若小于，则重新设置计时器
+    fn.call(context, text);
+    fn.start = fn.cur;
+  } else {
+    fn.timer = setTimeout(()=> {
+      fn.call(context, text);
+    }, delay);
+  }
 }

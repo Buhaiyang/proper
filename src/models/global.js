@@ -1,12 +1,26 @@
-import { queryNotices,searchData } from '../services/api';
+import { queryNotices, searchData } from '../services/api';
+
+const getWindowSize = ()=>{
+  const w = window.innerWidth;
+  let size = 'default';
+  if (w > 1200 && w < 1400) {
+    size = 'middle';
+  } else if (w < 1200) {
+    size = 'small';
+  } else {
+    size = 'large';
+  }
+  return size;
+}
 
 export default {
   namespace: 'global',
 
   state: {
     collapsed: false,
-    dataSource:[],
+    searchOptions: [],
     notices: [],
+    size: getWindowSize()
   },
 
   effects: {
@@ -32,21 +46,82 @@ export default {
         payload: count,
       });
     },
-    *queryData({ payload },{ put, call }){
-      const resp = yield call(searchData);
+    *queryData({ payload }, { put, call }) {
+      const res = yield call(searchData, payload);
       yield put({
         type: 'saveSearchData',
-        payload: resp,
+        payload: {res, matchStr: payload},
+      });
+    },
+    *showHistory(_, {put}) {
+      yield put({
+        type: 'saveHistoryData'
       });
     }
   },
 
   reducers: {
-    saveSearchData(state, { payload }){
+    saveLogicData(state) {
       return {
         ...state,
-        dataSource: payload,
+        searchOptions: [
+          {id: 'and',
+            label: '并且',
+            matchLabel: '并且',
+            desc: '',
+            preActive: true
+          },
+          {
+            id: 'or',
+            label: '或者',
+            matchLabel: '或者',
+            desc: ''
+          }
+        ],
+      }
+    },
+    saveSearchData(state, { payload }) {
+      const { res, matchStr } = payload;
+      const preActiveIndex = payload.preActiveIndex || 0;
+      const searchOptions = [];
+      res.forEach((item) => {
+        const text = item.content
+        if (text) {
+          const i = text.indexOf(matchStr);
+          const obj = {
+            id: item.column,
+            label: text,
+            desc: item.desc,
+            table: item.contract_e_cont,
+            operate: item.operate || 'like',
+            preActive: false,
+            matchLabel: i === 0 ? text.substring(0, i + matchStr.length) : '',
+            unMatchLabel: i === 0 ? text.substring(i + matchStr.length, text.length) : text,
+          }
+          searchOptions.push(obj)
+        }
+      });
+      if (searchOptions.length) {
+        searchOptions[preActiveIndex].preActive = true
+      }
+      return {
+        ...state,
+        searchOptions,
       };
+    },
+    clearSearchData(state) {
+      return {
+        ...state,
+        searchOptions: [],
+      };
+    },
+    saveHistoryData(state) {
+      return {
+        ...state,
+        searchOptions: [
+          {id: 'history_20170101', label: '这是一条价的搜索历史', matchLabel: '这是一条价的搜索历史', desc: '昨天上午'}
+        ],
+      }
     },
     changeLayoutCollapsed(state, { payload }) {
       return {
@@ -66,16 +141,23 @@ export default {
         notices: state.notices.filter(item => item.type !== payload),
       };
     },
+    resize(state) {
+      return {
+        ...state,
+        size: getWindowSize()
+      }
+    }
   },
 
   subscriptions: {
-    setup({ history }) {
-      // Subscribe history(url) change, trigger `load` action if pathname is `/`
-      return history.listen(({ pathname, search }) => {
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search);
-        }
-      });
+    setup({ dispatch }) {
+      let tid
+      window.onresize = ()=>{
+        clearTimeout(tid);
+        tid = setTimeout(()=>{
+          dispatch({type: 'resize'})
+        }, 300)
+      }
     },
   },
 };

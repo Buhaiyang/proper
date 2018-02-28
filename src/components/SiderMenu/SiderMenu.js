@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Layout, Menu, Icon ,Spin} from 'antd';
+import { Layout, Menu, Icon, Spin} from 'antd';
 import pathToRegexp from 'path-to-regexp';
 import { Link } from 'dva/router';
 import styles from './index.less';
@@ -231,13 +231,14 @@ export default class SiderMenu extends PureComponent {
           {...menuProps}
           onOpenChange={this.handleOpenChange}
           selectedKeys={selectedKeys}
-          style={{ padding: '16px 0', width: '100%' }}
-        >
+          style={{ padding: '16px 0', width: '100%', height: 'calc(100vh - 64px)', overflowY: 'auto'}} >
           {this.getNavMenuItems(this.props.menuData)}
         </Menu>
-        {this.props.menuData.length === 0 && <div className={styles.menuLoading}>
-          <Spin size='large'/>
-        </div>}
+        {this.props.menuData.length === 0 && (
+          <div className={styles.menuLoading}>
+            <Spin size="large" />
+          </div>
+        )}
       </Sider>
     );
   }

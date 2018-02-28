@@ -78,6 +78,6 @@ export async function queryNotices() {
   return request('/api/notices');
 }
 
-export async function searchData() {
-  return request('/api/searchData');
+export async function searchData(params) {
+  return request(`/api/back/demo/search?data=${params}`);
 }

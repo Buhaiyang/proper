@@ -11,6 +11,11 @@
     "jasmine": true
   },
   "rules": {
+    "semi": [0],
+    "no-plusplus": [0],
+    "no-unused-expressions":"warn",
+    "for-direction":"warn",
+    "guard-for-in": "warn",
     "generator-star-spacing": [0],
     "consistent-return": [0],
     "react/forbid-prop-types": [0],
@@ -29,6 +34,18 @@
       "logical": "parens-new-line",
       "prop": "ignore"
     }],
+    "react/jsx-curly-spacing": [0],
+    "react/jsx-equals-spacing": [0],
+    "react/jsx-closing-bracket-location": [0],
+    "react/jsx-indent": [0],
+    "react/jsx-boolean-value": [0],
+    "react/jsx-closing-tag-location": [0],
+    "react/jsx-indent-props": [0],
+    "react/sort-comp": [0],
+    "object-property-newline": [0],
+    "object-curly-spacing": [0],
+    "arrow-spacing": [0],
+    "eol-last": [0],
     "no-else-return": [0],
     "no-restricted-syntax": [0],
     "import/no-extraneous-dependencies": [0],
@@ -44,8 +61,8 @@
     "no-cond-assign": [0],
     "import/no-unresolved": [0],
     "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
+      "arrays": "ignore",
+      "objects": "ignore",
       "imports": "always-multiline",
       "exports": "always-multiline",
       "functions": "ignore"
