@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { routerRedux, Route, Switch,Redirect } from 'dva/router';
+import { routerRedux, Route, Switch, Redirect } from 'dva/router';
 import { connect } from 'dva';
 import { Input } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';

@@ -7,15 +7,15 @@ console.log('');
 
 var onReq = function (req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DEvarE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Max-Age', '1000');
 
   var query = common.parseUrl(req).query;
 
   console.log('Received %s request %s', req.method, req.url);
-  console.log('with header %j', req.rawHeaders);
-  if (req.method === 'GET' || req.method === 'DEvarE') {
+  // console.log('with header %j', req.rawHeaders);
+  if (req.method === 'GET' || req.method === 'DELETE') {
     console.log('With query %j', query);
   } else {
     common.parsePostData(req, res, function (req1, res1, data) {
@@ -41,7 +41,7 @@ var onReq = function (req, res) {
   handler.onPost = handler.onPost ? handler.onPost : common.commonPost;
   handler.onPut = handler.onPut ? handler.onPut : common.commonPost;
   handler.onGet = handler.onGet ? handler.onGet : common.commonGet;
-  handler.onDevare = handler.onDevare ? handler.onDevare : common.commonGet;
+  handler.onDelete = handler.onDelete ? handler.onDelete : common.commonGet;
 
   if (req.method === 'POST') {
     common.parsePostData(req, res, handler.onPost);
@@ -49,8 +49,8 @@ var onReq = function (req, res) {
     common.parsePostData(req, res, handler.onPut);
   } else if (req.method === 'GET') {
     handler.onGet(req, res);
-  } else if (req.method === 'DEvarE') {
-    handler.onDevare(req, res);
+  } else if (req.method === 'DELETE') {
+    handler.onDelete(req, res);
   } else if (req.method === 'OPTIONS') {
     res.statusCode = 200;
     res.end();

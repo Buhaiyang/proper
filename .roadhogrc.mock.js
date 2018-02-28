@@ -183,6 +183,9 @@ const proxy = {
     children: [{
       name: '用户',
       path: 'user',
+    }, {
+      name: "用户组",
+      path: "group"
     }]
   }],
   // 支持值为 Object 和 Array

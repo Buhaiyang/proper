@@ -126,5 +126,18 @@
     "hideInMenu":true,
     "path": "http://pro.ant.design/docs/getting-started",
     "target": "_blank"
+  }, {
+    "name": "权限",
+    "icon": "lock",
+    "path": "auth",
+    "children": [
+      {
+        "name": "用户权限",
+        "path": "user"
+      },
+      {
+      "name": "用户组权限",
+      "path": "group"
+    }]
   }
 ]

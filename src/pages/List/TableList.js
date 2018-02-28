@@ -5,7 +5,7 @@ import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 import styles from './TableList.less';
-import {inject} from "../../common/inject";
+import {inject} from '../../common/inject';
 
 const FormItem = Form.Item;
 const { Option } = Select;
