@@ -1,63 +1,265 @@
 import React, { PureComponent } from 'react';
-import { Card, Button, Table, Switch, Divider, Form, Modal, Input, message, Tabs } from 'antd';
+import { Card, Button, Table, Switch, Divider, Spin, Transfer,
+  Form, Modal, Input, message, Tabs, Radio, Select, Badge } from 'antd';
 import { connect } from 'dva';
 import styles from './Group.less';
 import { inject } from './../../common/inject';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import OSearch from '../../components/Osearch';
+import DescriptionList from '../../components/DescriptionList';
 
 const FormItem = Form.Item;
+const { TabPane } = Tabs;
+const RadioGroup = Radio.Group;
+const { TextArea } = Input;
+const { Option } = Select;
+const { Description } = DescriptionList;
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 },
+  },
+};
+
+const BasicInfoForm = Form.create()((props) => {
+  const { form, groupsBasicInfo } = props;
+
+  return (
+    <Form>
+      <FormItem>
+        {form.getFieldDecorator('id', {
+          initialValue: groupsBasicInfo.id,
+        })(
+          <Input type="hidden" />
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="名称"
+      >
+        {form.getFieldDecorator('name', {
+          initialValue: groupsBasicInfo.name,
+          rules: [{ required: true, message: '名称不能为空' }],
+        })(
+          <Input placeholder="请输入名称" />
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="顺序"
+      >
+        {form.getFieldDecorator('seq', {
+          initialValue: groupsBasicInfo.seq,
+          rules: [{ required: true, message: '顺序不能为空' }],
+        })(
+          <Input placeholder="请输入顺序" />
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="状态"
+      >
+        {form.getFieldDecorator('groupEnable', {
+          initialValue: groupsBasicInfo.enable || true
+        })(
+          <RadioGroup>
+            <Radio value={true}>启用</Radio>
+            <Radio value={false}>停用</Radio>
+          </RadioGroup>
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="描述"
+      >
+        {form.getFieldDecorator('description', {
+          initialValue: groupsBasicInfo.description,
+          rules: [{ required: true, message: '描述不能为空' }]
+        })(
+          <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
+        )}
+      </FormItem>
+    </Form>
+  )
+});
+
+const UserInfoForm = Form.create()((props) => {
+  const { form, groupUsers, allUsers, loading, userTargetKeys, handleUserTrans } = props;
+
+  for (const item of allUsers) {
+    item.key = item.id;
+  }
+
+  const handleChange = (tKeys) => {
+    handleUserTrans(tKeys);
+  }
+
+  return (
+    <Form>
+      <FormItem
+        {...formItemLayout}
+        label="用户"
+      >
+        {form.getFieldDecorator('users', {
+          initialValue: groupUsers && groupUsers.map(item => item.id),
+          rules: [{ required: true, message: '用户不能为空' }],
+        })(
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            placeholder="请选择用户 "
+          >
+            {allUsers.length ? allUsers.map(item=>
+              <Option key={item.id}>{item.name}</Option>
+              ) : allUsers}
+          </Select>
+        )}
+        {loading && (
+          <div className={styles.selectLoading}>
+            <Spin size="small" />
+          </div>
+        )}
+      </FormItem>
+      <FormItem>
+        <Transfer
+          dataSource={allUsers}
+          showSearch
+          listStyle={{
+            width: '40%',
+            height: 300,
+          }}
+          operations={['添加', '删除']}
+          targetKeys={userTargetKeys}
+          onChange={handleChange}
+          render={item => `${item.username}-${item.name}`}
+        />
+      </FormItem>
+    </Form>
+  )
+});
+
+const GroupInfoForm = Form.create()((props) => {
+  const { form, groupAll, loading } = props;
+
+  return (
+    <Form>
+      <FormItem
+        {...formItemLayout}
+          label="用户组"
+      >
+        {form.getFieldDecorator('groups', {
+          initialValue: groupAll && groupAll.map(item => item.id),
+          rules: [{ required: true, message: '用户组不能为空' }],
+        })(
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            placeholder="请选择用户组 "
+          >
+            {groupAll.length ? groupAll.map(item=>
+              <Option key={item.id}>{item.name}</Option>
+              ) : groupAll}
+          </Select>
+        )}
+        {loading && (
+          <div className={styles.selectLoading}>
+            <Spin size="small" />
+          </div>
+        )}
+      </FormItem>
+    </Form>
+  )
+});
 
 const CreateForm = Form.create()((props) => {
-  const { modalVisible, form, handleCreateOk, handleCreate } = props;
+  const { modalVisible, handleFormSubmit, closeForm, groupUsers, allUsers, groupAll, userTargetKeys,
+    isCreate, loading, groupsBasicInfo, currentTabKey, handleTabChange, handleUserTrans } = props;
+
+  // 取消
+  const handleCancel = () => {
+    const customForm = this[currentTabKey].getForm();
+    closeForm(customForm);
+  }
+
   const okHandle = () => {
-    form.validateFields((err, fieldsValue) => {
+    const customForm = this[currentTabKey].getForm();
+    customForm.validateFields((err, fieldsValue) => {
       if (err) return;
-      handleCreateOk(fieldsValue);
+      handleFormSubmit(customForm, fieldsValue);
     });
   };
+
+  const onTabChange = (activeKey) => {
+    handleTabChange(activeKey);
+  }
+
+  const tabList = [
+    {
+      key: 'basic',
+      tab: '基本信息',
+      disabled: false,
+      content: <BasicInfoForm
+        ref = {(el) => { this.basic = el; }}
+        groupsBasicInfo = {groupsBasicInfo}
+        loading = {loading}
+      />
+    },
+    {
+      key: 'user',
+      tab: '用户信息',
+      disabled: isCreate,
+      content: <UserInfoForm
+        ref = {(el) => { this.user = el; }}
+        groupUsers = {groupUsers}
+        allUsers = {allUsers}
+        handleUserTrans = {handleUserTrans}
+        userTargetKeys = {userTargetKeys}
+        loading = {loading}
+      />
+    },
+    {
+      key: 'group',
+      tab: '用户组信息',
+      disabled: isCreate,
+      content: <GroupInfoForm
+        ref = {(el) => { this.group = el; }}
+        groupUsers = {groupUsers}
+        allUsers = {allUsers}
+        groupAll = {groupAll}
+        loading = {loading}
+      />
+    }
+  ];
 
   return (
     <Modal
       visible={modalVisible}
       onOk={okHandle}
-      onCancel={() => handleCreate()}
+      onCancel={handleCancel}
     >
-      <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="基本信息" key="1">
-          <FormItem
-            labelCol={{ span: 5 }}
-            wrapperCol={{ span: 15 }}
-            label="描述"
-          >
-            {form.getFieldDecorator('desc', {
-              rules: [{ required: true, message: 'Please input some description...' }],
-            })(
-              <Input placeholder="请输入" />
-            )}
-          </FormItem>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="用户/用户组信息" key="2">
-          <FormItem
-            labelCol={{ span: 5 }}
-            wrapperCol={{ span: 15 }}
-            label="描述"
-          >
-            {form.getFieldDecorator('desc', {
-              rules: [{ required: true, message: 'Please input some description...' }],
-            })(
-              <Input placeholder="请输入" />
-            )}
-          </FormItem>
-        </Tabs.TabPane>
+      <Tabs
+        onChange={onTabChange}
+        activeKey={currentTabKey}
+      >
+        {
+          tabList.map(item => (
+            <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
+          ))
+        }
       </Tabs>
     </Modal>
   );
 });
 
 
-@inject('authGroups')
-@connect(({ authGroups, loading }) => ({
+@inject(['authGroups', 'global'])
+@connect(({ authGroups, global, loading }) => ({
   authGroups,
+  global,
   loading: loading.models.authGroups
 }))
 @Form.create()
@@ -65,7 +267,11 @@ export default class Group extends PureComponent {
   state = {
     modalVisible: false,
     selectedRows: [],
-    selectedRowKeys: []
+    selectedRowKeys: [],
+    currentTabKey: 'basic',
+    userTargetKeys: [],
+    viewVisible: false,
+    userInfoView: {}
   };
 
   componentDidMount() {
@@ -163,28 +369,116 @@ export default class Group extends PureComponent {
   // 打开新建层
   handleCreate = (flag) => {
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: flag,
     });
   }
 
-  // 新建确认
-  handleCreateOk = (fields) => {
-    this.props.dispatch({
-      type: 'rule/add',
-      payload: {
-        description: fields.desc,
-      },
-    });
+  // 关闭form
+  closeForm = (customForm) => {
+    setTimeout(() => {
+      this.setState({
+        modalVisible: false,
+        currentTabKey: 'basic',
+        userTargetKeys: []
+      });
+      customForm.resetFields();
+      this.props.dispatch({
+        type: 'authGroups/clear'
+      });
+    }, 300);
+  }
 
-    message.success('添加用户成功');
+  // form确认按钮
+  handleFormSubmit = (customForm, fields) => {
+    const activeKey = this.state.currentTabKey;
+
+    if (activeKey === 'basic') {
+      this.props.dispatch({
+        type: 'authGroups/createOrUpdate',
+        payload: fields,
+        callback: () => {
+          this.props.dispatch({
+            type: 'authGroups/fetch'
+          });
+        }
+      });
+    } else if (activeKey === 'user') {
+      // TODO
+    } else if (activeKey === 'group') {
+      // TODO
+    }
+    this.closeForm(customForm);
+  }
+
+  // tab切换
+  handleTabChange = (activeKey) => {
     this.setState({
-      modalVisible: false,
+      currentTabKey: activeKey
+    });
+    if (activeKey === 'user') {
+      this.props.dispatch({
+        type: 'authGroups/fetchUserGroups',
+        payload: this.props.authGroups.groupsBasicInfo.id,
+        callback: () => {
+          const userKey = [];
+          for (const item of this.props.authGroups.groupUsers) {
+            userKey.push(item.id);
+          }
+          this.setState({
+            userTargetKeys: userKey
+          });
+        }
+      });
+    } else if (activeKey === 'group') {
+      // todo
+    }
+  }
+
+  // 点击编辑按钮
+  handleEdit = (record) => {
+    const self = this;
+    this.props.dispatch({
+      type: 'authGroups/fetchById',
+      payload: record.id,
+      callback() {
+        self.setState({
+          modalVisible: true
+        });
+      }
+    });
+  }
+
+  // user穿梭框change
+  handleUserTrans = (key) => {
+    this.setState({
+      userTargetKeys: key
+    });
+  }
+
+  // 查看基本信息
+  handleView = (record) => {
+    const userInfoView = record;
+    const text = userInfoView.enable;
+    userInfoView.enableLabel = text === true ? '已启用' : '已停用';
+    userInfoView.badge = text === true ? 'processing' : 'default';
+    this.setState({
+      viewVisible: true,
+      userInfoView
+    });
+  }
+
+  // 关闭基本信息
+  handleViewModalVisible = (flag) => {
+    this.setState({
+      viewVisible: flag
     });
   }
 
   render() {
-    const { authGroups: { groupsData }, loading } = this.props;
-    const { modalVisible, selectedRows, selectedRowKeys } = this.state;
+    const { authGroups: { groupsData }, loading,
+      global: {searchOptions, size} } = this.props;
+    const { modalVisible, selectedRows, selectedRowKeys,
+      currentTabKey, userTargetKeys, viewVisible, userInfoView } = this.state;
     const rowSelection = {
       onChange: (keys, rows) => {
         this.setState({
@@ -195,13 +489,26 @@ export default class Group extends PureComponent {
     };
 
     const parentMethods = {
-      handleCreateOk: this.handleCreateOk,
-      handleCreate: this.handleCreate,
+      handleFormSubmit: this.handleFormSubmit,
+      closeForm: this.closeForm,
+      groupsBasicInfo: this.props.authGroups.groupsBasicInfo,
+      groupUsers: this.props.authGroups.groupUsers,
+      allUsers: this.props.authGroups.allUsers,
+      groupAll: this.props.authGroups.groupsData,
+      handleTabChange: this.handleTabChange,
+      handleUserTrans: this.handleUserTrans,
+      isCreate: !this.props.authGroups.groupsBasicInfo.id,
+      currentTabKey,
+      userTargetKeys
     };
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
-        render: text => (<span style={{textDecoration: 'underline', cursor: 'pointer'}}>{text}</span>)
+        render: (text, record) => (
+          <span onClick={() => this.handleView(record)} style={{textDecoration: 'underline', cursor: 'pointer'}}>
+            {text}
+          </span>
+        )
       },
       { title: '描述说明', dataIndex: 'description', key: 'description', },
       { title: '顺序', dataIndex: 'seq', key: 'seq', },
@@ -215,16 +522,25 @@ export default class Group extends PureComponent {
       {
         title: '操作', key: 'action', render: record => (
           <span>
-            <a href="#">编辑</a>
+            <a onClick={() => this.handleEdit(record)}>编辑</a>
             <Divider type="vertical" />
-            <a onClick={() => { this.showDeleteConfirm(record); }}>删除</a>
+            <a onClick={() => this.showDeleteConfirm(record)}>删除</a>
           </span>
         )
       }
     ];
 
     return (
-      <PageHeaderLayout>
+      <PageHeaderLayout content={
+        <OSearch
+          searchOptions={searchOptions}
+          placeholder="请输入"
+          enterButtonText="搜索"
+          size={size}
+          onSuggest={this.onSuggest}
+          onSearchResult={this.onSearchResult}
+        />
+      }>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
@@ -245,6 +561,7 @@ export default class Group extends PureComponent {
               dataSource={groupsData}
               columns={columns}
               rowKey={record => record.id}
+              size={size}
             />
           </div>
         </Card>
@@ -252,6 +569,28 @@ export default class Group extends PureComponent {
           {...parentMethods}
           modalVisible={modalVisible}
         />
+        <Modal
+          title="用户组信息"
+          visible={viewVisible}
+          userInfoView={userInfoView}
+          footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
+          onCancel={()=>this.handleViewModalVisible(false)}
+        >
+          <DescriptionList size="small" col="1">
+            <Description term="名称">
+              {userInfoView.name}
+            </Description>
+            <Description term="顺序">
+              {userInfoView.seq}
+            </Description>
+            <Description term="描述">
+              {userInfoView.description}
+            </Description>
+            <p>
+              <Badge status={userInfoView.badge} text={userInfoView.enableLabel} />
+            </p>
+          </DescriptionList>
+        </Modal>
       </PageHeaderLayout>
     );
   }

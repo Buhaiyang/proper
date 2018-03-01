@@ -23,3 +23,21 @@ export async function removeUserGroups(params) {
     method: 'DELETE'
   });
 }
+
+export async function createOrUpdateUserGroups(params) {
+  return params.id ? request(`/api/auth/user-groups/${params.id}`, {
+    method: 'PUT',
+    body: params,
+  }) : request('/api/auth/user-groups', {
+    method: 'POST',
+    body: params,
+  });
+}
+
+export async function queryUserGroupsById(params) {
+  return request(`/api/auth/user-groups/${params}`);
+}
+
+export async function queryGroupUsers(params) {
+  return request(`/api/auth/user-groups/${params}/users`);
+}

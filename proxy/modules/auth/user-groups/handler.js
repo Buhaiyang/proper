@@ -7,7 +7,7 @@ handler.onPut = function(req, res, data) {
 };
 
 handler.onPost = function(req, res, data) {
-  res.writeHeader(200, {'Content-Type': 'application/json'});
+  res.writeHeader(201, {'Content-Type': 'application/json'});
   res.end();
 };
 
