@@ -1,0 +1,351 @@
+[
+  {
+    "id": "9901",
+    "name": "dashboard",
+    "leaf": false,
+    "root": true,
+    "icon": "dashboard",
+    "parentId": null,
+    "route": "dashboard",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990101",
+    "name": "分析页",
+    "parentId": "9901",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "analysis",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990102",
+    "name": "监控页",
+    "parentId": "9901",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "monitor",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990103",
+    "name": "工作台",
+    "parentId": "9901",
+    "leaf": true,
+    "icon": "",
+    "route": "workplace",
+    "sequenceNumber": 3
+  },
+  {
+    "id": "9902",
+    "name": "表单页",
+    "leaf": false,
+    "root": true,
+    "icon": "form",
+    "parentId": null,
+    "route": "forms",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990201",
+    "name": "基础表单",
+    "parentId": "9902",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "basic-form",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990202",
+    "name": "分步表单",
+    "parentId": "9902",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "step-form",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990203",
+    "name": "高级表单",
+    "parentId": "9902",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "advanced-form",
+    "sequenceNumber": 3
+  },
+  {
+    "id": "9903",
+    "name": "列表页",
+    "leaf": false,
+    "root": true,
+    "icon": "table",
+    "parentId": null,
+    "route": "list",
+    "sequenceNumber": 3
+  },
+  {
+    "id": "990301",
+    "name": "查询表格",
+    "parentId": "9903",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "table-list",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990302",
+    "name": "标准列表",
+    "parentId": "9903",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "basic-list",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990303",
+    "name": "卡片列表",
+    "parentId": "9903",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "card-list",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990304",
+    "name": "搜索列表",
+    "parentId": "9903",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "search-list",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "99030401",
+    "name": "搜索列表（文章）",
+    "parentId": "990304",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "articles",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "99030402",
+    "name": "搜索列表（项目）",
+    "parentId": "990304",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "projects",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "99030403",
+    "name": "搜索列表（应用）",
+    "parentId": "990304",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "applications",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9904",
+    "name": "结果页",
+    "leaf": false,
+    "root": true,
+    "icon": "check-circle-o",
+    "parentId": null,
+    "route": "result",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990401",
+    "name": "成功",
+    "parentId": "9904",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "success",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990402",
+    "name": "失败",
+    "parentId": "9904",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "error",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9905",
+    "name": "异常页",
+    "leaf": false,
+    "root": true,
+    "icon": "warning",
+    "parentId": null,
+    "route": "exception",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990501",
+    "name": "403",
+    "parentId": "9905",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "403",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990502",
+    "name": "404",
+    "parentId": "9905",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "404",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990503",
+    "name": "500",
+    "parentId": "9905",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "500",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990504",
+    "name": "触发异常",
+    "parentId": "9905",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "trigger-exception",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9906",
+    "name": "账户",
+    "leaf": false,
+    "root": true,
+    "icon": "user",
+    "parentId": null,
+    "route": "user",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990601",
+    "name": "登录",
+    "parentId": "9906",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "login",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990602",
+    "name": "注册",
+    "parentId": "9906",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "register",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "990603",
+    "name": "注册结果",
+    "parentId": "9906",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "register-result",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9907",
+    "name": "一个例子",
+    "leaf": false,
+    "root": true,
+    "icon": "book",
+    "parentId": null,
+    "route": "demo",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "990701",
+    "name": "例子",
+    "parentId": "9907",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "demo",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9908",
+    "name": "高级查询",
+    "leaf": false,
+    "root": true,
+    "icon": "book",
+    "parentId": null,
+    "route": "menu",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "9909",
+    "name": "使用文档",
+    "leaf": false,
+    "root": true,
+    "icon": "book",
+    "parentId": null,
+    "route": "http://pro.ant.design/docs/getting-started",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "99010",
+    "name": "权限",
+    "leaf": false,
+    "root": true,
+    "icon": "lock",
+    "parentId": null,
+    "route": "auth",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "9901001",
+    "name": "用户权限",
+    "parentId": "99010",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "user",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9901002",
+    "name": "用户组权限",
+    "parentId": "99010",
+    "leaf": true,
+    "root": false,
+    "icon": "",
+    "route": "group",
+    "sequenceNumber": 2
+  }
+]  

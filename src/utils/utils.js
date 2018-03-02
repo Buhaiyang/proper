@@ -40,7 +40,10 @@ export function getTimeDistance(type) {
     const nextYear = nextDate.year();
     const nextMonth = nextDate.month();
 
-    return [moment(`${year}-${fixedZero(month + 1)}-01 00:00:00`), moment(moment(`${nextYear}-${fixedZero(nextMonth + 1)}-01 00:00:00`).valueOf() - 1000)];
+    return [
+      moment(`${year}-${fixedZero(month + 1)}-01 00:00:00`),
+      moment(moment(`${nextYear}-${fixedZero(nextMonth + 1)}-01 00:00:00`).valueOf() - 1000)
+    ];
   }
 
   if (type === 'year') {
@@ -71,10 +74,7 @@ export function getPlainNode(nodeList, parentPath = '') {
 export function digitUppercase(n) {
   const fraction = ['角', '分'];
   const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
-  const unit = [
-    ['元', '万', '亿'],
-    ['', '拾', '佰', '仟'],
-  ];
+  const unit = [['元', '万', '亿'], ['', '拾', '佰', '仟']];
   let num = Math.abs(n);
   let s = '';
   fraction.forEach((item, index) => {
@@ -94,10 +94,9 @@ export function digitUppercase(n) {
   return s.replace(/(零.)*零元/, '元').replace(/(零.)+/g, '零').replace(/^整$/, '零元整');
 }
 
-
 function getRelation(str1, str2) {
   if (str1 === str2) {
-    console.warn('Two path are equal!');  // eslint-disable-line
+    console.warn('Two path are equal!'); // eslint-disable-line
   }
   const arr1 = str1.split('/');
   const arr2 = str2.split('/');
@@ -136,8 +135,7 @@ export function getRoutes(path, routerData) {
   if (keys.length === 0) {
     return [];
   }
-  let routes = keys.filter(routePath =>
-    routePath.indexOf(path) === 0 && routePath !== path);
+  let routes = keys.filter(routePath => routePath.indexOf(path) === 0 && routePath !== path);
   // Replace path to '' eg. path='user' /user/name => name
   routes = routes.map(item => item.replace(path, ''));
   // Get the route to be rendered to remove the deep rendering
@@ -149,12 +147,11 @@ export function getRoutes(path, routerData) {
       ...routerData[`${path}${item}`],
       key: `${path}${item}`,
       path: `${path}${item}`,
-      exact,
+      exact
     };
   });
   return renderRoutes;
 }
-
 
 /* eslint no-useless-escape:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/g;
@@ -207,7 +204,7 @@ export function formatter(data, parentPath = '') {
     }
     const result = {
       ...item,
-      path,
+      path
     };
     if (item.children) {
       result.children = formatter(item.children, `${parentPath}${item.path}/`);
@@ -226,15 +223,15 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
       if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
         const path = exchangePath2Router(k);
         routerConfig[`/${k}`] = {
-          component: dynamicWrapper(()=>import(`../pages/${path}`))
+          component: dynamicWrapper(() => import(`../pages/${path}`))
         };
         // if(menu.subRoute && menu.subRoute.length){
         //   menu.subRoute.forEach((sr)=>{
-        //     let key = `${k}/${sr.path}`;
-        //     const path = exchangePath2Router(key);
-        //     routerConfig2[`/${key}`] = {
-        //       component:dynamicWrapper(()=>import(`../routes/${path}`))
-        //     }
+        //   let key = `${k}/${sr.path}`;
+        //   const path = exchangePath2Router(key);
+        //   routerConfig2[`/${key}`] = {
+        //     component:dynamicWrapper(()=>import(`../routes/${path}`))
+        //   }
         //   })
         // }
       }
@@ -268,8 +265,9 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
 export function throttle(func, context, delay, text, mustApplyTime) {
   const fn = func;
   clearTimeout(fn.timer);
-  fn.cur = Date.now();// 记录当前时间
-  if (!fn.start) { // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
+  fn.cur = Date.now(); // 记录当前时间
+  if (!fn.start) {
+    // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
     fn.start = fn.cur;
   }
   if (fn.cur - fn.start > mustApplyTime) {
@@ -277,8 +275,47 @@ export function throttle(func, context, delay, text, mustApplyTime) {
     fn.call(context, text);
     fn.start = fn.cur;
   } else {
-    fn.timer = setTimeout(()=> {
+    fn.timer = setTimeout(() => {
       fn.call(context, text);
     }, delay);
   }
+}
+
+// 处理菜单函数
+export function controlMenu(oldMenu, newMenu = []) {
+  for (let i = 0; i < oldMenu.length; i++) {
+    const item = oldMenu[i];
+    item.path = oldMenu[i].route;
+    if (oldMenu[i].parentId == null) {
+      newMenu.push(oldMenu[i]);
+    }
+  }
+  return delInvalidMenu(culMenu(oldMenu, newMenu));
+}
+
+function culMenu(oldMenu, newMenu) {
+  const newMenuTemp = newMenu;
+  for (let i = 0; i < newMenuTemp.length; i++) {
+    newMenuTemp[i].children = [];
+    for (let j = 0; j < oldMenu.length; j++) {
+      if (newMenuTemp[i].id === oldMenu[j].parentId) {
+        newMenuTemp[i].children.push(oldMenu[j]);
+        newMenuTemp[i].children = culMenu(oldMenu, newMenuTemp[i].children);
+      }
+    }
+  }
+  return newMenuTemp;
+}
+
+// 删除children长度为0的字段
+function delInvalidMenu(oldMenu) {
+  const temp = oldMenu;
+  for (let i = 0; i < temp.length; i++) {
+    if (temp[i].children.length === 0) {
+      delete temp[i].children;
+    } else {
+      temp[i].children = delInvalidMenu(temp[i].children);
+    }
+  }
+  return temp;
 }

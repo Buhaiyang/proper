@@ -8,5 +8,5 @@ export async function queryCurrent() {
   return request('/api/currentUser');
 }
 export async function queryCurrentMenus() {
-  return request('/api/currentMenus');
+  return request('/api/auth/menus');
 }

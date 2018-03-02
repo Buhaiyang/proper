@@ -1,6 +1,6 @@
-import { query as queryUsers, queryCurrent,queryCurrentMenus } from '../services/user';
-import { getRouterDataFromMenuData, formatter } from '../utils/utils';
-import { dynamicWrapper ,addRoutersData } from "../common/frameHelper"
+import { query as queryUsers, queryCurrent, queryCurrentMenus } from '../services/user';
+import { getRouterDataFromMenuData, formatter, controlMenu } from '../utils/utils';
+import { dynamicWrapper, addRoutersData } from '../common/frameHelper';
 
 export default {
   namespace: 'user',
@@ -8,8 +8,8 @@ export default {
   state: {
     list: [],
     currentUser: {},
-    menus:[],
-    routerData:{}
+    menus: [],
+    routerData: {}
   },
 
   effects: {
@@ -27,16 +27,17 @@ export default {
         payload: response,
       });
     },
-    *fetchMenus({payload}, { call, put }){
+    *fetchMenus(_, { call, put }) {
       const response = yield call(queryCurrentMenus);
-      const menus = formatter(response)
+      const menus = formatter(controlMenu(response));
+
       yield put({
         type: 'saveMenus',
         payload: menus
       });
       yield put({
         type: 'saveRouters',
-        payload: getRouterDataFromMenuData(menus,dynamicWrapper),
+        payload: getRouterDataFromMenuData(menus, dynamicWrapper),
       });
     }
   },
@@ -63,19 +64,19 @@ export default {
         },
       };
     },
-    saveMenus(state, action){
+    saveMenus(state, action) {
       return {
         ...state,
-        menus:action.payload
+        menus: action.payload
       }
     },
-    saveRouters(state, action){
+    saveRouters(state, action) {
       // console.log('bad',action.payload)
       // console.log('ok',getRouterData(getApp()))
       const routerData = addRoutersData(action.payload)
       return {
         ...state,
-        routerData:routerData
+        routerData
       }
     }
   },
