@@ -30,7 +30,6 @@ export default {
     *fetchMenus(_, { call, put }) {
       const response = yield call(queryCurrentMenus);
       const menus = formatter(controlMenu(response));
-
       yield put({
         type: 'saveMenus',
         payload: menus

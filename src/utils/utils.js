@@ -223,7 +223,7 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
       if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
         const path = exchangePath2Router(k);
         routerConfig[`/${k}`] = {
-          component: dynamicWrapper(() => import(`../pages/${path}`))
+          component: dynamicWrapper(()=> import(`../pages/${path}`))
         };
         // if(menu.subRoute && menu.subRoute.length){
         //   menu.subRoute.forEach((sr)=>{
@@ -263,11 +263,10 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
 }
 /* 节流函数 */
 export function throttle(func, context, delay, text, mustApplyTime) {
-  const fn = func;
+  const fn = func
   clearTimeout(fn.timer);
-  fn.cur = Date.now(); // 记录当前时间
-  if (!fn.start) {
-    // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
+  fn.cur = Date.now();// 记录当前时间
+  if (!fn.start) { // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
     fn.start = fn.cur;
   }
   if (fn.cur - fn.start > mustApplyTime) {
@@ -275,7 +274,7 @@ export function throttle(func, context, delay, text, mustApplyTime) {
     fn.call(context, text);
     fn.start = fn.cur;
   } else {
-    fn.timer = setTimeout(() => {
+    fn.timer = setTimeout(()=> {
       fn.call(context, text);
     }, delay);
   }

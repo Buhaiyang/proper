@@ -54,6 +54,21 @@ export default {
         }
       })
     },
+    *fetchAll({ payload, callback }, { call, put}) {
+      // 查询用户所有信息 基本信息、角色信息、用户组信息
+      const userBasicInfo = yield call(queryUsersById, payload);
+      const userRoles = yield call(queryUserRoles, payload);
+      const userGroups = yield call(queryUserGroups, payload);
+      yield put({
+        type: 'saveAll',
+        payload: {
+          userBasicInfo,
+          userGroups,
+          userRoles,
+        }
+      })
+      if (callback) callback()
+    },
     *deleteUsers({payload}, {call, put}) {
       yield call(deleteUsers, payload);
       yield put({
@@ -97,6 +112,14 @@ export default {
         ...state,
         userGroups: payload.userGroups,
         userGroupsAll: payload.userGroupsAll,
+      }
+    },
+    saveAll(state, { payload: {userBasicInfo, userRoles, userGroups} }) {
+      return {
+        ...state,
+        userBasicInfo,
+        userRoles,
+        userGroups
       }
     },
     clear(state) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Icon, message } from 'antd';
 import DocumentTitle from 'react-document-title';
+import { Layout, Icon, message } from 'antd';
 import { connect } from 'dva';
 import { Route, Redirect, Switch, routerRedux } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
@@ -13,14 +13,14 @@ import SiderMenu from '../components/SiderMenu';
 import NotFound from '../pages/Exception/404';
 import { getRoutes } from '../utils/utils';
 import logo from '../assets/logo.svg';
-import {inject} from "../common/inject";
+import {inject} from '../common/inject';
 import styles from './BasicLayout.less'
-const { Content } = Layout;
 
+const { Content } = Layout;
+let redirectData = [];
 /**
  * 根据菜单取得重定向地址.
  */
-const redirectData = [];
 const query = {
   'screen-xs': {
     maxWidth: 575,
@@ -46,23 +46,23 @@ enquireScreen((b) => {
   isMobile = b;
 });
 
-@inject(['user','login'])
+@inject(['user', 'login'])
 @connect(({ user, global, loading }) => ({
   currentUser: user.currentUser,
-  menus:user.menus,
-  routerData:user.routerData,
+  menus: user.menus,
+  routerData: user.routerData,
   collapsed: global.collapsed,
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
 }))
-class BasicLayout extends React.PureComponent {
+export default class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
     breadcrumbNameMap: PropTypes.object,
   }
   state = {
     isMobile,
-    marginLeft:'256px'
+    marginLeft: '256px'
   };
 
   getChildContext() {
@@ -78,10 +78,17 @@ class BasicLayout extends React.PureComponent {
         isMobile: mobile,
       });
     });
+    // 从localStorage里查看是否有token
+    if (!window.localStorage.getItem('proper-auth-login-token')) {
+      this.props.dispatch({
+        type: 'login/logout'
+      })
+      return
+    }
     // 从后台数据库加载菜单并且 按照菜单格式组装路由
     this.props.dispatch({
       type: 'user/fetchMenus',
-      payload:this.props.app
+      payload: this.props.app
     });
     this.props.dispatch({
       type: 'user/fetchCurrent',
@@ -117,7 +124,7 @@ class BasicLayout extends React.PureComponent {
       payload: collapsed,
     });
     this.setState({
-      marginLeft:collapsed?'80px':'256px'
+      marginLeft: collapsed ? '80px' : '256px'
     })
   }
   handleNoticeClear = (type) => {
@@ -146,9 +153,9 @@ class BasicLayout extends React.PureComponent {
     }
   }
   getRedirect = (menus) => {
-    if(redirectData.length > 0){
-      return  redirectData
-    }else{
+    if (redirectData.length > 0) {
+      return redirectData;
+    } else {
       menus.forEach((item)=>{
         if (item && item.children) {
           if (item.children[0] && item.children[0].path) {
@@ -168,16 +175,16 @@ class BasicLayout extends React.PureComponent {
 
   render() {
     const {
-      currentUser, collapsed, fetchingNotices, notices, routerData, match, location,menus
+      currentUser, collapsed, fetchingNotices, notices, routerData, match, location, menus
     } = this.props;
     // console.log('routerData',routerData);
     const bashRedirect = this.getBashRedirect();
-    const redirectData = this.getRedirect(menus);
+    redirectData = this.getRedirect(menus);
     const routes = getRoutes(match.path, routerData);
     // console.log('routes',routes);
     const layout = (
-      <Layout>
-        <div style={{position:'fixed',top:0,left:0}}>
+      <Layout className={styles.placeholder}>
+        <div style={{position: 'fixed', top: 0, left: 0}}>
           <SiderMenu
             logo={logo}
             // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
@@ -191,7 +198,7 @@ class BasicLayout extends React.PureComponent {
             onClick={this.onclick}
           />
         </div>
-        <Layout style={{marginLeft:this.state.marginLeft,transform: 'translate3d(0px, 0px, 0px)',minHeight: '100vh'}}>
+        <Layout style={{marginLeft: this.state.marginLeft, transform: 'translate3d(0px, 0px, 0px)', minHeight: '100vh'}}>
           <GlobalHeader
             logo={logo}
             currentUser={currentUser}
@@ -208,15 +215,18 @@ class BasicLayout extends React.PureComponent {
             <Switch>
               {
                 redirectData.map(item =>
-                  {<Redirect key={item.from} exact from={item.from} to={item.to} />}
+                  <Redirect key={item.from} exact from={item.from} to={item.to} />
                 )
               }
               {
-                routes.map((item) =>
-                {
-                  // console.log(`当前加载 路由:${item.name} - ${item.path}`)
-                  return <Route key={item.key} path={item.path} component={item.component} exact={item.exact}/>
-                }
+                routes.map(item =>
+                  (
+                    <Route
+                        key={item.key}
+                        path={item.path}
+                        component={item.component}
+                        exact={item.exact} />
+                  )
                 )
               }
               {
@@ -263,5 +273,3 @@ class BasicLayout extends React.PureComponent {
     );
   }
 }
-
-export default BasicLayout;

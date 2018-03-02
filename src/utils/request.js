@@ -57,7 +57,11 @@ export default function request(url, options) {
     };
     newOptions.body = JSON.stringify(newOptions.body);
   }
-
+  const { headers } = newOptions;
+  newOptions.headers = {
+    ...headers,
+    token: window.localStorage.getItem('proper-auth-login-token')
+  }
   return fetch(newUrl, newOptions)
     .then(checkStatus)
     .then((response) => {

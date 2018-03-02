@@ -1,4 +1,3 @@
-const common = require('../../common.js');
 let handler = module.exports = {};
 
 handler.onPut = function(req, res, data) {

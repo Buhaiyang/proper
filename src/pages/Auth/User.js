@@ -282,8 +282,7 @@ export default class User extends React.PureComponent {
     modalVisible: false,
     viewModalVisible: false,
     currentTabKey: 'basicUser',
-    selectedRowKeys: [],
-    userInfoView: {}
+    selectedRowKeys: []
   }
   componentDidMount() {
     this.props.dispatch({type: 'authUser/fetch'});
@@ -312,19 +311,29 @@ export default class User extends React.PureComponent {
     });
   }
   onView = (record)=>{
-    const userInfoView = record;
-    const text = userInfoView.enable;
-    userInfoView.enableLabel = text === true ? '已启用' : '已停用';
+    const me = this
+    me.props.dispatch({
+      type: 'authUser/fetchAll',
+      payload: record.id,
+      callback() {
+      }
+    });
     this.setState({
-      userInfoView,
       viewModalVisible: true
     });
   }
   onDelete = (record)=>{
-    this.props.dispatch({
+    const me = this
+    me.props.dispatch({
       type: 'authUser/deleteUsers',
-      payload: {ids: record.id}
-    });
+      payload: {ids: record.id},
+      callback() {
+        me.setState({
+          selectedRowKeys: []
+        });
+        message.success('删除成功');
+      }
+    })
   }
   handleModalVisible = (flag)=>{
     this.setState({
@@ -335,6 +344,9 @@ export default class User extends React.PureComponent {
     this.setState({
       viewModalVisible: flag
     });
+    this.props.dispatch({
+      type: 'authUser/clear'
+    });
   }
   handleTabChange = (activeKey)=>{
     const me = this;
@@ -342,14 +354,14 @@ export default class User extends React.PureComponent {
       currentTabKey: activeKey
     });
     if (activeKey === 'roleUser') {
-      if (this.props.authUser.userRoles.length === 0) {
+      if (this.props.authUser.userRolesAll.length === 0) {
         me.props.dispatch({
           type: 'authUser/fetchUserRoles',
           payload: this.props.authUser.userBasicInfo.id
         });
       }
     } else if (activeKey === 'userGroups') {
-      if (this.props.authUser.userGroups.length === 0) {
+      if (this.props.authUser.userGroupsAll.length === 0) {
         me.props.dispatch({
           type: 'authUser/fetchUserGroups',
           payload: this.props.authUser.userBasicInfo.id
@@ -398,17 +410,23 @@ export default class User extends React.PureComponent {
     });
   }
   batchDelete = ()=>{
+    const me = this;
     Modal.confirm({
       title: '提示',
       content: `确定删除选中的${this.state.selectedRowKeys.length}条数据吗`,
       okText: '确认',
       cancelText: '取消',
       onOk: ()=>{
-        console.log(this.state.selectedRowKeys);
-        this.props.dispatch({
+        me.props.dispatch({
           type: 'authUser/deleteUsers',
-          payload: {ids: this.state.selectedRowKeys.toString()}
-        });
+          payload: {ids: this.state.selectedRowKeys.toString()},
+          callback() {
+            me.setState({
+              selectedRowKeys: []
+            });
+            message.success('删除成功');
+          }
+        })
       }
     });
   }
@@ -431,8 +449,10 @@ export default class User extends React.PureComponent {
     });
   }
   render() {
-    const {authUser: {data: {list, pagination}}, loading,
-      global: {searchOptions, size}} = this.props;
+    const {authUser: {data: {list, pagination},
+      userBasicInfo, userRoles, userRolesAll, userGroups, userGroupsAll},
+    loading,
+    global: {searchOptions, size}} = this.props;
     const column = [
       {title: '用户名', dataIndex: 'username', render: (text, record)=>{
         return <div onClick={()=>this.onView(record)} style={{textDecoration: 'underline', cursor: 'pointer'}}>{text}</div>;
@@ -443,7 +463,7 @@ export default class User extends React.PureComponent {
       {title: '手机号码', dataIndex: 'phone'},
       {title: '状态', dataIndex: 'enable', render: text=>(
           <Fragment>
-            {text === true ? '启用' : '停用'}
+            {text === true ? '已启用' : '已停用'}
           </Fragment>
       )},
       // {title:'是否为超级用户',dataIndex:'superuser',render(text){
@@ -468,6 +488,7 @@ export default class User extends React.PureComponent {
     };
     const rowSelectionCfg = {
       onChange: this.rowSelectionChange,
+      selectedRowKeys: this.state.selectedRowKeys,
       getCheckboxProps: record => ({
         disabled: record.disabled,
       })
@@ -509,13 +530,13 @@ export default class User extends React.PureComponent {
                    currentTabKey={this.state.currentTabKey}
                    handleTabChange={this.handleTabChange}
                    onSubmitForm={this.onSubmitForm}
-                   userBasicInfo={this.props.authUser.userBasicInfo}
-                   userRoles={this.props.authUser.userRoles}
-                   userRolesAll={this.props.authUser.userRolesAll}
-                   userGroups={this.props.authUser.userGroups}
-                   userGroupsAll={this.props.authUser.userGroupsAll}
+                   userBasicInfo={userBasicInfo}
+                   userRoles={userRoles}
+                   userRolesAll={userRolesAll}
+                   userGroups={userGroups}
+                   userGroupsAll={userGroupsAll}
                    clearModalForms={this.clearModalForms}
-                   isCreate={!this.props.authUser.userBasicInfo.id}
+                   isCreate={!userBasicInfo.id}
                    size={size}
                    loading={loading} />
       <Modal
@@ -523,14 +544,29 @@ export default class User extends React.PureComponent {
              destroyOnClose={true}
              footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
              onCancel={()=>this.handleViewModalVisible(false)}>
-        <DescriptionList size="small" col="2">
-          <Description term="用户名">{this.state.userInfoView.username}</Description>
-          <Description term="密码">{this.state.userInfoView.password}</Description>
-          <Description term="显示名">{this.state.userInfoView.name}</Description>
-          <Description term="电子邮箱">{this.state.userInfoView.email}</Description>
-          <Description term="手机号码">{this.state.userInfoView.phone}</Description>
-          <Description term="状态">{this.state.userInfoView.enableLabel}</Description>
-        </DescriptionList>
+        <div>
+          <DescriptionList size={size} col="2" title="基本信息">
+            <Description term="用户名">{userBasicInfo.username}</Description>
+            <Description term="密码">{userBasicInfo.password}</Description>
+            <Description term="显示名">{userBasicInfo.name}</Description>
+            <Description term="电子邮箱">{userBasicInfo.email}</Description>
+            <Description term="手机号码">{userBasicInfo.phone}</Description>
+            <Description term="状态">{userBasicInfo.enable ? '已启用' : '已停用'}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="2" title="角色信息">
+            <Description>{userRoles.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="2" title="用户组信息">
+            <Description>{userGroups.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
+          {loading && (
+            <div className={styles.viewModalLoading}>
+              <Spin />
+            </div>
+          )}
+        </div>
       </Modal>
       </PageHeaderLayout>);
   }

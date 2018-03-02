@@ -1,12 +1,12 @@
 {
   "name": "proper-platform",
-  "version": "0.0.1",
+  "version": "0.3.4",
   "description": "propersoft integration platform",
   "private": true,
   "scripts": {
     "precommit": "npm run lint-staged",
     "start": "cross-env DISABLE_ESLINT=true roadhog dev",
-    "start:no-proxy": "cross-env NO_PROXY=true DISABLE_ESLINT=true roadhog dev",
+    "mock": "node proxy/mock-server.js",
     "build": "cross-env DISABLE_ESLINT=true roadhog build",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "cross-env DISABLE_ESLINT=true ANALYZE=true roadhog build",
