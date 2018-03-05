@@ -474,6 +474,26 @@ export default class Group extends PureComponent {
     });
   }
 
+  onSuggest = (query, matchStr)=>{
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/queryData',
+      payload: matchStr
+    });
+  }
+
+  onSearchResult = (param)=>{
+    const { authGroups: { pagination = {}} } = this.props;
+    this.props.dispatch({
+      type: 'authGroups/fetch',
+      payload: {
+        currentPage: pagination.current,
+        pageSize: pagination.pageSize,
+        extraParams: param,
+      }
+    });
+  }
+
   render() {
     const { authGroups: { groupsData }, loading,
       global: {searchOptions, size} } = this.props;

@@ -5,190 +5,6 @@ module.exports = {
     "userid": "00000001",
     "notifyCount": 12
   },
-  "GET:/currentMenus": [
-    {
-      "name": "dashboard",
-      "icon": "dashboard",
-      "path": "dashboard",
-      "children": [
-        {
-          "name": "分析页",
-          "path": "analysis"
-        },
-        {
-          "name": "监控页",
-          "path": "monitor"
-        },
-        {
-          "name": "工作台",
-          "path": "workplace"
-        }
-      ]
-    },
-    {
-      "name": "表单页",
-      "icon": "form",
-      "path": "forms",
-      "children": [
-        {
-          "name": "基础表单",
-          "path": "basic-form"
-        },
-        {
-          "name": "分步表单",
-          "path": "step-form"
-        },
-        {
-          "name": "高级表单",
-          "path": "advanced-form"
-        }
-      ]
-    },
-    {
-      "name": "列表页",
-      "icon": "table",
-      "path": "list",
-      "children": [
-        {
-          "name": "查询表格",
-          "path": "table-list"
-        },
-        {
-          "name": "标准列表",
-          "path": "basic-list"
-        },
-        {
-          "name": "卡片列表",
-          "path": "card-list"
-        },
-        {
-          "name": "搜索列表",
-          "path": "search-list",
-          "children": [
-            {
-              "name": "搜索列表（文章）",
-              "path": "articles"
-            },
-            {
-              "name": "搜索列表（项目）",
-              "path": "projects"
-            },
-            {
-              "name": "搜索列表（应用）",
-              "path": "applications"
-            }
-          ],
-          "subRoute": true
-        }
-      ]
-    },
-    {
-      "name": "详情页",
-      "icon": "profile",
-      "path": "profile",
-      "children": [
-        {
-          "name": "基础详情页",
-          "path": "basic-profile"
-        },
-        {
-          "name": "高级详情页",
-          "path": "advanced-profile"
-        }
-      ]
-    },
-    {
-      "name": "结果页",
-      "icon": "check-circle-o",
-      "path": "result",
-      "children": [
-        {
-          "name": "成功",
-          "path": "success"
-        },
-        {
-          "name": "失败",
-          "path": "error"
-        }
-      ]
-    },
-    {
-      "name": "异常页",
-      "icon": "warning",
-      "path": "exception",
-      "children": [
-        {
-          "name": "403",
-          "path": "403"
-        },
-        {
-          "name": "404",
-          "path": "404"
-        },
-        {
-          "name": "500",
-          "path": "500"
-        },
-        {
-          "name": "触发异常",
-          "path": "trigger-exception"
-        }
-      ]
-    },
-    {
-      "name": "账户",
-      "icon": "user",
-      "path": "user",
-      "children": [
-        {
-          "name": "登录",
-          "path": "login"
-        },
-        {
-          "name": "注册",
-          "path": "register"
-        },
-        {
-          "name": "注册结果",
-          "path": "register-result"
-        }
-      ]
-    },
-    {
-      "name": "一个例子",
-      "icon": "book",
-      "path": "demo",
-      "children": [
-        {
-          "name": "例子",
-          "path": "demo"
-        }
-      ]
-    },
-    {
-      "name": "高级查询",
-      "icon": "book",
-      "path": "menu"
-    },
-    {
-      "name": "使用文档",
-      "icon": "book",
-      "hideInMenu": true,
-      "path": "http://pro.ant.design/docs/getting-started",
-      "target": "_blank"
-    },
-    {
-      "name": "权限",
-      "icon": "book",
-      "path": "auth",
-      "children": [
-        {
-          "name": "用户",
-          "path": "user"
-        }
-      ]
-    }
-  ],
   "POST:/auth/login": (req, res)=>{
     const { password, userName } = req.body;
     if(password === '888888' && userName === 'admin'){
@@ -615,5 +431,139 @@ module.exports = {
   },
   'DELETE:/auth/users':{
     type:"ok"
-  }
+  },
+  'GET:/auth/user-groups':[
+    {
+      "id": "ggjs",
+      "name": "高管角色",
+      "description": "高管角色用户组",
+      "seq": 1,
+      "enable": true
+    },
+    {
+      "id": "glyjs",
+      "name": "管理员角色",
+      "description": "管理员角色用户组",
+      "seq": 2,
+      "enable": true
+    },
+    {
+      "id": "nqjs",
+      "name": "内勤角色",
+      "description": "内勤角色用户组",
+      "seq": 3,
+      "enable": false
+    },
+    {
+      "id": "oer2",
+      "name": "其他角色",
+      "description": "其他角色用户组",
+      "seq": 4,
+      "enable": false
+    },
+    {
+      "id": "oer1",
+      "name": "其他角色2",
+      "description": "其他角色2用户组",
+      "seq": 5,
+      "enable": false
+    }
+  ],
+  'GET:/auth/user-groups/:id':{
+    "id": "ggjs",
+    "name": "高管角色",
+    "description": "高管角色用户组",
+    "seq": 1,
+    "enable": true
+  },
+  'GET:/auth/user-groups/:id/users':[
+    {
+      "id": "1",
+      "username": "denggy",
+      "pwd": "123456",
+      "name": "邓广义",
+      "email": "denggy@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "2",
+      "username": "cbj",
+      "pwd": "123456",
+      "name": "陈冰洁",
+      "email": "cbj@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "3",
+      "username": "lym",
+      "pwd": "123456",
+      "name": "李一鸣",
+      "email": "lym@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "4",
+      "username": "whp",
+      "pwd": "123456",
+      "name": "王浩鹏",
+      "email": "whp@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "5",
+      "username": "wh",
+      "pwd": "123456",
+      "name": "王贺",
+      "email": "wh@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    }
+  ],
+  'PUT:/auth/user-groups':(req , res)=>{
+    res.send({
+      "id": "ggjs",
+      "name": "高管角色",
+      "description": "高管角色用户组",
+      "seq": 1,
+      "enable": false
+    });
+  },
+  'DELETE:/auth/user-groups':{
+    type:"ok"
+  },
+  'DELETE:/auth/user-groups/:id':{
+    type:"ok"
+  },
+  'PUT:/auth/user-groups/:id':(req , res)=>{
+    res.send({
+      "id": "ggjs",
+      "name": "高管角色",
+      "description": "测试角色用户组",
+      "seq": 1,
+      "enable": false
+    });
+  },
+  'POST:/auth/user-groups':(req , res)=>{
+    res.send({
+      "id": "ceshi",
+      "name": "测试角色",
+      "description": "新的高管角色用户组",
+      "seq": 1,
+      "enable": false
+    })
+  },
 }

@@ -11,7 +11,8 @@ export default {
     groupsMessageData: '',
     groupsBasicInfo: {},
     groupUsers: [],
-    allUsers: []
+    allUsers: [],
+    pagination: {}
   },
 
   effects: {
