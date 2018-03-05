@@ -189,8 +189,19 @@ module.exports = {
       ]
     }
   ],
-  "POST:/auth/login": {
-    "token": "1519877249325"
+  "POST:/auth/login": (req, res)=>{
+    const { password, userName } = req.body;
+    if(password === '888888' && userName === 'admin'){
+      res.send({
+        status: 'ok',
+        token:  +(new Date())
+      });
+    }else {
+      res.send({
+        status: 'error',
+        token: ''
+      });
+    }
   },
   "GET:/auth/menus":[
     {

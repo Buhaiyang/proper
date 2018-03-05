@@ -5,6 +5,7 @@ getMockData((mockData)=> {
 });
 const start = (mockData)=>{
   const server = jsonServer.create()
+  server.use(jsonServer.bodyParser)
 // const router = jsonServer.router('test.json')
 // const middlewares = jsonServer.defaults()
 

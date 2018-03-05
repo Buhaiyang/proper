@@ -1,3 +1,4 @@
+import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
 import { login } from '../services/api';
 
@@ -12,9 +13,14 @@ export default {
     *login({ payload }, { call, put }) {
       const response = yield call(login, payload);
       // Login successfully
-      if (response) {
-        window.localStorage.setItem('proper-auth-login-token', response);
+      if (response.token) {
+        window.localStorage.setItem('proper-auth-login-token', response.token);
         yield put(routerRedux.push('/'));
+      } else {
+        notification.error({
+          message: '登录失败',
+          description: '用户名或者密码错误'
+        })
       }
     },
     *logout(_, { put }) {

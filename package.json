@@ -6,7 +6,7 @@
   "scripts": {
     "precommit": "npm run lint-staged",
     "start": "cross-env DISABLE_ESLINT=true roadhog dev",
-    "mock": "node proxy/mock-server.js",
+    "mock": "node proxy/proxy-server.js",
     "build": "cross-env DISABLE_ESLINT=true roadhog build",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "cross-env DISABLE_ESLINT=true ANALYZE=true roadhog build",
