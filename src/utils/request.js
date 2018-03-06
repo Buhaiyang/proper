@@ -51,7 +51,7 @@ export default function request(url, options) {
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
     newOptions.headers = {
-      Accept: 'application/json',
+      Accept: '*/*',
       'Content-Type': 'application/json; charset=utf-8',
       ...newOptions.headers,
     };
@@ -68,7 +68,13 @@ export default function request(url, options) {
       if (newOptions.method === 'DELETE' || response.status === 204) {
         return response.text();
       }
-      return response.json();
+      if (response.headers.get('content-type').indexOf('text/plain') !== -1) {
+        return response.text();
+      } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
+        return response.json();
+      } else {
+        return response;
+      }
     })
     .catch((e) => {
       const { dispatch } = store;

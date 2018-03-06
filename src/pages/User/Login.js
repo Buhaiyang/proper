@@ -4,7 +4,7 @@ import { Link } from 'dva/router';
 import { Checkbox, Alert, Icon } from 'antd';
 import Login from '../../components/Login';
 import styles from './Login.less';
-import {inject} from "../../common/inject";
+import {inject} from '../../common/inject';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 
@@ -24,13 +24,11 @@ export default class LoginPage extends Component {
   }
 
   handleSubmit = (err, values) => {
-    const { type } = this.state;
     if (!err) {
       this.props.dispatch({
         type: 'login/login',
         payload: {
           ...values,
-          type,
         },
       });
     }
@@ -63,10 +61,10 @@ export default class LoginPage extends Component {
               login.status === 'error' &&
               login.type === 'account' &&
               !login.submitting &&
-              this.renderMessage('账户或密码错误（admin/888888）')
+              this.renderMessage('账户或密码错误（admin/123456')
             }
-            <UserName name="userName" placeholder="admin/user" />
-            <Password name="password" placeholder="888888/123456" />
+            <UserName name="username" placeholder="admin" />
+            <Password name="pwd" placeholder="123456" />
           </Tab>
           <Tab key="mobile" tab="手机号登录">
             {

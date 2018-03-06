@@ -13,8 +13,8 @@ export default {
     *login({ payload }, { call, put }) {
       const response = yield call(login, payload);
       // Login successfully
-      if (response.token) {
-        window.localStorage.setItem('proper-auth-login-token', response.token);
+      if (response) {
+        window.localStorage.setItem('proper-auth-login-token', response);
         yield put(routerRedux.push('/'));
       } else {
         notification.error({

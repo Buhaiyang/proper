@@ -7,11 +7,8 @@ module.exports = {
   },
   "POST:/auth/login": (req, res)=>{
     const { password, userName } = req.body;
-    if(password === '888888' && userName === 'admin'){
-      res.send({
-        status: 'ok',
-        token:  +(new Date())
-      });
+    if(password === '123456' && userName === 'admin'){
+      res.send('husrhtluihetioyhoihl');
     }else {
       res.send({
         status: 'error',
