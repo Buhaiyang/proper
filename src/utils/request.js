@@ -60,7 +60,7 @@ export default function request(url, options) {
   const { headers } = newOptions;
   newOptions.headers = {
     ...headers,
-    token: window.localStorage.getItem('proper-auth-login-token')
+    'X-PEP-TOKEN': window.localStorage.getItem('proper-auth-login-token')
   }
   return fetch(newUrl, newOptions)
     .then(checkStatus)

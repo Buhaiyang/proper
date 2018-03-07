@@ -31,15 +31,24 @@ export default {
       });
       if (callback) callback();
     },
-    *fetchUserGroups({ payload, callback }, { call, put}) {
+    *fetchUserAll({ payload, callback }, { call, put}) {
       // 查找所有的用户和已选中的用户
       const res = yield call(queryUsers, payload);
+      yield put({
+        type: 'saveGroupUserAll',
+        payload: {
+          allUsers: res.data
+        }
+      })
+      if (callback) callback();
+    },
+    *fetchUserGroups({ payload, callback }, { call, put}) {
+      // 查找所有的用户和已选中的用户
       const response = yield call(queryGroupUsers, payload);
       yield put({
         type: 'saveGroupUser',
         payload: {
-          allUsers: res.data,
-          groupUsers: response
+          groupUsers: Array.isArray(response) ? response : [],
         }
       })
       if (callback) callback();
@@ -96,8 +105,13 @@ export default {
     saveGroupUser(state, { payload }) {
       return {
         ...state,
-        allUsers: payload.allUsers,
         groupUsers: payload.groupUsers
+      }
+    },
+    saveGroupUserAll(state, { payload }) {
+      return {
+        ...state,
+        allUsers: payload.allUsers
       }
     },
     clear(state) {

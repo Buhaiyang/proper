@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Card, Button, Table, Switch, Divider, Spin, Transfer,
-  Form, Modal, Input, message, Tabs, Radio, Select, Badge } from 'antd';
+  Form, Modal, Input, message, Tabs, Radio, Select, Badge, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import styles from './Group.less';
 import { inject } from './../../common/inject';
@@ -54,7 +54,10 @@ const BasicInfoForm = Form.create()((props) => {
       >
         {form.getFieldDecorator('seq', {
           initialValue: groupsBasicInfo.seq,
-          rules: [{ required: true, message: '顺序不能为空' }],
+          rules: [
+            { required: true, message: '顺序不能为空' },
+            { pattern: /\d+/i, message: '顺序只能为数字'}
+          ],
         })(
           <Input placeholder="请输入顺序" />
         )}
@@ -88,7 +91,8 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const UserInfoForm = Form.create()((props) => {
-  const { form, groupUsers, allUsers, loading, userTargetKeys, handleUserTrans } = props;
+  // const { form, groupUsers, allUsers, loading, userTargetKeys, handleUserTrans } = props;
+  const { allUsers, userTargetKeys, handleUserTrans } = props;
 
   for (const item of allUsers) {
     item.key = item.id;
@@ -100,7 +104,7 @@ const UserInfoForm = Form.create()((props) => {
 
   return (
     <Form>
-      <FormItem
+      {/* <FormItem
         {...formItemLayout}
         label="用户"
       >
@@ -123,7 +127,7 @@ const UserInfoForm = Form.create()((props) => {
             <Spin size="small" />
           </div>
         )}
-      </FormItem>
+      </FormItem> */}
       <FormItem>
         <Transfer
           dataSource={allUsers}
@@ -271,7 +275,8 @@ export default class Group extends PureComponent {
     currentTabKey: 'basic',
     userTargetKeys: [],
     viewVisible: false,
-    userInfoView: {}
+    userInfoView: {},
+    isCreate: !this.props.authGroups.groupsBasicInfo.id
   };
 
   componentDidMount() {
@@ -316,21 +321,6 @@ export default class Group extends PureComponent {
     });
   }
 
-  // 批量删除弹出框
-  showDeleteAllConfirm = (row) => {
-    Modal.confirm({
-      title: '提示',
-      content: `确定删除选中的${this.state.selectedRowKeys.length}条数据吗?`,
-      okText: '确定',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: () => {
-        this.handleRemoveAll(row);
-      },
-      onCancel() {},
-    });
-  }
-
   // 单个删除
   handleRemove = (row) => {
     this.props.dispatch({
@@ -351,25 +341,10 @@ export default class Group extends PureComponent {
     });
   }
 
-  // 单个删除提示框
-  showDeleteConfirm = (row) => {
-    Modal.confirm({
-      title: '提示',
-      content: '确定删除选中的数据吗?',
-      okText: '确定',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: () => {
-        this.handleRemove(row);
-      },
-      onCancel() {},
-    });
-  }
-
   // 打开新建层
   handleCreate = (flag) => {
     this.setState({
-      modalVisible: flag,
+      modalVisible: flag
     });
   }
 
@@ -379,7 +354,8 @@ export default class Group extends PureComponent {
       this.setState({
         modalVisible: false,
         currentTabKey: 'basic',
-        userTargetKeys: []
+        userTargetKeys: [],
+        isCreate: true
       });
       customForm.resetFields();
       this.props.dispatch({
@@ -391,7 +367,7 @@ export default class Group extends PureComponent {
   // form确认按钮
   handleFormSubmit = (customForm, fields) => {
     const activeKey = this.state.currentTabKey;
-
+    const self = this;
     if (activeKey === 'basic') {
       this.props.dispatch({
         type: 'authGroups/createOrUpdate',
@@ -400,6 +376,9 @@ export default class Group extends PureComponent {
           this.props.dispatch({
             type: 'authGroups/fetch'
           });
+          self.setState({
+            isCreate: false
+          });
         }
       });
     } else if (activeKey === 'user') {
@@ -407,7 +386,6 @@ export default class Group extends PureComponent {
     } else if (activeKey === 'group') {
       // TODO
     }
-    this.closeForm(customForm);
   }
 
   // tab切换
@@ -417,18 +395,27 @@ export default class Group extends PureComponent {
     });
     if (activeKey === 'user') {
       this.props.dispatch({
-        type: 'authGroups/fetchUserGroups',
-        payload: this.props.authGroups.groupsBasicInfo.id,
-        callback: () => {
-          const userKey = [];
-          for (const item of this.props.authGroups.groupUsers) {
-            userKey.push(item.id);
-          }
-          this.setState({
-            userTargetKeys: userKey
-          });
-        }
+        type: 'authGroups/fetchUserAll',
       });
+      if (this.props.authGroups.groupsBasicInfo.id) {
+        this.props.dispatch({
+          type: 'authGroups/fetchUserGroups',
+          payload: this.props.authGroups.groupsBasicInfo.id,
+          callback: () => {
+            const userKey = [];
+            for (const item of this.props.authGroups.groupUsers) {
+              userKey.push(item.id);
+            }
+            this.setState({
+              userTargetKeys: userKey
+            });
+          }
+        });
+      } else {
+        this.setState({
+          userTargetKeys: []
+        });
+      }
     } else if (activeKey === 'group') {
       // todo
     }
@@ -442,7 +429,8 @@ export default class Group extends PureComponent {
       payload: record.id,
       callback() {
         self.setState({
-          modalVisible: true
+          modalVisible: true,
+          isCreate: !record.id
         });
       }
     });
@@ -498,7 +486,7 @@ export default class Group extends PureComponent {
     const { authGroups: { groupsData }, loading,
       global: {searchOptions, size} } = this.props;
     const { modalVisible, selectedRows, selectedRowKeys,
-      currentTabKey, userTargetKeys, viewVisible, userInfoView } = this.state;
+      currentTabKey, userTargetKeys, viewVisible, userInfoView, isCreate } = this.state;
     const rowSelection = {
       onChange: (keys, rows) => {
         this.setState({
@@ -517,7 +505,7 @@ export default class Group extends PureComponent {
       groupAll: this.props.authGroups.groupsData,
       handleTabChange: this.handleTabChange,
       handleUserTrans: this.handleUserTrans,
-      isCreate: !this.props.authGroups.groupsBasicInfo.id,
+      isCreate,
       currentTabKey,
       userTargetKeys
     };
@@ -544,7 +532,9 @@ export default class Group extends PureComponent {
           <span>
             <a onClick={() => this.handleEdit(record)}>编辑</a>
             <Divider type="vertical" />
-            <a onClick={() => this.showDeleteConfirm(record)}>删除</a>
+            {<Popconfirm title="是否要删除此条信息？" onConfirm={() => this.handleRemove(record)}>
+              <a>删除</a>
+            </Popconfirm>}
           </span>
         )
       }
@@ -570,7 +560,9 @@ export default class Group extends PureComponent {
               {
                 selectedRows.length > 0 && (
                   <span>
-                    <Button icon="delete" onClick={() => this.showDeleteAllConfirm(selectedRowKeys)}>批量删除</Button>
+                    {<Popconfirm title={`确定删除选中的${this.state.selectedRowKeys.length}条数据吗?`} onConfirm={() => this.handleRemoveAll(selectedRowKeys)}>
+                      <Button icon="delete">批量删除</Button>
+                    </Popconfirm>}
                   </span>
                 )
               }
