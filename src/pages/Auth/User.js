@@ -281,7 +281,8 @@ export default class User extends React.PureComponent {
     modalVisible: false,
     viewModalVisible: false,
     currentTabKey: 'basicUser',
-    selectedRowKeys: []
+    selectedRowKeys: [],
+    isCreate: !this.props.authUser.userBasicInfo.id
   }
   componentDidMount() {
     this.props.dispatch({type: 'authUser/fetch'});
@@ -304,7 +305,8 @@ export default class User extends React.PureComponent {
       payload: record.id,
       callback() {
         me.setState({
-          modalVisible: true
+          modalVisible: true,
+          isCreate: false
         });
       }
     });
@@ -333,6 +335,12 @@ export default class User extends React.PureComponent {
         message.success('删除成功');
       }
     })
+  }
+  onCreate = ()=>{
+    this.setState({
+      modalVisible: true,
+      isCreate: true
+    });
   }
   handleModalVisible = (flag)=>{
     this.setState({
@@ -377,9 +385,9 @@ export default class User extends React.PureComponent {
       this.props.dispatch({
         type: 'authUser/saveOrUpdateUser',
         payload: data,
-        callback(userBasicInfo) {
+        callback() {
           me.setState({
-            userBasicInfo
+            isCreate: false
           });
           message.success('保存成功');
         }
@@ -505,7 +513,7 @@ export default class User extends React.PureComponent {
       }>
         <Card bordered={false}>
           <div className={styles.toolbar}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.onCreate()}>
               新建
             </Button>
             {this.state.selectedRowKeys.length > 0 && (
@@ -535,7 +543,7 @@ export default class User extends React.PureComponent {
                    userGroups={userGroups}
                    userGroupsAll={userGroupsAll}
                    clearModalForms={this.clearModalForms}
-                   isCreate={!userBasicInfo.id}
+                   isCreate={this.state.isCreate}
                    size={size}
                    loading={loading} />
       <Modal

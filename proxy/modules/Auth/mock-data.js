@@ -395,12 +395,7 @@ module.exports = {
     {"id":"oer1","name":"其他角色2"},
   ],
   'GET:/auth/users/:id/user-groups':[
-    {"id":"ggyh","name":"高管用户"},
-  ],
-  'GET:/auth/user-groups':[
-    {"id":"ggyh","name":"高管用户"},
-    {"id":"nqyh","name":"内勤用户"},
-    {"id":"glyyh","name":"管理员用户"},
+    {"id":"ggjs","name":"高管用户"},
   ],
   'PUT:/auth/users/:id': (req , res)=>{
     res.send({
@@ -432,35 +427,35 @@ module.exports = {
   'GET:/auth/user-groups':[
     {
       "id": "ggjs",
-      "name": "高管角色",
+      "name": "高管用户",
       "description": "高管角色用户组",
       "seq": 1,
       "enable": true
     },
     {
       "id": "glyjs",
-      "name": "管理员角色",
+      "name": "管理员用户",
       "description": "管理员角色用户组",
       "seq": 2,
       "enable": true
     },
     {
       "id": "nqjs",
-      "name": "内勤角色",
+      "name": "内勤用户",
       "description": "内勤角色用户组",
       "seq": 3,
       "enable": false
     },
     {
       "id": "oer2",
-      "name": "其他角色",
+      "name": "其他用户",
       "description": "其他角色用户组",
       "seq": 4,
       "enable": false
     },
     {
       "id": "oer1",
-      "name": "其他角色2",
+      "name": "其他用户2",
       "description": "其他角色2用户组",
       "seq": 5,
       "enable": false

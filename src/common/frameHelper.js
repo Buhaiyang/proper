@@ -1,14 +1,14 @@
 import { createElement } from 'react';
 import dynamic from 'dva/dynamic';
-let _app = null;
-let routerDataCache;
 
+let _app = null;
+// let routerDataCache;
 /**
  * 初始化系统的全局变量包括
  * app routerData 等
  */
-export const initGlobalVars = (app)=>{
-  if(_app === null && app){
+export const initGlobalVars = (app)=> {
+  if (_app === null && app) {
     _app = app
   }
 }
@@ -32,7 +32,7 @@ export const dynamicWrapper = (component) => {
   // }
   // () => import('module')
   return dynamic({
-    app:getApp(),
+    app: getApp(),
     models: () => [],
     // add routerData prop
     component: () => {
@@ -50,27 +50,27 @@ export const dynamicWrapper = (component) => {
   });
 };
 let _routerData = {
-  '/user':{
-    component:dynamicWrapper(()=>import('../layouts/UserLayout'))
+  '/user': {
+    component: dynamicWrapper(()=>import('../layouts/UserLayout'))
   },
-  '/user/login':{
-    component:dynamicWrapper(()=>import('../pages/User/Login'))
+  '/user/login': {
+    component: dynamicWrapper(()=>import('../pages/User/Login'))
   },
-  '/user/register':{
-    component:dynamicWrapper(()=>import('../pages/User/Register'))
+  '/user/register': {
+    component: dynamicWrapper(()=>import('../pages/User/Register'))
   },
-  '/user/register-result':{
-    component:dynamicWrapper(()=>import('../pages/User/RegisterResult'))
+  '/user/register-result': {
+    component: dynamicWrapper(()=>import('../pages/User/RegisterResult'))
   },
-  '/':{
-    component:dynamicWrapper(()=>import('../layouts/BasicLayout'))
+  '/': {
+    component: dynamicWrapper(()=>import('../layouts/BasicLayout'))
   }
 };
 export const getRouterData = ()=> _routerData;
 
-export const addRoutersData = (routerData)=>{
-  if(routerData){
-    _routerData = Object.assign(_routerData,routerData)
+export const addRoutersData = (routerData)=> {
+  if (routerData) {
+    _routerData = Object.assign(_routerData, routerData)
     return _routerData
   }
 }

@@ -69,8 +69,9 @@ export default {
       })
       if (callback) callback()
     },
-    *deleteUsers({payload}, {call, put}) {
+    *deleteUsers({payload, callback}, {call, put}) {
       yield call(deleteUsers, payload);
+      if (callback) callback()
       yield put({
         type: 'fetch'
       })
