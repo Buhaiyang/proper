@@ -1,7 +1,7 @@
-import { queryUserGroups, updateUserGroups, removeAllUserGroups,
+import { queryGroups, updateUserGroups, removeAllUserGroups,
   removeUserGroups, createOrUpdateUserGroups, queryUserGroupsById,
   queryGroupUsers } from '../services/auth/authGroupsS';
-import { queryUsers } from '../services/auth/authUserS';
+import { queryUsers, queryUserGroups } from '../services/auth/authUserS';
 
 export default {
   namespace: 'authGroups',
@@ -12,16 +12,29 @@ export default {
     groupsBasicInfo: {},
     groupUsers: [],
     allUsers: [],
+    userGroups: [],
     pagination: {}
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryUserGroups, payload);
+      // 所有的用户组信息
+      const response = yield call(queryGroups, payload);
       yield put({
         type: 'getUserGroups',
         payload: Array.isArray(response) ? response : [],
       });
+    },
+    *fetchUserGroups({ payload, callback }, { call, put}) {
+      // 查找已选中用户的用户组
+      const response = yield call(queryUserGroups, payload);
+      yield put({
+        type: 'saveUserGroups',
+        payload: {
+          groupUsers: Array.isArray(response) ? response : [],
+        }
+      })
+      if (callback) callback();
     },
     *fetchById({ payload, callback }, { call, put }) {
       const response = yield call(queryUserGroupsById, payload);
@@ -32,7 +45,7 @@ export default {
       if (callback) callback();
     },
     *fetchUserAll({ payload, callback }, { call, put}) {
-      // 查找所有的用户和已选中的用户
+      // 查找所有的用户
       const res = yield call(queryUsers, payload);
       yield put({
         type: 'saveGroupUserAll',
@@ -42,11 +55,11 @@ export default {
       })
       if (callback) callback();
     },
-    *fetchUserGroups({ payload, callback }, { call, put}) {
-      // 查找所有的用户和已选中的用户
+    *fetchGroupUsers({ payload, callback }, { call, put}) {
+      // 查找已选中的用户
       const response = yield call(queryGroupUsers, payload);
       yield put({
-        type: 'saveGroupUser',
+        type: 'saveGroupUsers',
         payload: {
           groupUsers: Array.isArray(response) ? response : [],
         }
@@ -102,10 +115,16 @@ export default {
         groupsMessageData: action.payload
       };
     },
-    saveGroupUser(state, { payload }) {
+    saveGroupUsers(state, { payload }) {
       return {
         ...state,
         groupUsers: payload.groupUsers
+      }
+    },
+    saveUserGroups(state, { payload }) {
+      return {
+        ...state,
+        userGroups: payload.groupUsers
       }
     },
     saveGroupUserAll(state, { payload }) {

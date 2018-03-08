@@ -147,7 +147,7 @@ const UserInfoForm = Form.create()((props) => {
 });
 
 const GroupInfoForm = Form.create()((props) => {
-  const { form, groupAll, loading } = props;
+  const { form, groupAll, userGroups, loading } = props;
 
   return (
     <Form>
@@ -156,7 +156,7 @@ const GroupInfoForm = Form.create()((props) => {
           label="用户组"
       >
         {form.getFieldDecorator('groups', {
-          initialValue: groupAll && groupAll.map(item => item.id),
+          initialValue: userGroups && userGroups.map(item => item.id),
           rules: [{ required: true, message: '用户组不能为空' }],
         })(
           <Select
@@ -179,9 +179,10 @@ const GroupInfoForm = Form.create()((props) => {
   )
 });
 
-const CreateForm = Form.create()((props) => {
-  const { modalVisible, handleFormSubmit, closeForm, groupUsers, allUsers, groupAll, userTargetKeys,
-    isCreate, loading, groupsBasicInfo, currentTabKey, handleTabChange, handleUserTrans } = props;
+const CreateForm = connect()((props) => {
+  const { modalVisible, handleFormSubmit, closeForm, groupUsers,
+    allUsers, groupAll, userGroups, userTargetKeys, isCreate, loading,
+    groupsBasicInfo, currentTabKey, handleTabChange, handleUserTrans } = props;
 
   // 取消
   const handleCancel = () => {
@@ -231,7 +232,7 @@ const CreateForm = Form.create()((props) => {
       disabled: isCreate,
       content: <GroupInfoForm
         ref = {(el) => { this.group = el; }}
-        groupUsers = {groupUsers}
+        userGroups = {userGroups}
         allUsers = {allUsers}
         groupAll = {groupAll}
         loading = {loading}
@@ -276,6 +277,8 @@ export default class Group extends PureComponent {
     userTargetKeys: [],
     viewVisible: false,
     userInfoView: {},
+    groupUsers: [],
+    userGroups: [],
     isCreate: !this.props.authGroups.groupsBasicInfo.id
   };
 
@@ -399,7 +402,7 @@ export default class Group extends PureComponent {
       });
       if (this.props.authGroups.groupsBasicInfo.id) {
         this.props.dispatch({
-          type: 'authGroups/fetchUserGroups',
+          type: 'authGroups/fetchGroupUsers',
           payload: this.props.authGroups.groupsBasicInfo.id,
           callback: () => {
             const userKey = [];
@@ -417,7 +420,15 @@ export default class Group extends PureComponent {
         });
       }
     } else if (activeKey === 'group') {
-      // todo
+      this.props.dispatch({
+        type: 'authGroups/fetchUserGroups',
+        payload: this.props.authGroups.groupsBasicInfo.id,
+        callback: () => {
+          this.setState({
+            userGroups: this.props.authGroups.userGroups
+          });
+        }
+      });
     }
   }
 
@@ -453,6 +464,24 @@ export default class Group extends PureComponent {
       viewVisible: true,
       userInfoView
     });
+    this.props.dispatch({
+      type: 'authGroups/fetchGroupUsers',
+      payload: this.props.authGroups.groupsBasicInfo.id,
+      callback: () => {
+        this.setState({
+          groupUsers: this.props.authGroups.groupUsers
+        });
+      }
+    });
+    this.props.dispatch({
+      type: 'authGroups/fetchUserGroups',
+      payload: this.props.authGroups.groupsBasicInfo.id,
+      callback: () => {
+        this.setState({
+          userGroups: this.props.authGroups.userGroups
+        });
+      }
+    });
   }
 
   // 关闭基本信息
@@ -486,7 +515,8 @@ export default class Group extends PureComponent {
     const { authGroups: { groupsData }, loading,
       global: {searchOptions, size} } = this.props;
     const { modalVisible, selectedRows, selectedRowKeys,
-      currentTabKey, userTargetKeys, viewVisible, userInfoView, isCreate } = this.state;
+      currentTabKey, userTargetKeys, viewVisible, userInfoView,
+      groupUsers, userGroups, isCreate } = this.state;
     const rowSelection = {
       onChange: (keys, rows) => {
         this.setState({
@@ -503,6 +533,7 @@ export default class Group extends PureComponent {
       groupUsers: this.props.authGroups.groupUsers,
       allUsers: this.props.authGroups.allUsers,
       groupAll: this.props.authGroups.groupsData,
+      userGroups: this.props.authGroups.userGroups,
       handleTabChange: this.handleTabChange,
       handleUserTrans: this.handleUserTrans,
       isCreate,
@@ -585,6 +616,8 @@ export default class Group extends PureComponent {
           title="用户组信息"
           visible={viewVisible}
           userInfoView={userInfoView}
+          groupUsers={groupUsers}
+          userGroups={userGroups}
           footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={()=>this.handleViewModalVisible(false)}
         >
@@ -602,6 +635,19 @@ export default class Group extends PureComponent {
               <Badge status={userInfoView.badge} text={userInfoView.enableLabel} />
             </p>
           </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="1" title="包含的用户信息">
+            <Description>{groupUsers.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="1" title="用户组信息">
+            <Description>{userGroups.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
+          {loading && (
+            <div className={styles.viewModalLoading}>
+              <Spin />
+            </div>
+          )}
         </Modal>
       </PageHeaderLayout>
     );

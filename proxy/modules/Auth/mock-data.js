@@ -365,7 +365,27 @@ module.exports = {
       "icon": "",
       "route": "group",
       "sequenceNumber": 2
-    }
+    },
+    {
+      "id": "99011",
+      "name": "流程设置",
+      "leaf": false,
+      "root": true,
+      "icon": "database",
+      "parentId": null,
+      "route": "workflow",
+      "sequenceNumber": 1
+    },
+    {
+      "id": "9901101",
+      "name": "流程设计器",
+      "parentId": "99011",
+      "leaf": true,
+      "root": false,
+      "icon": "",
+      "route": "designer",
+      "sequenceNumber": 2
+    },
   ],
   "GET:/auth/users": {
     "count":100,

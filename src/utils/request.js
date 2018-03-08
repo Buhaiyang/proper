@@ -85,6 +85,9 @@ export default function request(url, options) {
         });
         return;
       }
+      if (status === 409) {
+        return;
+      }
       if (status === 403) {
         dispatch(routerRedux.push('/exception/403'));
         return;

@@ -1,11 +1,12 @@
-import { queryWorkflowList, removeWorkflowList } from '../services/workflow/WorkflowDesignerS';
+import { queryWorkflowList, removeWorkflowList, createWorkflow } from '../services/workflow/WorkflowDesignerS';
 
 export default {
   namespace: 'workflowDesigner',
 
   state: {
     data: {},
-    messageData: ''
+    messageData: null,
+    newId: null
   },
 
   effects: {
@@ -21,6 +22,14 @@ export default {
       const response = yield call(removeWorkflowList, payload);
       yield put({
         type: 'getMessages',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *create({ payload, callback }, { call, put }) {
+      const response = yield call(createWorkflow, payload);
+      yield put({
+        type: 'getCreateId',
         payload: response,
       });
       if (callback) callback();
@@ -43,6 +52,12 @@ export default {
       return {
         ...state,
         messageData: action.payload
+      };
+    },
+    getCreateId(state, action) {
+      return {
+        ...state,
+        newId: action.payload.id
       };
     },
   }

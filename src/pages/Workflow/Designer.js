@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Button, Card, Icon, Badge, List, Tooltip, Checkbox, Dropdown, Menu, Upload, Modal, Popconfirm } from 'antd';
+import { Button, Card, Icon, Badge, List, Tooltip, Checkbox, Dropdown,
+  Menu, Upload, Modal, Popconfirm, Form, Input, message } from 'antd';
 import cookie from 'react-cookies'
 import { inject } from './../../common/inject';
 import styles from './Designer.less';
@@ -8,12 +9,88 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import OSearch from '../../components/Osearch';
 import Ellipsis from '../../components/Ellipsis';
 
+const FormItem = Form.Item;
+const { TextArea } = Input;
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 },
+  },
+};
+
+const CreateForm = Form.create()((props) => {
+  const { form } = props;
+
+  return (
+    <Form>
+      <FormItem
+        {...formItemLayout}
+        label="名称"
+      >
+        {form.getFieldDecorator('name', {
+          rules: [{ required: true, message: '名称不能为空' }],
+        })(
+          <Input placeholder="请输入名称" />
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="关键字"
+      >
+        {form.getFieldDecorator('key', {
+          rules: [
+            { required: true, message: '关键字不能为空' }
+          ],
+        })(
+          <Input placeholder="请输入关键字" />
+        )}
+      </FormItem>
+      <FormItem
+        {...formItemLayout}
+        label="描述"
+      >
+        {form.getFieldDecorator('description', {
+        })(
+          <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
+        )}
+      </FormItem>
+    </Form>
+  )
+});
+
+const CreateModal = connect()((props) => {
+  const { viewVisible, createOk, createCancel } = props;
+  const okHandle = () => {
+    const form = this.CreateForm.getForm();
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      createOk(false, fieldsValue);
+    });
+  };
+  return (
+    <Modal
+      title="新建工作流"
+      visible={viewVisible}
+      onOk={okHandle}
+      onCancel={() => createCancel(false)}
+      destroyOnClose={true}
+    >
+      <CreateForm ref={(el)=>{ this.CreateForm = el; }} />
+    </Modal>
+  );
+});
+
 @inject(['workflowDesigner', 'global'])
 @connect(({ workflowDesigner, global, loading }) => ({
   workflowDesigner,
   global,
   loading: loading.models.workflowDesigner
 }))
+@Form.create()
 export default class Designer extends PureComponent {
   state = {
     buttonSize: 'small',
@@ -93,9 +170,7 @@ export default class Designer extends PureComponent {
       type: 'workflowDesigner/remove',
       payload: id,
       callback: () => {
-        this.props.dispatch({
-          type: 'workflowDesigner/fetch'
-        });
+        this.refresh();
         this.state.deleteLists = this.arrayRemove(this.state.deleteLists, id);
       }
     });
@@ -128,8 +203,8 @@ export default class Designer extends PureComponent {
   }
 
   // 跳转到activiti
-  goActivity = (item) => {
-    window.location = `workflow/index.html#/editor/${item.id}`;
+  goActivity = (id) => {
+    window.location = `workflow/index.html#/editor/${id}`;
   }
 
   // 打开新建窗口
@@ -140,9 +215,21 @@ export default class Designer extends PureComponent {
   }
 
   // 新建确认
-  createOk = (flag) => {
+  createOk = (flag, fields) => {
     this.setState({
       viewVisible: flag,
+    });
+    const params = { ...fields, modelType: 0 };
+    this.props.dispatch({
+      type: 'workflowDesigner/create',
+      payload: params,
+      callback: () => {
+        if (this.props.workflowDesigner.newId == null) {
+          message.error('关键字重复');
+        } else {
+          this.goActivity(this.props.workflowDesigner.newId);
+        }
+      }
     });
   }
 
@@ -151,6 +238,28 @@ export default class Designer extends PureComponent {
     this.setState({
       viewVisible: flag,
     });
+  }
+
+  // 导出
+  exportActivity = (id) => {
+    window.location = `workflow/service/app/rest/models/${id}/bpmn20?version=${Date.now()}`;
+  }
+
+  // 刷新
+  refresh = () => {
+    this.props.dispatch({
+      type: 'workflowDesigner/fetch'
+    });
+  }
+
+  // 导入
+  uploadChange = (info) => {
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} 导入成功`);
+      this.refresh();
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} 导入失败`);
+    }
   }
 
   render() {
@@ -163,6 +272,10 @@ export default class Designer extends PureComponent {
       {key: 'item_2', type: 'right-circle-o', content: '发起'},
       {key: 'item_3', type: 'swap', content: '移动'}
     ];
+
+    const uploadParams = {
+      action: '/workflow/service/app/rest/import-process-model',
+    }
 
     return (
       <PageHeaderLayout content={
@@ -178,7 +291,7 @@ export default class Designer extends PureComponent {
           <Button className={styles.headerButton} icon="plus" type="primary" size={buttonSize} onClick={() => this.create(true)}>
             新建
           </Button>
-          <Upload showUploadList={showUploadList}>
+          <Upload {...uploadParams} showUploadList={showUploadList} onChange={this.uploadChange}>
             <Button className={styles.headerButton} icon="select" type="primary" size={buttonSize}>
               导入
             </Button>
@@ -199,17 +312,21 @@ export default class Designer extends PureComponent {
                   <Card
                     hoverable
                     className={styles.cardContent}
-                    cover={<div style={{background: `url(${item.sourceExtraUrl}) no-repeat 50% 50%`, backgroundSize: 'contain'}} />}
+                    cover={
+                      <div
+                        style={{ background: `url(${item.sourceExtraUrl}) 50% 50% / contain no-repeat` }}
+                      />
+                    }
                     actions={
                       [
                         <Tooltip placement="bottom" title="部署">
                           <Icon type="api" />
                         </Tooltip>,
                         <Tooltip placement="bottom" title="编辑">
-                          <Icon type="edit" onClick={() => this.goActivity(item)} />
+                          <Icon type="edit" onClick={() => this.goActivity(item.id)} />
                         </Tooltip>,
                         <Tooltip placement="bottom" title="导出">
-                          <Icon type="download" />
+                          <Icon type="download" onClick={() => this.exportActivity(item.id)} />
                         </Tooltip>,
                         <Dropdown
                           overlay={
@@ -246,7 +363,7 @@ export default class Designer extends PureComponent {
                           </Ellipsis>
                           <Ellipsis className={styles.item} lines={4}>
                             <Badge
-                              status={ item.status ? (item.status.code === 1 ? 'default' : (item.status.code === 2 ? 'processing' : 'error')) : 'default' }
+                              status={ item.status ? (item.status.code === '1' ? 'default' : (item.status.code === '2' ? 'processing' : 'error')) : 'default' }
                               text={ item.status ? item.status.content : '未部署' }
                               className={styles.status} />
                             部署时间: { item.deploymentTime }
@@ -264,17 +381,11 @@ export default class Designer extends PureComponent {
             />
           </div>
         </div>
-        <Modal
-          title="新建工作流"
-          visible={viewVisible}
-          onOk={() => this.createOk(false)}
-          onCancel={() => this.createCancel(false)}
-          destroyOnClose={true}
-        >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Modal>
+        <CreateModal
+          createOk={this.createOk}
+          createCancel={this.createCancel}
+          viewVisible={viewVisible}
+        />
       </PageHeaderLayout>
     );
   }

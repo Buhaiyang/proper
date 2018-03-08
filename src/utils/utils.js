@@ -282,14 +282,18 @@ export function throttle(func, context, delay, text, mustApplyTime) {
 
 // 处理菜单函数
 export function controlMenu(oldMenu, newMenu = []) {
-  for (let i = 0; i < oldMenu.length; i++) {
-    const item = oldMenu[i];
-    item.path = oldMenu[i].route;
-    if (oldMenu[i].parentId == null) {
-      newMenu.push(oldMenu[i]);
+  if (oldMenu != null) {
+    for (let i = 0; i < oldMenu.length; i++) {
+      const item = oldMenu[i];
+      item.path = oldMenu[i].route;
+      if (oldMenu[i].parentId == null) {
+        newMenu.push(oldMenu[i]);
+      }
     }
+    return delInvalidMenu(culMenu(oldMenu, newMenu));
+  } else {
+    return [];
   }
-  return delInvalidMenu(culMenu(oldMenu, newMenu));
 }
 
 function culMenu(oldMenu, newMenu) {

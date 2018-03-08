@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import request from '../../utils/request';
 
-export async function queryUserGroups(params) {
+export async function queryGroups(params) {
   return request(`/api/auth/user-groups?${stringify(params)}`);
 }
 
