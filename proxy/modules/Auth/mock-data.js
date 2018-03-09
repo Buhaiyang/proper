@@ -6,14 +6,11 @@ module.exports = {
     "notifyCount": 12
   },
   "POST:/auth/login": (req, res)=>{
-    const { password, userName } = req.body;
-    if(password === '123456' && userName === 'admin'){
+    const { pwd, username } = req.body;
+    if(pwd === '123456' && username === 'admin'){
       res.send('husrhtluihetioyhoihl');
     }else {
-      res.send({
-        status: 'error',
-        token: ''
-      });
+      res.send('');
     }
   },
   "GET:/auth/menus":[
@@ -144,6 +141,7 @@ module.exports = {
       "root": false,
       "icon": "",
       "route": "search-list",
+      "subRoute":true,
       "sequenceNumber": 2
     },
     {
@@ -263,7 +261,7 @@ module.exports = {
       "root": true,
       "icon": "user",
       "parentId": null,
-      "route": "user",
+      "route": "base",
       "sequenceNumber": 1
     },
     {
@@ -297,34 +295,32 @@ module.exports = {
       "sequenceNumber": 2
     },
     {
-      "id": "9907",
-      "name": "一个例子",
+      "id": "9908",
+      "name": "详情页",
       "leaf": false,
       "root": true,
-      "icon": "book",
+      "icon": "profile",
       "parentId": null,
-      "route": "demo",
+      "route": "profile",
       "sequenceNumber": 1
     },
     {
-      "id": "990701",
-      "name": "例子",
-      "parentId": "9907",
+      "id": "990801",
+      "name": "基础详情页",
       "leaf": true,
       "root": false,
-      "icon": "",
-      "route": "demo",
-      "sequenceNumber": 2
+      "parentId": "9908",
+      "route": "basic-profile",
+      "sequenceNumber": 1
     },
     {
-      "id": "9908",
-      "name": "高级查询",
-      "leaf": false,
-      "root": true,
-      "icon": "book",
-      "parentId": null,
-      "route": "menu",
-      "sequenceNumber": 1
+      "id": "990802",
+      "name": "高级详情页",
+      "leaf": true,
+      "root": false,
+      "parentId": "9908",
+      "route": "advanced-profile",
+      "sequenceNumber": 2
     },
     {
       "id": "9909",
@@ -333,6 +329,7 @@ module.exports = {
       "root": true,
       "icon": "book",
       "parentId": null,
+      "hideInMenu": true,
       "route": "http://pro.ant.design/docs/getting-started",
       "sequenceNumber": 1
     },

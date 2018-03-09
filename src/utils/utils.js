@@ -188,8 +188,12 @@ function exchangePath2Router(path) {
       result.push(firstUpperCase(item));
     }
   });
-  const routePath = result.join('/');
-  return routePath;
+  // const routePath = result.join('/');
+  const [moduleName, ...pathName] = result;
+  return {
+    moduleName,
+    pathName: pathName.join('/')
+  };
 }
 
 function firstUpperCase(str) {
@@ -221,9 +225,10 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
     for (const k in menuData) {
       const menu = menuData[k];
       if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
-        const path = exchangePath2Router(k);
+        const { moduleName, pathName } = exchangePath2Router(k);
+        // console.log(k, '====>', path)
         routerConfig[`/${k}`] = {
-          component: dynamicWrapper(()=> import(`../pages/${path}`))
+          component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
         };
         // if(menu.subRoute && menu.subRoute.length){
         //   menu.subRoute.forEach((sr)=>{

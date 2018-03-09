@@ -12,7 +12,8 @@ export const inject = (url)=> {
   const loadModel = (dependArr)=> {
     dependArr.forEach((modelUrl)=> {
       if (!registeredModels.some(model => model.namespace === modelUrl)) {
-        app.model(require(`../models/${modelUrl}`).default);
+        const modelName = parseModuleNameByModelUrl(modelUrl);
+        app.model(require(`../modules/${modelName}/models/${modelUrl}`).default);
       }
     })
   }
@@ -20,4 +21,24 @@ export const inject = (url)=> {
     loadModel(arrParam)
   }
 }
-
+// 通过modelUrl解析出modelName
+// 如通过authUser解析出Auth
+const reg = /^[A-Z]+$/;
+const parseModuleNameByModelUrl = (modelUrl) => {
+  let result = ''
+  const arr = [];
+  const letters = modelUrl.split('');
+  for (let i = 0; i < letters.length; i++) {
+    const l = letters[i];
+    if (!reg.test(l)) {
+      arr.push(l)
+    } else {
+      break
+    }
+  }
+  if (arr.length) {
+    arr[0] = arr[0].toUpperCase()
+    result = arr.join('');
+  }
+  return result;
+}

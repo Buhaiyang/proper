@@ -11,13 +11,13 @@ dynamic.setDefaultLoadingComponent(() => {
 });
 function RouterConfig({ history, app }) {
   initGlobalVars(app)
-  const UserLayout = getRouterData()['/user'].component
+  const UserLayout = getRouterData()['/base'].component
   const BasicLayout = getRouterData()['/'].component
   return (
       <LocaleProvider locale={zhCN}>
         <Router history={history}>
           <Switch>
-            <Route path="/user" component={UserLayout} />
+            <Route path="/base" component={UserLayout} />
             <Route path="/" component={BasicLayout} />
             <Redirect to="/" />
           </Switch>

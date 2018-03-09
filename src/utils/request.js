@@ -68,7 +68,7 @@ export default function request(url, options) {
       if (newOptions.method === 'DELETE' || response.status === 204) {
         return response.text();
       }
-      if (response.headers.get('content-type').indexOf('text/plain') !== -1) {
+      if (response.headers.get('content-type').indexOf('text/') !== -1) {
         return response.text();
       } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
         return response.json();

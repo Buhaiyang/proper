@@ -6,7 +6,7 @@ import GlobalFooter from '../components/GlobalFooter';
 import styles from './UserLayout.less';
 import logo from '../assets/logo.svg';
 import { getRoutes } from '../utils/utils';
-import {inject} from "../common/inject";
+import {inject} from '../common/inject';
 
 const links = [{
   key: 'help',
@@ -23,7 +23,7 @@ const links = [{
 }];
 
 const copyright = <div>Copyright <Icon type="copyright" /> 2018 普日软件技术有限公司</div>;
-@inject('login')
+@inject('baseLogin')
 class UserLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
@@ -60,11 +60,10 @@ class UserLayout extends React.PureComponent {
                   />
                 )
               )}
-              <Redirect exact from="/user" to="/user/login" />
+              <Redirect exact from="/base" to="/base/login" />
             </Switch>
             <GlobalFooter links={links} copyright={copyright} />
           </div>
-          {/*<div className={styles.overlay}></div>*/}
         </div>
       </DocumentTitle>
     );

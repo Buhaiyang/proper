@@ -10,7 +10,7 @@ import { enquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
-import NotFound from '../pages/Exception/404';
+import NotFound from '../modules/Base/pages/404';
 import { getRoutes } from '../utils/utils';
 import logo from '../assets/logo.svg';
 import {inject} from '../common/inject';
@@ -46,11 +46,11 @@ enquireScreen((b) => {
   isMobile = b;
 });
 
-@inject(['user', 'login'])
-@connect(({ user, global, loading }) => ({
-  currentUser: user.currentUser,
-  menus: user.menus,
-  routerData: user.routerData,
+@inject(['baseUser', 'baseLogin'])
+@connect(({ baseUser, global, loading }) => ({
+  currentUser: baseUser.currentUser,
+  menus: baseUser.menus,
+  routerData: baseUser.routerData,
   collapsed: global.collapsed,
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
@@ -81,17 +81,17 @@ export default class BasicLayout extends React.PureComponent {
     // 从localStorage里查看是否有token
     if (!window.localStorage.getItem('proper-auth-login-token')) {
       this.props.dispatch({
-        type: 'login/logout'
+        type: 'baseLogin/logout'
       })
       return
     }
     // 从后台数据库加载菜单并且 按照菜单格式组装路由
     this.props.dispatch({
-      type: 'user/fetchMenus',
+      type: 'baseUser/fetchMenus',
       payload: this.props.app
     });
     this.props.dispatch({
-      type: 'user/fetchCurrent',
+      type: 'baseUser/fetchCurrent',
     });
   }
   getPageTitle() {
@@ -141,7 +141,7 @@ export default class BasicLayout extends React.PureComponent {
     }
     if (key === 'logout') {
       this.props.dispatch({
-        type: 'login/logout',
+        type: 'baseLogin/logout',
       });
     }
   }
