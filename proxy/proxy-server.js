@@ -31,7 +31,7 @@ const start = (mockData)=>{
         method = 'get';
       }
       console.log(`register route : ${method.toUpperCase()} /api${route}`)
-      server[method](`/api${route}`, (req, res) => {
+      server[method](`/pep${route}`, (req, res) => {
         const result = data[k];
         if(typeof result ==='object'){
           res.jsonp(result)
@@ -60,7 +60,7 @@ const start = (mockData)=>{
 // server.use(router)
 // server.use('/api', router)
 
-  server.listen(9000, () => {
+  server.listen(8080, () => {
     console.log('JSON Server is running')
   })
 
