@@ -1,4 +1,5 @@
-import { queryWorkflowList, removeWorkflowList, createWorkflow } from '../services/WorkflowDesignerS';
+import { queryWorkflowList, removeWorkflowList, createWorkflow, repositoryWorkflow } from '../services/WorkflowDesignerS';
+import { formatDate } from '../../../utils/utils';
 
 export default {
   namespace: 'workflowDesigner',
@@ -6,7 +7,9 @@ export default {
   state: {
     data: {},
     messageData: null,
-    newId: null
+    newId: null,
+    changeList: [],
+    deployData: {}
   },
 
   effects: {
@@ -34,6 +37,28 @@ export default {
       });
       if (callback) callback();
     },
+    *checkAll({ payload, callback }, { put }) {
+      yield put({
+        type: 'getCheckList',
+        payload
+      });
+      if (callback) callback();
+    },
+    *checkItem({ payload, callback }, { put }) {
+      yield put({
+        type: 'getCheckList',
+        payload
+      });
+      if (callback) callback();
+    },
+    *repository({ payload, callback }, { call, put }) {
+      const response = yield call(repositoryWorkflow, payload);
+      yield put({
+        type: 'getDepoly',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   reducers: {
@@ -42,6 +67,8 @@ export default {
       for (let i = 0; i < lists.data.length; i++) {
         const url = `/workflow/service/app/rest/models/${lists.data[i].id}/thumbnail?version=${Date.now()}`;
         lists.data[i].sourceExtraUrl = `${location.protocol}//${location.host}${url}`;
+        lists.data[i].isChecked = false;
+        lists.data[i].lastUpdated = formatDate(lists.data[i].lastUpdated);
       }
       return {
         ...state,
@@ -58,6 +85,18 @@ export default {
       return {
         ...state,
         newId: action.payload.id
+      };
+    },
+    getCheckList(state, action) {
+      return {
+        ...state,
+        changeList: action.payload
+      };
+    },
+    getDepoly(state, action) {
+      return {
+        ...state,
+        deployData: action.payload
       };
     },
   }

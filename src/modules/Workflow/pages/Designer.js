@@ -93,6 +93,7 @@ const CreateModal = connect()((props) => {
 @Form.create()
 export default class Designer extends PureComponent {
   state = {
+    lists: [],
     buttonSize: 'small',
     showUploadList: false,
     deleteLists: [],
@@ -129,8 +130,49 @@ export default class Designer extends PureComponent {
     });
   }
 
+  // 全选
+  checkAll = () => {
+    if (this.state.lists.length === this.state.deleteLists.length) {
+      for (let i = 0; i < this.state.lists.length; i++) {
+        this.state.lists[i].isChecked = false;
+      }
+      this.state.deleteLists = [];
+    } else {
+      this.state.deleteLists = [];
+      for (let i = 0; i < this.state.lists.length; i++) {
+        this.state.lists[i].isChecked = true;
+        this.state.deleteLists.push(this.state.lists[i].id);
+      }
+    }
+    this.props.dispatch({
+      type: 'workflowDesigner/checkAll',
+      payload: this.state.lists,
+      callback: () => {
+        this.setState({
+          lists: this.props.workflowDesigner.changeList
+        })
+      }
+    });
+  }
+
   checkboxChange = (e, item) => {
     const isChecked = e.target.checked;
+    // 渲染页面使用
+    for (let i = 0; i < this.state.lists.length; i++) {
+      if (this.state.lists[i].id === item.id) {
+        this.state.lists[i].isChecked = isChecked;
+      }
+    }
+    this.props.dispatch({
+      type: 'workflowDesigner/checkItem',
+      payload: this.state.lists,
+      callback: () => {
+        this.setState({
+          lists: this.props.workflowDesigner.changeList
+        })
+      }
+    });
+
     let isInList = false;
 
     let index;
@@ -262,9 +304,38 @@ export default class Designer extends PureComponent {
     }
   }
 
+  // 部署
+  repository = (item) => {
+    this.props.dispatch({
+      type: 'workflowDesigner/repository',
+      payload: item.id,
+      callback: () => {
+        for (let i = 0; i < this.state.lists.length; i++) {
+          if (this.state.lists[i].id === this.props.workflowDesigner.deployData.id) {
+            this.state.lists[i].disposeTime = this.props.workflowDesigner.deployData.deployTime;
+            this.state.lists[i].status.content = '已部署';
+            this.state.lists[i].status.code = '1';
+            this.state.lists[i].version = this.props.workflowDesigner.deployData.version;
+          }
+        }
+        this.props.dispatch({
+          type: 'workflowDesigner/checkItem',
+          payload: this.state.lists,
+          callback: () => {
+            this.setState({
+              lists: this.props.workflowDesigner.changeList
+            })
+          }
+        });
+      }
+    });
+  }
+
   render() {
     const { workflowDesigner: { data }, global: {searchOptions, size}, loading } = this.props;
     const { buttonSize, showUploadList, viewVisible } = this.state;
+
+    this.state.lists = data.data;
 
     const itemMenu = [
       {key: 'item_0', type: 'lock', content: '权限'},
@@ -275,6 +346,7 @@ export default class Designer extends PureComponent {
 
     const uploadParams = {
       action: '/workflow/service/app/rest/import-process-model',
+      accept: 'text/xml',
     }
 
     return (
@@ -296,6 +368,9 @@ export default class Designer extends PureComponent {
               导入
             </Button>
           </Upload>
+          <Button className={styles.headerButton} icon="check-square-o" size={buttonSize} onClick={() => this.checkAll()}>
+            全选
+          </Button>
           {<Popconfirm title="确定删除选中的数据吗?" onConfirm={() => this.deleteAll()}>
             <Button icon="delete" size={buttonSize}>批量删除</Button>
           </Popconfirm>}
@@ -306,7 +381,7 @@ export default class Designer extends PureComponent {
             <List
               loading={loading}
               grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
-              dataSource={data.data}
+              dataSource={this.state.lists}
               renderItem={item => (
                 <List.Item key={item.id} className={styles.contolFontSize}>
                   <Card
@@ -319,14 +394,16 @@ export default class Designer extends PureComponent {
                     }
                     actions={
                       [
-                        <Tooltip placement="bottom" title="部署">
+                        <Tooltip placement="bottom" title="部署" onClick={() => this.repository(item)}>
                           <Icon type="api" />
-                        </Tooltip>,
-                        <Tooltip placement="bottom" title="编辑">
-                          <Icon type="edit" onClick={() => this.goActivity(item.id)} />
                         </Tooltip>,
                         <Tooltip placement="bottom" title="导出">
                           <Icon type="download" onClick={() => this.exportActivity(item.id)} />
+                        </Tooltip>,
+                        <Tooltip placement="bottom" title="删除">
+                          <Popconfirm title="确定删除选中的数据吗" onConfirm={() => this.deleteItem(item.id)}>
+                            <Icon type="delete" />
+                          </Popconfirm>
                         </Tooltip>,
                         <Dropdown
                           overlay={
@@ -338,11 +415,12 @@ export default class Designer extends PureComponent {
                                   </Menu.Item>
                                 ))
                               }
-                              <Menu.Item key="item_4">
-                                <Popconfirm title="确定删除选中的数据吗" onConfirm={() => this.deleteItem(item.id)}>
+                              {/* <Menu.Item key="item_4">
+                                <Popconfirm title="确定删除选中的数据吗"
+                                  onConfirm={() => this.deleteItem(item.id)}>
                                   <a><Icon type="delete" /> 删除</a>
                                 </Popconfirm>
-                              </Menu.Item>
+                              </Menu.Item> */}
                             </Menu>
                           }
                           placement="topCenter">
@@ -355,22 +433,34 @@ export default class Designer extends PureComponent {
                       description={(
                         <div>
                           <Checkbox
+                            checked={item.isChecked}
                             className={styles.checkboxPosition}
                             onChange={value => this.checkboxChange(value, item)}
                           />
                           <Ellipsis className={styles.item} lines={1}>
-                            <a>{item.name}</a>
+                            <Tooltip placement="bottom" title="编辑">
+                              <a onClick={() => this.goActivity(item.id)} style={{textDecoration: 'underline', cursor: 'pointer'}}>
+                                {item.name}
+                              </a>
+                            </Tooltip>
                           </Ellipsis>
                           <Ellipsis className={styles.item} lines={4}>
                             <Badge
-                              status={ item.status ? (item.status.code === '1' ? 'default' : (item.status.code === '2' ? 'processing' : 'error')) : 'default' }
+                              status={ item.status ? (item.status.code === '0' ? 'default' : (item.status.code === '1' ? 'success' : (item.status.code === '2' ? 'processing' : 'error'))) : 'default' }
                               text={ item.status ? item.status.content : '未部署' }
                               className={styles.status} />
-                            部署时间: { item.deploymentTime }
-                            /
-                            最后更新: { item.lastUpdated }
-                            /
-                            创建时间: { item.createTime }
+                            <Ellipsis className={styles.item} lines={1}>
+                              版本号: { item.version }
+                            </Ellipsis>
+                            <Ellipsis className={styles.item} lines={1}>
+                              部署时间: { item.disposeTime }
+                            </Ellipsis>
+                            <Ellipsis className={styles.item} lines={1}>
+                              最后更新: { item.lastUpdated }
+                            </Ellipsis>
+                            <Ellipsis className={styles.item} lines={1}>
+                              创建时间: { item.createTime }
+                            </Ellipsis>
                         </Ellipsis>
                         </div>
                       )}

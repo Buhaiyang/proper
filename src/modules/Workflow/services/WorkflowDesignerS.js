@@ -17,3 +17,9 @@ export async function removeWorkflowList(params) {
     method: 'DELETE'
   });
 }
+
+export async function repositoryWorkflow(params) {
+  return request(`/repository/models/${params}/deployment`, {
+    method: 'POST'
+  });
+}

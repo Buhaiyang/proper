@@ -327,3 +327,10 @@ function delInvalidMenu(oldMenu) {
   }
   return temp;
 }
+
+// 处理workflow的日期格式
+export function formatDate(date) {
+  const str1 = date.substr(0, 10);
+  const str2 = date.substr(11, 8);
+  return `${str1} ${str2}`;
+}
