@@ -1,6 +1,6 @@
 import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
-import { login } from '../services/api';
+import { login } from '../services/base';
 
 export default {
   namespace: 'baseLogin',

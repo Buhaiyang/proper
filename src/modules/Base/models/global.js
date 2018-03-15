@@ -1,4 +1,4 @@
-import { queryNotices, searchData } from '../services/api';
+import { queryNotices, searchData } from '../services/base';
 
 const getWindowSize = ()=>{
   const w = window.innerWidth;
@@ -42,7 +42,7 @@ export default {
       });
       const count = yield select(state => state.global.notices.length);
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'baseUser/changeNotifyCount',
         payload: count,
       });
     },

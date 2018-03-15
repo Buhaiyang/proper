@@ -28,9 +28,9 @@ class UserLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Proper Platform';
+    let title = 'Proper Enterprise App';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - Proper Platform`;
+      title = `${routerData[pathname].name} - Proper Enterprise App`;
     }
     return title;
   }
@@ -44,10 +44,10 @@ class UserLayout extends React.PureComponent {
               <div className={styles.header}>
                 <Link to="/">
                   <img alt="logo" className={styles.logo} src={logo} />
-                  <span className={styles.title}>Proper Platform</span>
+                  <span className={styles.title}>Proper Enterprise App</span>
                 </Link>
               </div>
-              <div className={styles.desc}>Proper Platform 是一体化管理平台</div>
+              <div className={styles.desc}>Proper Enterprise App 是一体化管理平台</div>
             </div>
             <Switch>
               {getRoutes(match.path, routerData).map(item =>

@@ -97,9 +97,9 @@ export default class BasicLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Proper Platform';
+    let title = 'Proper Enterprise App';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - Proper Platform`;
+      title = `${routerData[pathname].name} - Proper Enterprise App`;
     }
     return title;
   }
@@ -114,7 +114,7 @@ export default class BasicLayout extends React.PureComponent {
       urlParams.searchParams.delete('redirect');
       window.history.replaceState(null, 'redirect', urlParams.href);
     } else {
-      return '/dashboard/analysis';
+      return '';
     }
     return redirect;
   }
@@ -230,7 +230,7 @@ export default class BasicLayout extends React.PureComponent {
                 )
               }
               {
-                routes.length && <Redirect exact from="/" to={bashRedirect} />
+                routes.length && bashRedirect && <Redirect exact from="/" to={bashRedirect} />
               }
               {
                 routes.length && <Route render={NotFound} />
