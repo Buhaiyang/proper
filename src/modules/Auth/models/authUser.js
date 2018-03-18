@@ -76,8 +76,12 @@ export default {
         type: 'fetch'
       })
     },
-    *saveOrUpdateUser({payload, callback}, {call}) {
+    *saveOrUpdateUser({payload, callback}, {call, put}) {
       const resp = yield call(saveOrUpdateUser, payload);
+      yield put({
+        type: 'saveUserBasicInfo',
+        payload: resp
+      })
       if (callback) callback(resp)
     },
   },

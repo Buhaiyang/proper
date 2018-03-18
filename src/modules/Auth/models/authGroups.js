@@ -1,6 +1,6 @@
 import { queryGroups, updateUserGroups, removeAllUserGroups,
   removeUserGroups, createOrUpdateUserGroups, queryUserGroupsById,
-  queryGroupUsers } from '../services/authGroupsS';
+  queryGroupUsers, groupAddUsers, groupDeleteUsers } from '../services/authGroupsS';
 import { queryUsers, queryUserGroups } from '../services/authUserS';
 
 export default {
@@ -75,7 +75,10 @@ export default {
       if (callback) callback();
     },
     *removeAll({ payload, callback }, { call, put }) {
-      const response = yield call(removeAllUserGroups, payload);
+      let response = yield call(removeAllUserGroups, payload);
+      if (response === '') {
+        response = '删除成功';
+      }
       yield put({
         type: 'getMessages',
         payload: response,
@@ -83,15 +86,32 @@ export default {
       if (callback) callback();
     },
     *remove({ payload, callback }, { call, put }) {
-      const response = yield call(removeUserGroups, payload);
+      let response = yield call(removeUserGroups, payload);
+      if (response === '') {
+        response = '删除成功';
+      }
       yield put({
         type: 'getMessages',
         payload: response,
       });
       if (callback) callback();
     },
-    *createOrUpdate({ payload, callback }, { call }) {
-      yield call(createOrUpdateUserGroups, payload);
+    *createOrUpdate({ payload, callback }, { call, put }) {
+      const response = yield call(createOrUpdateUserGroups, payload);
+      yield put({
+        type: 'getGroupsBasicInfo',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 用户组添加用户
+    *groupAddUsers({ payload, callback }, { call }) {
+      yield call(groupAddUsers, payload);
+      if (callback) callback();
+    },
+    // 用户组删除用户
+    *groupDeleteUsers({ payload, callback }, { call }) {
+      yield call(groupDeleteUsers, payload);
       if (callback) callback();
     },
   },

@@ -2,7 +2,8 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 export async function queryUsers() {
-  return request('/api/auth/users');
+  const params = {pageNo: '1', pageSize: '10'};
+  return request(`/api/auth/users?${stringify(params)}`);
 }
 export async function queryUsersById(params) {
   return request(`/api/auth/users/${params}`);

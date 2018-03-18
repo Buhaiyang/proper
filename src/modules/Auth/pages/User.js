@@ -133,7 +133,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         label="状态"
       >
         {getFieldDecorator('enable', {
-          initialValue: userBasicInfo.enable || true
+          initialValue: userBasicInfo.enable == null ? true : userBasicInfo.enable
         })(
           <RadioGroup>
             <Radio value={true}>启用</Radio>
@@ -401,6 +401,7 @@ export default class User extends React.PureComponent {
             isCreate: false
           });
           message.success('保存成功');
+          me.props.dispatch({type: 'authUser/fetch'});
         }
       });
     } else if (activeKey === 'roleUser') {
@@ -443,6 +444,7 @@ export default class User extends React.PureComponent {
               selectedRowKeys: []
             });
             message.success('删除成功');
+            me.props.dispatch({type: 'authUser/fetch'});
           }
         })
       }

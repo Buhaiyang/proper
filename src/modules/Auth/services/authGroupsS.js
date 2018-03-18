@@ -41,3 +41,16 @@ export async function queryUserGroupsById(params) {
 export async function queryGroupUsers(params) {
   return request(`/api/auth/user-groups/${params}/users`);
 }
+
+export async function groupAddUsers(params) {
+  return request(`/api/auth/user-groups/${params.id}/user/${params.userId}`, {
+    method: 'POST',
+    body: params,
+  });
+}
+
+export async function groupDeleteUsers(params) {
+  return request(`/api/auth/user-groups/${params.id}/user/${params.userId}`, {
+    method: 'DELETE'
+  });
+}

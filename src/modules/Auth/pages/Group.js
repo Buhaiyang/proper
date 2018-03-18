@@ -91,19 +91,26 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const UserInfoForm = Form.create()((props) => {
-  // const { form, groupUsers, allUsers, loading, userTargetKeys, handleUserTrans } = props;
-  const { allUsers, userTargetKeys, handleUserTrans } = props;
+  // const { form, groupUsers, allUsers, loading, groupsBasicInfo } = props;
+  const { form, allUsers, userTargetKeys, handleUserTrans, groupsBasicInfo } = props;
 
   for (const item of allUsers) {
     item.key = item.id;
   }
 
   const handleChange = (tKeys) => {
-    handleUserTrans(tKeys);
+    handleUserTrans(groupsBasicInfo.id, tKeys);
   }
 
   return (
     <Form>
+      <FormItem>
+        {form.getFieldDecorator('id', {
+          initialValue: groupsBasicInfo.id,
+        })(
+          <Input type="hidden" />
+        )}
+      </FormItem>
       {/* <FormItem
         {...formItemLayout}
         label="用户"
@@ -219,6 +226,7 @@ const CreateForm = connect()((props) => {
       disabled: isCreate,
       content: <UserInfoForm
         ref = {(el) => { this.user = el; }}
+        groupsBasicInfo = {groupsBasicInfo}
         groupUsers = {groupUsers}
         allUsers = {allUsers}
         handleUserTrans = {handleUserTrans}
@@ -385,7 +393,23 @@ export default class Group extends PureComponent {
         }
       });
     } else if (activeKey === 'user') {
-      // TODO
+      for (let j = 0; j < this.state.userTargetKeys.length; j++) {
+        this.props.dispatch({
+          type: 'authGroups/groupAddUsers',
+          payload: {
+            id: fields.id,
+            userId: this.state.userTargetKeys[j]
+          },
+          callback: () => {
+            this.props.dispatch({
+              type: 'authGroups/fetch'
+            });
+            self.setState({
+              isCreate: false
+            });
+          }
+        });
+      }
     } else if (activeKey === 'group') {
       // TODO
     }
@@ -448,7 +472,7 @@ export default class Group extends PureComponent {
   }
 
   // user穿梭框change
-  handleUserTrans = (key) => {
+  handleUserTrans = (groupId, key) => {
     this.setState({
       userTargetKeys: key
     });
@@ -466,7 +490,7 @@ export default class Group extends PureComponent {
     });
     this.props.dispatch({
       type: 'authGroups/fetchGroupUsers',
-      payload: this.props.authGroups.groupsBasicInfo.id,
+      payload: record.id,
       callback: () => {
         this.setState({
           groupUsers: this.props.authGroups.groupUsers
@@ -475,7 +499,7 @@ export default class Group extends PureComponent {
     });
     this.props.dispatch({
       type: 'authGroups/fetchUserGroups',
-      payload: this.props.authGroups.groupsBasicInfo.id,
+      payload: record.id,
       callback: () => {
         this.setState({
           userGroups: this.props.authGroups.userGroups
