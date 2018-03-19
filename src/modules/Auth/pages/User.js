@@ -501,15 +501,21 @@ export default class User extends React.PureComponent {
       //       </div>
       //   }},
       {
-        title: '操作', render: (text, record) => (
-          <Fragment>
-            <a onClick={() => this.onEdit(record)}>编辑</a>
-            <Divider type="vertical" />
-            {<Popconfirm title="是否要删除此行？" onConfirm={() => this.onDelete(record)}>
-              <a>删除</a>
-            </Popconfirm>}
-          </Fragment>
-        )
+        title: '操作', render: (text, record) => {
+          if (record.superuser) {
+            return null;
+          } else {
+            return (
+              <Fragment>
+                <a onClick={() => this.onEdit(record)}>编辑</a>
+                <Divider type="vertical" />
+                {<Popconfirm title="是否要删除此行？" onConfirm={() => this.onDelete(record)}>
+                  <a>删除</a>
+                </Popconfirm>}
+              </Fragment>
+            )
+          }
+        }
       }
     ];
     const paginationProps = {

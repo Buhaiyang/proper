@@ -66,8 +66,8 @@ const BasicInfoForm = Form.create()((props) => {
         {...formItemLayout}
         label="状态"
       >
-        {form.getFieldDecorator('groupEnable', {
-          initialValue: groupsBasicInfo.enable || true
+        {form.getFieldDecorator('enable', {
+          initialValue: groupsBasicInfo.enable == null ? true : groupsBasicInfo.enable
         })(
           <RadioGroup>
             <Radio value={true}>启用</Radio>
@@ -306,7 +306,13 @@ export default class Group extends PureComponent {
       },
       callback: () => {
         this.props.dispatch({
-          type: 'authGroups/fetch'
+          type: 'authGroups/fetch',
+          callback: (res) => {
+            this.props.dispatch({
+              type: 'authGroups/changeStatus',
+              payload: res
+            })
+          }
         });
       }
     });
@@ -385,7 +391,13 @@ export default class Group extends PureComponent {
         payload: fields,
         callback: () => {
           this.props.dispatch({
-            type: 'authGroups/fetch'
+            type: 'authGroups/fetch',
+            callback: (res) => {
+              this.props.dispatch({
+                type: 'authGroups/changeStatus',
+                payload: res
+              })
+            }
           });
           self.setState({
             isCreate: false
@@ -393,23 +405,23 @@ export default class Group extends PureComponent {
         }
       });
     } else if (activeKey === 'user') {
-      for (let j = 0; j < this.state.userTargetKeys.length; j++) {
-        this.props.dispatch({
-          type: 'authGroups/groupAddUsers',
-          payload: {
-            id: fields.id,
-            userId: this.state.userTargetKeys[j]
-          },
-          callback: () => {
-            this.props.dispatch({
-              type: 'authGroups/fetch'
-            });
-            self.setState({
-              isCreate: false
-            });
-          }
-        });
-      }
+      // for (let j = 0; j < this.state.userTargetKeys.length; j++) {
+      //   this.props.dispatch({
+      //     type: 'authGroups/groupAddUsers',
+      //     payload: {
+      //       id: fields.id,
+      //       userId: this.state.userTargetKeys[j]
+      //     },
+      //     callback: () => {
+      //       this.props.dispatch({
+      //         type: 'authGroups/fetch'
+      //       });
+      //       self.setState({
+      //         isCreate: false
+      //       });
+      //     }
+      //   });
+      // }
     } else if (activeKey === 'group') {
       // TODO
     }
@@ -577,7 +589,8 @@ export default class Group extends PureComponent {
       { title: '顺序', dataIndex: 'seq', key: 'seq', },
       { title: '状态', dataIndex: 'enable', key: 'enable', render: (text, record) => (
           <Switch
-            defaultChecked = { text }
+            size="small"
+            checked = { record.enable }
             onChange={(value) => {
               this.handleSwitchOnChange(value, record);
             }} />)},

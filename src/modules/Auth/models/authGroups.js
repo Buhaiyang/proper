@@ -17,13 +17,14 @@ export default {
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
+    *fetch({ payload, callback }, { call, put }) {
       // 所有的用户组信息
       const response = yield call(queryGroups, payload);
       yield put({
         type: 'getUserGroups',
         payload: Array.isArray(response) ? response : [],
       });
+      if (callback) callback(response);
     },
     *fetchUserGroups({ payload, callback }, { call, put}) {
       // 查找已选中用户的用户组
@@ -158,6 +159,12 @@ export default {
         ...state,
         groupsBasicInfo: {},
         groupUser: []
+      }
+    },
+    changeStatus(state, action) {
+      return {
+        ...state,
+        groupsData: action.payload
       }
     }
   },
