@@ -55,7 +55,7 @@ export default class GlobalHeader extends PureComponent {
   render() {
     const {
       currentUser, collapsed, fetchingNotices, isMobile, logo,
-      onNoticeVisibleChange, onMenuClick, onNoticeClear,
+      onNoticeVisibleChange, onMenuClick, onNoticeClear, onMainClick
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
@@ -96,6 +96,9 @@ export default class GlobalHeader extends PureComponent {
               console.log('enter', value); // eslint-disable-line
             }}
           />
+          <div className={styles.action} onClick={onMainClick}>
+            <Icon type="home" />
+          </div>
           <NoticeIcon
             className={styles.action}
             count={currentUser ? currentUser.notifyCount : 0}

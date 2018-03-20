@@ -18,23 +18,5 @@
   },
   "publicPath": "/",
   "disableDynamicImport": false,
-  "hash": true,
-  "proxy": {
-    "/api": {
-      "target": "http://localhost:8080",
-      "pathRewrite": {"^/api" : "/pep"}
-    },
-    "/workflow": {
-      "target": "http://localhost:8080",
-      "pathRewrite": {"^/workflow" : "/pep/workflow"}
-    },
-    "/repository": {
-      "target": "http://localhost:8080",
-      "pathRewrite": {"^/repository" : "/pep/repository"}
-    },
-    "/pep": {
-      "target": "http://localhost:8080",
-      "pathRewrite": {"^/pep/workflow/service" : "/pep/workflow/service"}
-    }
-  }
+  "hash": true
 }

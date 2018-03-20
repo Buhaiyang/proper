@@ -1,9 +1,9 @@
 import React from 'react';
-import { connect } from 'dva';
+import {connect} from 'dva';
 import { Input, Tooltip } from 'antd';
-import {inject} from '../../common/inject';
 import { throttle } from '../../utils/utils';
 import styles from './index.less';
+
 /*  光标向前直到空格之前的字符串 */
 const getCursorBackToWhitespaceValue = (element) =>{
   const { value, selectionStart } = element;
@@ -65,9 +65,10 @@ const getSize = (size)=>{
   }
 }
 const { Search } = Input;
-@inject('global')
-@connect(({global})=>({global}))
-export default class OSearch extends React.Component {
+@connect(({global})=>({
+  global
+}), null, null, {withRef: true})
+export default class OopSearch extends React.Component {
   state={
     showDropMenu: false,
     inputValueArr: [],
@@ -77,13 +78,16 @@ export default class OSearch extends React.Component {
   }
   // 获取下拉菜单
   getSearchOptions = (query)=>{
-    const { dispatch, onSuggest } = this.props;
+    const { dispatch } = this.props;
     const element = this.inputOSearch.input.input;
     const matchStr = getCursorBackToWhitespaceValue(element)
     // input如果有值
     if (query) {
       if (matchStr) {
-        onSuggest && onSuggest(query, matchStr)
+        dispatch({
+          type: 'global/oopSearchSuggest',
+          payload: matchStr
+        });
       } else {
         dispatch({
           type: 'global/saveLogicData'
@@ -97,23 +101,7 @@ export default class OSearch extends React.Component {
   }
   // 根据input框触发最终查询
   handleButtonClick = ()=>{
-    // console.log(value,'search grid')
-    const param = [];
-    this.state.searchOptionsDesc.forEach((sod) => {
-      param.push({
-        key: sod.id,
-        value: sod.label,
-        operate: sod.operate,
-        table: sod.table
-      });
-    });
-    // 默认不 显示 列表
-    console.log(param);
-    if (param.length === 0) {
-      return
-    }
-    const { onSearchResult } = this.props;
-    onSearchResult && onSearchResult(param)
+    this.load()
   }
   // 下拉框点击事件
   handleOptionSelect = (event, option)=>{
@@ -286,8 +274,30 @@ export default class OSearch extends React.Component {
   onMouseOver = (event)=>{
     console.log(event.currentTarget)
   }
+  getCurrentParam = ()=>{
+    const param = [];
+    this.state.searchOptionsDesc.forEach((sod) => {
+      param.push({
+        key: sod.id,
+        value: sod.label,
+        operate: sod.operate,
+        table: sod.table
+      });
+    });
+    return param
+  }
+  load = (param = {})=>{
+    const params = {
+      pageNo: 1,
+      pageSize: 10,
+      ...param,
+      req: JSON.stringify(this.getCurrentParam()),
+      moduleName: 'userRoleConfigTest'
+    }
+    this.props.dispatch({type: 'global/oopSearchResult', payload: params});
+  }
   render() {
-    const {searchOptions, placeholder, enterButtonText, size} = this.props;
+    const {global: {searchOptions, size}, placeholder, enterButtonText} = this.props;
     return (
       <div className={styles.globalSearchWrapper}>
         <div className={styles.searchContainer}>

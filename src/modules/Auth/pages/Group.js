@@ -5,7 +5,7 @@ import { connect } from 'dva';
 import styles from './Group.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Osearch';
+import OSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
 
 const FormItem = Form.Item;

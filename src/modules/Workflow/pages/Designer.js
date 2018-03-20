@@ -6,7 +6,7 @@ import cookie from 'react-cookies'
 import { inject } from './../../../common/inject';
 import styles from './Designer.less';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Osearch';
+import OSearch from '../../../components/Oopsearch';
 import Ellipsis from '../../../components/Ellipsis';
 
 const FormItem = Form.Item;

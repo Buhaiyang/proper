@@ -16,7 +16,7 @@ const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 export default class LoginPage extends Component {
   state = {
     type: 'account',
-    autoLogin: true,
+    autoLogin: true
   }
 
   onTabChange = (type) => {
@@ -58,10 +58,7 @@ export default class LoginPage extends Component {
         >
           <Tab key="account" tab="账户密码登录">
             {
-              baseLogin.status === 'error' &&
-              baseLogin.type === 'account' &&
-              !baseLogin.submitting &&
-              this.renderMessage('账户或密码错误（admin/123456')
+              baseLogin.showError && this.renderMessage('账户或密码错误(admin/123456)')
             }
             <UserName name="username" placeholder="admin" />
             <Password name="pwd" placeholder="123456" />

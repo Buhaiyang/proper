@@ -1,3 +1,4 @@
+import {stringify} from 'qs';
 import request from '../../../utils/request';
 
 export async function query() {
@@ -24,6 +25,12 @@ export async function fakeRegister(params) {
 export async function queryNotices() {
   return request('/api/notices');
 }
-export async function searchData(params) {
-  return request(`/back/demo/search?data=${params}`);
+export async function searchSuggest(params) {
+  return request(`/api/search/inverse?moduleName=userRoleConfigTest&data=${params}`);
+}
+export async function searchResult(params) {
+  return request(`/api/search/query?${stringify(params)}`);
+}
+export async function fakeChartData() {
+  return request('/api/fake_chart_data');
 }

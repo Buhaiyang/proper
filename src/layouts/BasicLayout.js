@@ -114,7 +114,7 @@ export default class BasicLayout extends React.PureComponent {
       urlParams.searchParams.delete('redirect');
       window.history.replaceState(null, 'redirect', urlParams.href);
     } else {
-      return '';
+      return '/main';
     }
     return redirect;
   }
@@ -151,6 +151,9 @@ export default class BasicLayout extends React.PureComponent {
         type: 'global/fetchNotices',
       });
     }
+  }
+  handleMainClick = ()=>{
+    this.props.dispatch(routerRedux.push('/main'));
   }
   getRedirect = (menus) => {
     if (redirectData.length > 0) {
@@ -210,6 +213,7 @@ export default class BasicLayout extends React.PureComponent {
             onCollapse={this.handleMenuCollapse}
             onMenuClick={this.handleMenuClick}
             onNoticeVisibleChange={this.handleNoticeVisibleChange}
+            onMainClick={this.handleMainClick}
           />
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <Switch>

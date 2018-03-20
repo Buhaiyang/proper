@@ -1,4 +1,4 @@
-import { queryNotices, searchData } from '../services/base';
+import { queryNotices, searchSuggest, searchResult } from '../services/base';
 
 const getWindowSize = ()=>{
   const w = window.innerWidth;
@@ -19,6 +19,13 @@ export default {
   state: {
     collapsed: false,
     searchOptions: [],
+    oopSearchGrid: {
+      list: [],
+      pagination: {
+        showSizeChanger: true,
+        showQuickJumper: true,
+      }
+    },
     notices: [],
     size: getWindowSize()
   },
@@ -46,10 +53,17 @@ export default {
         payload: count,
       });
     },
-    *queryData({ payload }, { put, call }) {
-      const res = yield call(searchData, payload);
+    *oopSearchResult({ payload }, { put, call }) {
+      const res = yield call(searchResult, payload);
       yield put({
-        type: 'saveSearchData',
+        type: 'saveOopSearchGrid',
+        payload: res,
+      });
+    },
+    *oopSearchSuggest({ payload }, { put, call }) {
+      const res = yield call(searchSuggest, payload);
+      yield put({
+        type: 'saveSearchOptions',
         payload: {res, matchStr: payload},
       });
     },
@@ -80,27 +94,29 @@ export default {
         ],
       }
     },
-    saveSearchData(state, { payload }) {
+    saveSearchOptions(state, { payload }) {
       const { res, matchStr } = payload;
       const preActiveIndex = payload.preActiveIndex || 0;
       const searchOptions = [];
-      res.forEach((item) => {
-        const text = item.content
-        if (text) {
-          const i = text.indexOf(matchStr);
-          const obj = {
-            id: item.column,
-            label: text,
-            desc: item.desc,
-            table: item.contract_e_cont,
-            operate: item.operate || 'like',
-            preActive: false,
-            matchLabel: i === 0 ? text.substring(0, i + matchStr.length) : '',
-            unMatchLabel: i === 0 ? text.substring(i + matchStr.length, text.length) : text,
+      if (res) {
+        res.forEach((item) => {
+          const text = item.con
+          if (text) {
+            const i = text.indexOf(matchStr);
+            const obj = {
+              id: item.id,
+              label: text,
+              desc: item.des,
+              table: item.tab,
+              operate: item.operate || 'like',
+              preActive: false,
+              matchLabel: i === 0 ? text.substring(0, i + matchStr.length) : '',
+              unMatchLabel: i === 0 ? text.substring(i + matchStr.length, text.length) : text,
+            }
+            searchOptions.push(obj)
           }
-          searchOptions.push(obj)
-        }
-      });
+        })
+      }
       if (searchOptions.length) {
         searchOptions[preActiveIndex].preActive = true
       }
@@ -140,6 +156,14 @@ export default {
         ...state,
         notices: state.notices.filter(item => item.type !== payload),
       };
+    },
+    saveOopSearchGrid(state, { payload }) {
+      return {
+        ...state,
+        oopSearchGrid: {
+          list: payload
+        }
+      }
     },
     resize(state) {
       return {

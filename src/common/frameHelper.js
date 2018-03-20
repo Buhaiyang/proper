@@ -46,7 +46,10 @@ let _routerData = {
   },
   '/': {
     component: dynamicWrapper(()=>import('../layouts/BasicLayout'))
-  }
+  },
+  '/main': {
+    component: dynamicWrapper(()=>import('../modules/Base/pages/Main'))
+  },
 };
 export const getRouterData = ()=> _routerData;
 

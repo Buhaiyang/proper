@@ -410,9 +410,9 @@ module.exports = {
     "superuser": false
   },
   'GET:/auth/users/:id/roles':[
-    {"id":"ggjs","name":"高管角色"},
-    {"id":"nqjs","name":"内勤角色"},
-    {"id":"glyjs","name":"管理员角色"},
+    {"id":"1","name":"普通管理员"},
+    {"id":"2","name":"住院部功能"},
+    {"id":"3","name":"研发部功能"},
   ],
   'GET:/auth/roles':[
     {"id":"ggjs","name":"高管角色"},

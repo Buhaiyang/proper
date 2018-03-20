@@ -1,4 +1,3 @@
-import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
 import { login } from '../services/base';
 
@@ -7,6 +6,7 @@ export default {
 
   state: {
     status: undefined,
+    showError: false
   },
 
   effects: {
@@ -15,12 +15,16 @@ export default {
       // Login successfully
       if (response) {
         window.localStorage.setItem('proper-auth-login-token', response);
-        yield put(routerRedux.push('/'));
+        yield put(routerRedux.push('/main'));
+        yield put({
+          type: 'toggleShowError',
+          payload: false
+        });
       } else {
-        notification.error({
-          message: '登录失败',
-          description: '用户名或者密码错误'
-        })
+        yield put({
+          type: 'toggleShowError',
+          payload: true
+        });
       }
     },
     *logout(_, { put }) {
@@ -37,5 +41,11 @@ export default {
         type: payload.type,
       };
     },
+    toggleShowError(state, { payload }) {
+      return {
+        ...state,
+        showError: payload,
+      };
+    }
   },
 };

@@ -3,7 +3,7 @@ import {connect} from 'dva';
 import {Table, Card, Divider, Popconfirm, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
-import OSearch from '../../../components/Osearch';
+import OopSearch from '../../../components/Oopsearch';
 import {inject} from '../../../common/inject';
 import styles from './User.less';
 
@@ -23,7 +23,7 @@ const formItemLayout = {
   },
 };
 const UserBasicInfoForm = Form.create()((props) => {
-  const {form, userBasicInfo} = props;
+  const {form, userBasicInfo, loading} = props;
   const {getFieldDecorator} = form;
   const handleConfirmBlur = (e) => {
     console.log(e);
@@ -36,112 +36,114 @@ const UserBasicInfoForm = Form.create()((props) => {
     }
   };
   return (
-    <Form>
-      <div>
-        {getFieldDecorator('id', {
-          initialValue: userBasicInfo.id,
-        })(
-          <Input type="hidden" />
-        )}
-      </div>
-      <FormItem
-        {...formItemLayout}
-        label="用户名"
-      >
-        {getFieldDecorator('username', {
-          initialValue: userBasicInfo.username,
-          rules: [{
-            required: true, message: '用户名不能为空',
-          }],
-        })(
-          <Input placeholder="请输入用户名" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="显示名"
-      >
-        {getFieldDecorator('name', {
-          initialValue: userBasicInfo.name,
-          rules: [{
-            required: true, message: '显示名不能为空',
-          }],
-        })(
-          <Input placeholder="请输入显示名" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="密码"
-      >
-        {getFieldDecorator('password', {
-          initialValue: userBasicInfo.password,
-          rules: [{
-            required: true, message: '密码不能为空',
-          }],
-        })(
-          <Input type="password" placeholder="请输入密码" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="确认密码"
-      >
-        {getFieldDecorator('confirm', {
-          initialValue: userBasicInfo.password,
-          rules: [{
-            required: true, message: '请确认密码',
-          }, {
-            validator: checkPassword,
-          }],
-        })(
-          <Input type="password" placeholder="请确认密码" onBlur={handleConfirmBlur} />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="电子邮件"
-      >
-        {getFieldDecorator('email', {
-          initialValue: userBasicInfo.email,
-          rules: [{
-            required: true, message: '电子邮件不能为空',
-          }, {
-            type: 'email', message: '请输入正确的电子邮件',
-          }],
-        })(
-          <Input placeholder="请输入电子邮件" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="手机号码"
-      >
-        {getFieldDecorator('phone', {
-          initialValue: userBasicInfo.phone,
-          rules: [{
-            required: true, message: '手机号码不能为空',
-          }, {
-            pattern: /^(13[0-9]|14[0-9]|15[0-9]|17[0-9]|18[0-9])\d{8}$/i, message: '请输入正确的手机号码',
-          }],
-        })(
-          <Input placeholder="请输入手机号码" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="状态"
-      >
-        {getFieldDecorator('enable', {
-          initialValue: userBasicInfo.enable == null ? true : userBasicInfo.enable
-        })(
-          <RadioGroup>
-            <Radio value={true}>启用</Radio>
-            <Radio value={false}>停用</Radio>
-          </RadioGroup>
-        )}
-      </FormItem>
-    </Form>);
+    <Spin spinning={loading}>
+      <Form>
+        <div>
+          {getFieldDecorator('id', {
+            initialValue: userBasicInfo.id,
+          })(
+            <Input type="hidden" />
+          )}
+        </div>
+        <FormItem
+          {...formItemLayout}
+          label="用户名"
+        >
+          {getFieldDecorator('username', {
+            initialValue: userBasicInfo.username,
+            rules: [{
+              required: true, message: '用户名不能为空',
+            }],
+          })(
+            <Input placeholder="请输入用户名" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="显示名"
+        >
+          {getFieldDecorator('name', {
+            initialValue: userBasicInfo.name,
+            rules: [{
+              required: true, message: '显示名不能为空',
+            }],
+          })(
+            <Input placeholder="请输入显示名" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="密码"
+        >
+          {getFieldDecorator('password', {
+            initialValue: userBasicInfo.password,
+            rules: [{
+              required: true, message: '密码不能为空',
+            }],
+          })(
+            <Input type="password" placeholder="请输入密码" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="确认密码"
+        >
+          {getFieldDecorator('confirm', {
+            initialValue: userBasicInfo.password,
+            rules: [{
+              required: true, message: '请确认密码',
+            }, {
+              validator: checkPassword,
+            }],
+          })(
+            <Input type="password" placeholder="请确认密码" onBlur={handleConfirmBlur} />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="电子邮件"
+        >
+          {getFieldDecorator('email', {
+            initialValue: userBasicInfo.email,
+            rules: [{
+              required: true, message: '电子邮件不能为空',
+            }, {
+              type: 'email', message: '请输入正确的电子邮件',
+            }],
+          })(
+            <Input placeholder="请输入电子邮件" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="手机号码"
+        >
+          {getFieldDecorator('phone', {
+            initialValue: userBasicInfo.phone,
+            rules: [{
+              required: true, message: '手机号码不能为空',
+            }, {
+              pattern: /^(13[0-9]|14[0-9]|15[0-9]|17[0-9]|18[0-9])\d{8}$/i, message: '请输入正确的手机号码',
+            }],
+          })(
+            <Input placeholder="请输入手机号码" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="状态"
+        >
+          {getFieldDecorator('enable', {
+            initialValue: userBasicInfo.enable || true
+          })(
+            <RadioGroup>
+              <Radio value={true}>启用</Radio>
+              <Radio value={false}>停用</Radio>
+            </RadioGroup>
+          )}
+        </FormItem>
+      </Form>
+    </Spin>);
 });
 const RoleInfoForm = Form.create()((props) => {
   const {form, userRoles, userRolesAll, loading} = props;
@@ -242,7 +244,8 @@ const ModalForm = connect()((props) => {
       ref={(el) => {
         this.basicUser = el;
       }}
-      userBasicInfo={userBasicInfo} />
+      userBasicInfo={userBasicInfo}
+      loading={loading} />
   }, {
     key: 'roleUser',
     tab: '角色信息',
@@ -283,7 +286,8 @@ const ModalForm = connect()((props) => {
 @connect(({authUser, global, loading}) => ({
   authUser,
   global,
-  loading: loading.models.authUser
+  loading: loading.models.authUser,
+  gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class User extends React.PureComponent {
   state = {
@@ -295,31 +299,23 @@ export default class User extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type: 'authUser/fetch'});
+    this.oopSearch.load()
   }
-
   onChange = (pagination, filters, sorter) => {
     console.log(pagination, sorter);
-    this.props.dispatch({
-      type: 'authUser/fetch',
-      payload: {
-        currentPage: pagination.current,
-        pageSize: pagination.pageSize,
-        extraParams: pagination.extraParams,
-      }
-    });
+    this.oopSearch.load({
+      pageNo: pagination.current,
+      pageSize: pagination.pageSize,
+    })
   }
   onEdit = (record) => {
-    const me = this;
-    me.props.dispatch({
+    this.setState({
+      modalVisible: true,
+      isCreate: false
+    });
+    this.props.dispatch({
       type: 'authUser/fetchById',
-      payload: record.id,
-      callback() {
-        me.setState({
-          modalVisible: true,
-          isCreate: false
-        });
-      }
+      payload: record.id
     });
   }
   onView = (record) => {
@@ -450,33 +446,15 @@ export default class User extends React.PureComponent {
       }
     });
   }
-  onSearchResult = (param) => {
-    const {authUser: {data: {pagination = {}}}} = this.props;
-    this.props.dispatch({
-      type: 'authUser/fetch',
-      payload: {
-        currentPage: pagination.current,
-        pageSize: pagination.pageSize,
-        extraParams: param,
-      }
-    });
-  }
-  onSuggest = (query, matchStr) => {
-    const {dispatch} = this.props;
-    dispatch({
-      type: 'global/queryData',
-      payload: matchStr
-    });
-  }
-
   render() {
     const {
       authUser: {
-        data: {list, pagination},
+        // data: {list, pagination},
         userBasicInfo, userRoles, userRolesAll, userGroups, userGroupsAll
       },
       loading,
-      global: {searchOptions, size}
+      gridLoading,
+      global: { size, oopSearchGrid: {list, pagination}}
     } = this.props;
     const column = [
       {
@@ -518,11 +496,13 @@ export default class User extends React.PureComponent {
         }
       }
     ];
-    const paginationProps = {
-      showSizeChanger: true,
-      showQuickJumper: true,
-      ...pagination
-    };
+    // const column = [
+    //   {title: 'name0', dataIndex: 'name0'},
+    //   {title: 'name1', dataIndex: 'name1'},
+    //   {title: 'phone0', dataIndex: 'phone0'},
+    //   {title: 'description0', dataIndex: 'description0'},
+    //   {title: 'username0', dataIndex: 'username0'},
+    // ]
     const rowSelectionCfg = {
       onChange: this.rowSelectionChange,
       selectedRowKeys: this.state.selectedRowKeys,
@@ -532,13 +512,10 @@ export default class User extends React.PureComponent {
     };
     return (
       <PageHeaderLayout content={
-        <OSearch
-          searchOptions={searchOptions}
+        <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          size={size}
-          onSuggest={this.onSuggest}
-          onSearchResult={this.onSearchResult}
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
@@ -557,8 +534,8 @@ export default class User extends React.PureComponent {
             rowKey={record => record.id}
             rowSelection={rowSelectionCfg}
             columns={column}
-            loading={loading}
-            pagination={paginationProps}
+            loading={gridLoading}
+            pagination={pagination}
             onChange={this.onChange}
             size={size} />
         </Card>
@@ -575,13 +552,13 @@ export default class User extends React.PureComponent {
           clearModalForms={this.clearModalForms}
           isCreate={this.state.isCreate}
           size={size}
-          loading={loading} />
+          loading={!!loading} />
         <Modal
           visible={this.state.viewModalVisible}
           destroyOnClose={true}
           footer={<Button type="primary" onClick={() => this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={() => this.handleViewModalVisible(false)}>
-          <div>
+          <Spin spinning={loading}>
             <DescriptionList size={size} col="2" title="基本信息">
               <Description term="用户名">{userBasicInfo.username}</Description>
               <Description term="密码">{userBasicInfo.password}</Description>
@@ -598,12 +575,7 @@ export default class User extends React.PureComponent {
             <DescriptionList size={size} col="2" title="用户组信息">
               <Description>{userGroups.map(item => item.name.concat(', '))}</Description>
             </DescriptionList>
-            {loading && (
-              <div className={styles.viewModalLoading}>
-                <Spin />
-              </div>
-            )}
-          </div>
+          </Spin>
         </Modal>
       </PageHeaderLayout>);
   }

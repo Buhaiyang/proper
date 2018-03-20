@@ -1,13 +1,11 @@
 import React, { PureComponent } from 'react';
 import { Card, Button, Table, Switch, Divider, Modal, Spin, Badge,
   Form, message, Popconfirm } from 'antd';
-// import { Card, Button, Table, Switch, Divider, Spin, Transfer,
-//   Form, Modal, Input, message, Tabs, Radio, Select, Badge, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import styles from './Role.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Osearch';
+import OSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
 
 const { Description } = DescriptionList;
