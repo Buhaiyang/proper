@@ -355,6 +355,16 @@ module.exports = {
     },
     {
       "id": "9901002",
+      "name": "角色权限",
+      "parentId": "99010",
+      "leaf": true,
+      "root": false,
+      "icon": "",
+      "route": "role",
+      "sequenceNumber": 2
+    },
+    {
+      "id": "9901003",
       "name": "用户组权限",
       "parentId": "99010",
       "leaf": true,
@@ -575,4 +585,109 @@ module.exports = {
       "enable": false
     })
   },
+  'GET:/auth/roles':[
+    {
+      "id": "1",
+      "name": "普通管理员",
+      "description": "普通权限管理员",
+      "enable": true,
+      "parentId": "1",
+      "parentName": "普通权限"
+    },
+    {
+      "id": "2",
+      "name": "住院部功能",
+      "description": "住院部所有功能",
+      "enable": false,
+      "parentId": "1",
+      "parentName": "XX医院功能"
+    },
+    {
+      "id": "3",
+      "name": "研发部功能",
+      "description": "研发部所有功能",
+      "enable": true,
+      "parentId": "1",
+      "parentName": "普日基本权限功能"
+    },
+    {
+      "id": "4",
+      "name": "开发部功能",
+      "description": "开发部所有功能",
+      "enable": false,
+      "parentId": "1",
+      "parentName": "普日基本权限功能"
+    },
+  ],
+  'DELETE:/auth/roles':{
+    type:"ok"
+  },
+  'GET:/auth/roles/:id':{
+    "id": "1",
+    "name": "普通管理员",
+    "description": "显示角色信息，普通权限管理员",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "普通权限"
+  },
+  'GET:/auth/roles/:id/users':[
+    {
+      "id": "1",
+      "username": "denggy",
+      "pwd": "123456",
+      "name": "邓广义",
+      "email": "denggy@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "2",
+      "username": "cbj",
+      "pwd": "123456",
+      "name": "陈冰洁",
+      "email": "cbj@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "3",
+      "username": "lym",
+      "pwd": "123456",
+      "name": "李一鸣",
+      "email": "lym@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "4",
+      "username": "whp",
+      "pwd": "123456",
+      "name": "王浩鹏",
+      "email": "whp@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    },
+    {
+      "id": "5",
+      "username": "wh",
+      "pwd": "123456",
+      "name": "王贺",
+      "email": "wh@test.com",
+      "phone": "13012345678",
+      "enable": true,
+      "superuser": false,
+      "pepDtype": "pepDtype"
+    }
+  ],
+  'GET:/auth/roles/:id/user-groups':[
+    {"id":"ggjs","name":"高管用户"},
+  ],
 }
