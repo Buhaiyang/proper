@@ -42,9 +42,15 @@ function checkStatus(response) {
  * @param  {string} url       The URL we want to request
  * @param  {object} [options] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
+ * @desc 如果url以"$"开头，那么在发送请求前此url不会被加前缀（主要为开发调用调试接口考虑。）
  */
 export default function request(url, options) {
-  const newUrl = `${prefix}${url}`;
+  let newUrl = '';
+  if (url.indexOf('$') === 0) {
+    newUrl = url.replace('$', '')
+  } else {
+    newUrl = `${prefix}${url}`;
+  }
   const defaultOptions = {
     credentials: 'include',
   };

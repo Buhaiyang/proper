@@ -1,9 +1,10 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import {Table, Card, Divider, Popconfirm, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
+import { Card, Divider, Popconfirm, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/Oopsearch';
+import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';
 import styles from './User.less';
 
@@ -296,27 +297,11 @@ export default class User extends React.PureComponent {
     modalVisible: false,
     viewModalVisible: false,
     currentTabKey: 'basicUser',
-    selectedRowKeys: [],
     isCreate: !this.props.authUser.userBasicInfo.id
   }
 
   componentDidMount() {
-    this.refresh();
-  }
-
-  refresh() {
-    this.oopSearch.load({
-      moduleName: 'authUser'
-    });
-  }
-
-  onChange = (pagination, filters, sorter) => {
-    console.log(pagination, sorter);
-    this.oopSearch.load({
-      pageNo: pagination.current,
-      pageSize: pagination.pageSize,
-      moduleName: 'authUser'
-    })
+    this.onLoad()
   }
   onEdit = (record) => {
     this.setState({
@@ -407,7 +392,7 @@ export default class User extends React.PureComponent {
             isCreate: false
           });
           message.success('保存成功');
-          me.refresh();
+          me.onLoad();
         }
       });
     } else if (activeKey === 'roleUser') {
@@ -429,32 +414,28 @@ export default class User extends React.PureComponent {
       });
     }, 300);
   }
-  rowSelectionChange = (selectedRowKeys) => {
-    this.setState({
-      selectedRowKeys
-    });
-  }
-  batchDelete = () => {
+  batchDelete = (items) => {
     const me = this;
     Modal.confirm({
       title: '提示',
-      content: `确定删除选中的${this.state.selectedRowKeys.length}条数据吗`,
+      content: `确定删除选中的${items.length}条数据吗`,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
         me.props.dispatch({
           type: 'authUser/deleteUsers',
-          payload: {ids: this.state.selectedRowKeys.toString()},
+          payload: {ids: items.toString()},
           callback() {
-            me.setState({
-              selectedRowKeys: []
-            });
+            me.oopTable.clearSelection()
             message.success('删除成功');
-            me.refresh();
+            me.onLoad()
           }
         })
       }
     });
+  }
+  onLoad = (param)=> {
+    this.oopSearch.load(param)
   }
   userAddDel = (value, typeAdd, typeDel, typeRoles) => {
     const userIds = [];
@@ -517,12 +498,11 @@ export default class User extends React.PureComponent {
   render() {
     const {
       authUser: {
-        // data: {list, pagination},
         userBasicInfo, userRoles, userRolesAll, userGroups, userGroupsAll
       },
       loading,
       gridLoading,
-      global: { size, oopSearchGrid: {list, pagination}}
+      global: { size, oopSearchGrid }
     } = this.props;
     const column = [
       {
@@ -564,48 +544,47 @@ export default class User extends React.PureComponent {
         }
       }
     ];
-    // const column = [
-    //   {title: 'name0', dataIndex: 'name0'},
-    //   {title: 'name1', dataIndex: 'name1'},
-    //   {title: 'phone0', dataIndex: 'phone0'},
-    //   {title: 'description0', dataIndex: 'description0'},
-    //   {title: 'username0', dataIndex: 'username0'},
-    // ]
-    const rowSelectionCfg = {
-      onChange: this.rowSelectionChange,
-      selectedRowKeys: this.state.selectedRowKeys,
-      getCheckboxProps: record => ({
-        disabled: record.disabled,
-      })
-    };
+    const topButtons = [
+      {
+        text: '新建',
+        name: 'create',
+        type: 'primary',
+        icon: 'plus',
+        onClick: ()=>{ this.onCreate() }
+      },
+      {
+        text: '删除',
+        name: 'delete',
+        icon: 'delete',
+        onClick: (items)=>{ this.batchDelete(items) },
+        display: items=>(items.length),
+      }
+      // {
+      //   text: '按钮3',
+      // },
+      // {
+      //   text: '按钮4',
+      // }
+    ];
     return (
       <PageHeaderLayout content={
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
+          moduleName="$auth$users"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
-          <div className={styles.toolbar}>
-            <Button icon="plus" type="primary" onClick={() => this.onCreate()}>
-              新建
-            </Button>
-            {this.state.selectedRowKeys.length > 0 && (
-              <Button icon="delete" type="" onClick={() => this.batchDelete()}>
-                删除
-              </Button>
-            )}
-          </div>
-          <Table
-            dataSource={list}
-            rowKey={record => record.id}
-            rowSelection={rowSelectionCfg}
+          <OopTable
+            grid={oopSearchGrid}
             columns={column}
             loading={gridLoading}
-            pagination={pagination}
-            onChange={this.onChange}
-            size={size} />
+            onLoad={this.onLoad}
+            size={size}
+            topButtons={topButtons}
+            ref={(el)=>{ this.oopTable = el }}
+          />
         </Card>
         <ModalForm
           visible={this.state.modalVisible}

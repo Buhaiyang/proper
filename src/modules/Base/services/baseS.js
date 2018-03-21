@@ -2,35 +2,35 @@ import {stringify} from 'qs';
 import request from '../../../utils/request';
 
 export async function query() {
-  return request('/api/users');
+  return request('/users');
 }
 export async function queryCurrent() {
-  return request('/api/auth/login/user');
+  return request('/auth/login/user');
 }
 export async function queryCurrentMenus() {
-  return request('/api/auth/menus');
+  return request('/auth/menus');
 }
 export async function login(params) {
-  return request('/api/auth/login', {
+  return request('/auth/login', {
     method: 'POST',
     body: params,
   });
 }
 export async function fakeRegister(params) {
-  return request('/api/register', {
+  return request('/register', {
     method: 'POST',
     body: params,
   });
 }
 export async function queryNotices() {
-  return request('/api/notices');
+  return request('/notices');
 }
 export async function searchSuggest(params) {
-  return request(`/api/search/inverse?moduleName=userRoleConfigTest&data=${params}`);
+  return request(`/search/inverse?${stringify(params)}`);
 }
 export async function searchResult(params) {
-  return request(`/api/search/query?${stringify(params)}`);
+  return request(`/search/query?${stringify(params)}`);
 }
 export async function fakeChartData() {
-  return request('/api/fake_chart_data');
+  return request('/fake_chart_data');
 }

@@ -2,55 +2,55 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 export async function queryGroups(params) {
-  return request(`/api/auth/user-groups?${stringify(params)}`);
+  return request(`/auth/user-groups?${stringify(params)}`);
 }
 
 export async function updateUserGroups(params) {
-  return request('/api/auth/user-groups', {
+  return request('/auth/user-groups', {
     method: 'PUT',
     body: params,
   });
 }
 
 export async function removeAllUserGroups(params) {
-  return request(`/api/auth/user-groups?${stringify(params)}`, {
+  return request(`/auth/user-groups?${stringify(params)}`, {
     method: 'DELETE'
   });
 }
 
 export async function removeUserGroups(params) {
-  return request(`/api/auth/user-groups/${params.ids}`, {
+  return request(`/auth/user-groups/${params.ids}`, {
     method: 'DELETE'
   });
 }
 
 export async function createOrUpdateUserGroups(params) {
-  return params.id ? request(`/api/auth/user-groups/${params.id}`, {
+  return params.id ? request(`/auth/user-groups/${params.id}`, {
     method: 'PUT',
     body: params,
-  }) : request('/api/auth/user-groups', {
+  }) : request('/auth/user-groups', {
     method: 'POST',
     body: params,
   });
 }
 
 export async function queryUserGroupsById(params) {
-  return request(`/api/auth/user-groups/${params}`);
+  return request(`/auth/user-groups/${params}`);
 }
 
 export async function queryGroupUsers(params) {
-  return request(`/api/auth/user-groups/${params}/users`);
+  return request(`/auth/user-groups/${params}/users`);
 }
 
 export async function groupAddUsers(params) {
-  return request(`/api/auth/user-groups/${params.id}/users`, {
+  return request(`/auth/user-groups/${params.id}/users`, {
     method: 'PUT',
     body: params,
   });
 }
 
 export async function groupDeleteUsers(params) {
-  return request(`/api/auth/user-groups/${params.id}/users`, {
+  return request(`/auth/user-groups/${params.id}/users`, {
     method: 'DELETE',
     body: params,
   });

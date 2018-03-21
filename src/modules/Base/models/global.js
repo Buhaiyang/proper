@@ -1,4 +1,4 @@
-import { queryNotices, searchSuggest, searchResult } from '../services/base';
+import { queryNotices, searchSuggest, searchResult } from '../services/baseS';
 
 const getWindowSize = ()=>{
   const w = window.innerWidth;
@@ -24,6 +24,7 @@ export default {
       pagination: {
         showSizeChanger: true,
         showQuickJumper: true,
+        total: 0
       }
     },
     notices: [],
@@ -105,6 +106,7 @@ export default {
             const i = text.indexOf(matchStr);
             const obj = {
               id: item.id,
+              col: item.col,
               label: text,
               desc: item.des,
               table: item.tab,
@@ -161,8 +163,25 @@ export default {
       return {
         ...state,
         oopSearchGrid: {
-          list: payload.data
+          list: payload.data,
+          pagination: {
+            ...state.oopSearchGrid.pagination,
+            total: payload.total
+          }
         }
+      }
+    },
+    clearOopSearchGrid(state) {
+      return {
+        ...state,
+        oopSearchGrid: {
+          list: [],
+          pagination: {
+            showSizeChanger: true,
+            showQuickJumper: true,
+            total: 0
+          }
+        },
       }
     },
     resize(state) {

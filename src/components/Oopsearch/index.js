@@ -76,9 +76,14 @@ export default class OopSearch extends React.Component {
     inputValue: '',
     defaultValue: ''
   }
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'global/clearOopSearchGrid'
+    })
+  }
   // 获取下拉菜单
   getSearchOptions = (query)=>{
-    const { dispatch } = this.props;
+    const { dispatch, moduleName } = this.props;
     const element = this.inputOSearch.input.input;
     const matchStr = getCursorBackToWhitespaceValue(element)
     // input如果有值
@@ -86,7 +91,10 @@ export default class OopSearch extends React.Component {
       if (matchStr) {
         dispatch({
           type: 'global/oopSearchSuggest',
-          payload: matchStr
+          payload: {
+            data: matchStr,
+            moduleName
+          }
         });
       } else {
         dispatch({
@@ -132,6 +140,7 @@ export default class OopSearch extends React.Component {
     if (inputValueArr.length === searchOptionsDesc.length) {
       searchOptionsDesc[i] = {
         id: option.id,
+        col: option.col,
         label: optionLabel,
         text: desc || '',
         width: `${calculateLetterWidth(optionLabel, '16px')}px`,
@@ -141,6 +150,7 @@ export default class OopSearch extends React.Component {
     } else {
       searchOptionsDesc.push({
         id: option.id,
+        col: option.col,
         label: optionLabel,
         text: desc || '',
         width: `${calculateLetterWidth(optionLabel, '16px')}px`,
@@ -278,7 +288,7 @@ export default class OopSearch extends React.Component {
     const param = [];
     this.state.searchOptionsDesc.forEach((sod) => {
       param.push({
-        key: sod.id,
+        key: sod.col,
         value: sod.label,
         operate: sod.operate,
         table: sod.table
@@ -287,14 +297,15 @@ export default class OopSearch extends React.Component {
     return param
   }
   load = (param = {})=>{
+    const { dispatch, moduleName } = this.props;
     const params = {
       pageNo: 1,
       pageSize: 10,
-      moduleName: 'userRoleConfigTest',
       ...param,
       req: JSON.stringify(this.getCurrentParam()),
+      moduleName
     }
-    this.props.dispatch({type: 'global/oopSearchResult', payload: params});
+    dispatch({type: 'global/oopSearchResult', payload: params});
   }
   render() {
     const {global: {searchOptions, size}, placeholder, enterButtonText} = this.props;

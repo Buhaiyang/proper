@@ -1,5 +1,5 @@
 import { routerRedux } from 'dva/router';
-import { login } from '../services/base';
+import { login } from '../services/baseS';
 
 export default {
   namespace: 'baseLogin',

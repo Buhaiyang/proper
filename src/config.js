@@ -1,2 +1,2 @@
-const prefix = '';
+const prefix = '/api';
 export default prefix;

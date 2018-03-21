@@ -14,7 +14,8 @@ const { Description } = DescriptionList;
 @connect(({ authRole, global, loading }) => ({
   authRole,
   global,
-  loading: loading.models.authRole
+  loading: loading.models.authRole,
+  gridLoading: loading.effects['global/oopSearchResult']
 }))
 @Form.create()
 export default class Role extends PureComponent {
@@ -41,16 +42,13 @@ export default class Role extends PureComponent {
     console.log(pagination, sorter);
     this.oopSearch.load({
       pageNo: pagination.current,
-      pageSize: pagination.pageSize,
-      moduleName: 'authRole'
+      pageSize: pagination.pageSize
     })
   }
 
   // 刷新角色列表
   refresh = () => {
-    this.oopSearch.load({
-      moduleName: 'authRole'
-    });
+    this.oopSearch.load();
   }
 
   // 关闭基本信息
@@ -116,10 +114,11 @@ export default class Role extends PureComponent {
       }
     });
   }
-
+  handleEdit = ()=>{
+  }
   render() {
     const { loading,
-      global: { size, oopSearchGrid: {list, pagination}} } = this.props;
+      global: { size, oopSearchGrid: {list, pagination}}, gridLoading } = this.props;
 
     const { selectedRows, selectedRowKeys, viewVisible, roleInfo,
       roleUsers, roleGroups } = this.state;
@@ -170,6 +169,7 @@ export default class Role extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
+          moduleName="$auth$roles"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
@@ -192,7 +192,7 @@ export default class Role extends PureComponent {
               }
             </div>
             <Table
-              loading= {loading}
+              loading= {gridLoading}
               rowSelection={rowSelection}
               dataSource={list}
               columns={columns}

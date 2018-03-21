@@ -2109,22 +2109,20 @@ const workflowDesigner = {
   ]
 }
 
-function queryList(type, pageNo) {
+function queryList(type) {
   let list = {};
-  if (type === 'authUser') {
+  if (type === '$auth$users') {
     list = authUser;
-  } else if (type === 'authGroup') {
+  } else if (type === '$auth$groups') {
     list = authGroup;
-  } else if (type === 'authRole') {
+  } else if (type === '$auth$roles') {
     list = authRole;
-  } else if (type === 'workflowDesigner') {
-    list = workflowDesigner;
   }
   return list;
 }
 
 function getQueryList(req, res) {
-  const result = queryList(url.parse(req.url, true).query.moduleName, url.parse(req.url, true).query.pageNo);
+  const result = queryList(url.parse(req.url, true).query.moduleName);
 
   if (res && res.json) {
     res.json(result);

@@ -71,12 +71,9 @@ export default {
       })
       if (callback) callback()
     },
-    *deleteUsers({payload, callback}, {call, put}) {
+    *deleteUsers({payload, callback}, {call}) {
       yield call(deleteUsers, payload);
       if (callback) callback()
-      yield put({
-        type: 'fetch'
-      })
     },
     *saveOrUpdateUser({payload, callback}, {call, put}) {
       const resp = yield call(saveOrUpdateUser, payload);

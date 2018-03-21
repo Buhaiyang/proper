@@ -84,8 +84,9 @@ const CreateModal = connect()((props) => {
 });
 
 @inject(['workflowDesigner'])
-@connect(({ workflowDesigner, loading }) => ({
+@connect(({ workflowDesigner, global, loading }) => ({
   workflowDesigner,
+  global,
   loading: loading.models.workflowDesigner
 }))
 @Form.create()
@@ -325,9 +326,8 @@ export default class Designer extends PureComponent {
   }
 
   render() {
-    const { workflowDesigner: { data }, loading } = this.props;
+    const { workflowDesigner: { data }, loading, global: {size} } = this.props;
     const { buttonSize, showUploadList, viewVisible } = this.state;
-
     this.state.lists = data.data;
 
     const itemMenu = [
@@ -345,7 +345,7 @@ export default class Designer extends PureComponent {
     return (
       <PageHeaderLayout content={
         <div>
-          <Input.Search style={{marginBottom: '16px'}} onSearch={value => this.handleSearch(value)} enterButton="搜索" size="small" />
+          <Input.Search style={{marginBottom: '16px'}} onSearch={value => this.handleSearch(value)} enterButton="搜索" size={size} />
           <Button className={styles.headerButton} icon="plus" type="primary" size={buttonSize} onClick={() => this.create(true)}>
             新建
           </Button>

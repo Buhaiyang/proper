@@ -1,4 +1,4 @@
-import { fakeRegister } from '../services/base';
+import { fakeRegister } from '../services/baseS';
 
 export default {
   namespace: 'baseRegister',

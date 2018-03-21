@@ -1,4 +1,4 @@
-import { query as queryUsers, queryCurrent, queryCurrentMenus } from '../services/base';
+import { query as queryUsers, queryCurrent, queryCurrentMenus } from '../services/baseS';
 import { getRouterDataFromMenuData, formatter, controlMenu } from '../../../utils/utils';
 import { dynamicWrapper, addRoutersData } from '../../../common/frameHelper';
 

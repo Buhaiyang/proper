@@ -248,7 +248,8 @@ const CreateForm = connect()((props) => {
 @connect(({ authGroups, global, loading }) => ({
   authGroups,
   global,
-  loading: loading.models.authGroups
+  loading: loading.models.authGroups,
+  gridLoading: loading.effects['global/oopSearchResult']
 }))
 @Form.create()
 export default class Group extends PureComponent {
@@ -270,17 +271,14 @@ export default class Group extends PureComponent {
   }
 
   refresh() {
-    this.oopSearch.load({
-      moduleName: 'authGroup'
-    });
+    this.oopSearch.load();
   }
 
   onChange = (pagination, filters, sorter) => {
     console.log(pagination, sorter);
     this.oopSearch.load({
       pageNo: pagination.current,
-      pageSize: pagination.pageSize,
-      moduleName: 'authGroup'
+      pageSize: pagination.pageSize
     })
   }
 
@@ -352,14 +350,16 @@ export default class Group extends PureComponent {
 
   // 关闭form
   closeForm = (customForm) => {
+    this.setState({
+      modalVisible: false
+    });
     setTimeout(() => {
+      customForm.resetFields();
       this.setState({
-        modalVisible: false,
         currentTabKey: 'basic',
         userTargetKeys: [],
         isCreate: true
       });
-      customForm.resetFields();
       this.props.dispatch({
         type: 'authGroups/clear'
       });
@@ -556,7 +556,7 @@ export default class Group extends PureComponent {
   }
 
   render() {
-    const { loading, global: { size, oopSearchGrid: {list, pagination}} } = this.props;
+    const { loading, global: { size, oopSearchGrid: {list, pagination}}, gridLoading } = this.props;
     const { modalVisible, selectedRows, selectedRowKeys,
       currentTabKey, userTargetKeys, viewVisible, userInfoView,
       groupUsers, userGroups, isCreate } = this.state;
@@ -619,6 +619,7 @@ export default class Group extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
+          moduleName="$auth$groups"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
@@ -639,7 +640,7 @@ export default class Group extends PureComponent {
               }
             </div>
             <Table
-              loading= {loading}
+              loading= {gridLoading}
               rowSelection={rowSelection}
               dataSource={list}
               columns={columns}
