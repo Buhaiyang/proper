@@ -1,18 +1,18 @@
 import React, { PureComponent } from 'react';
 import { Card, Button, Table, Switch, Divider, Spin, Transfer,
-  Form, Modal, Input, message, Tabs, Radio, Select, Badge, Popconfirm } from 'antd';
+  Form, Modal, Input, message, Tabs, Radio, Badge, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import styles from './Group.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Oopsearch';
+import OopSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
-const { Option } = Select;
+// const { Option } = Select;
 const { Description } = DescriptionList;
 const formItemLayout = {
   labelCol: {
@@ -91,7 +91,6 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const UserInfoForm = Form.create()((props) => {
-  // const { form, groupUsers, allUsers, loading, groupsBasicInfo } = props;
   const { form, allUsers, userTargetKeys, handleUserTrans, groupsBasicInfo } = props;
 
   for (const item of allUsers) {
@@ -111,30 +110,6 @@ const UserInfoForm = Form.create()((props) => {
           <Input type="hidden" />
         )}
       </FormItem>
-      {/* <FormItem
-        {...formItemLayout}
-        label="用户"
-      >
-        {form.getFieldDecorator('users', {
-          initialValue: groupUsers && groupUsers.map(item => item.id),
-          rules: [{ required: true, message: '用户不能为空' }],
-        })(
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="请选择用户 "
-          >
-            {allUsers.length ? allUsers.map(item=>
-              <Option key={item.id}>{item.name}</Option>
-              ) : allUsers}
-          </Select>
-        )}
-        {loading && (
-          <div className={styles.selectLoading}>
-            <Spin size="small" />
-          </div>
-        )}
-      </FormItem> */}
       <FormItem>
         <Transfer
           dataSource={allUsers}
@@ -153,42 +128,42 @@ const UserInfoForm = Form.create()((props) => {
   )
 });
 
-const GroupInfoForm = Form.create()((props) => {
-  const { form, groupAll, userGroups, loading } = props;
+// const GroupInfoForm = Form.create()((props) => {
+//   const { form, groupAll, userGroups, loading } = props;
 
-  return (
-    <Form>
-      <FormItem
-        {...formItemLayout}
-        label="用户组"
-      >
-        {form.getFieldDecorator('groups', {
-          initialValue: userGroups && userGroups.map(item => item.id),
-          rules: [{ required: true, message: '用户组不能为空' }],
-        })(
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="请选择用户组 "
-          >
-            {groupAll.length ? groupAll.map(item=>
-              <Option key={item.id}>{item.name}</Option>
-            ) : groupAll}
-          </Select>
-        )}
-        {loading && (
-          <div className={styles.selectLoading}>
-            <Spin size="small" />
-          </div>
-        )}
-      </FormItem>
-    </Form>
-  )
-});
+//   return (
+//     <Form>
+//       <FormItem
+//         {...formItemLayout}
+//         label="用户组"
+//       >
+//         {form.getFieldDecorator('groups', {
+//           initialValue: userGroups && userGroups.map(item => item.id),
+//           rules: [{ required: true, message: '用户组不能为空' }],
+//         })(
+//           <Select
+//             mode="multiple"
+//             style={{ width: '100%' }}
+//             placeholder="请选择用户组 "
+//           >
+//             {groupAll.length ? groupAll.map(item=>
+//               <Option key={item.id}>{item.name}</Option>
+//             ) : groupAll}
+//           </Select>
+//         )}
+//         {loading && (
+//           <div className={styles.selectLoading}>
+//             <Spin size="small" />
+//           </div>
+//         )}
+//       </FormItem>
+//     </Form>
+//   )
+// });
 
 const CreateForm = connect()((props) => {
   const { modalVisible, handleFormSubmit, closeForm, groupUsers,
-    allUsers, groupAll, userGroups, userTargetKeys, isCreate, loading,
+    allUsers, userTargetKeys, isCreate, loading,
     groupsBasicInfo, currentTabKey, handleTabChange, handleUserTrans } = props;
 
   // 取消
@@ -234,18 +209,18 @@ const CreateForm = connect()((props) => {
         loading = {loading}
       />
     },
-    {
-      key: 'group',
-      tab: '用户组信息',
-      disabled: isCreate,
-      content: <GroupInfoForm
-        ref = {(el) => { this.group = el; }}
-        userGroups = {userGroups}
-        allUsers = {allUsers}
-        groupAll = {groupAll}
-        loading = {loading}
-      />
-    }
+    // {
+    //   key: 'group',
+    //   tab: '用户组信息',
+    //   disabled: isCreate,
+    //   content: <GroupInfoForm
+    //     ref = {(el) => { this.group = el; }}
+    //     userGroups = {userGroups}
+    //     allUsers = {allUsers}
+    //     groupAll = {groupAll}
+    //     loading = {loading}
+    //   />
+    // }
   ];
 
   return (
@@ -291,9 +266,22 @@ export default class Group extends PureComponent {
   };
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'authGroups/fetch'
+    this.refresh();
+  }
+
+  refresh() {
+    this.oopSearch.load({
+      moduleName: 'authGroup'
     });
+  }
+
+  onChange = (pagination, filters, sorter) => {
+    console.log(pagination, sorter);
+    this.oopSearch.load({
+      pageNo: pagination.current,
+      pageSize: pagination.pageSize,
+      moduleName: 'authGroup'
+    })
   }
 
   // 状态切换
@@ -305,15 +293,16 @@ export default class Group extends PureComponent {
         ids: [record.id]
       },
       callback: () => {
-        this.props.dispatch({
-          type: 'authGroups/fetch',
-          callback: (res) => {
-            this.props.dispatch({
-              type: 'authGroups/changeStatus',
-              payload: res
-            })
-          }
-        });
+        this.refresh();
+        // this.props.dispatch({
+        //   type: 'authGroups/fetch',
+        //   callback: (res) => {
+        //     this.props.dispatch({
+        //       type: 'authGroups/changeStatus',
+        //       payload: res
+        //     })
+        //   }
+        // });
       }
     });
   }
@@ -326,9 +315,7 @@ export default class Group extends PureComponent {
         ids: selectedRowKeys.toString()
       },
       callback: () => {
-        this.props.dispatch({
-          type: 'authGroups/fetch'
-        });
+        this.refresh();
         message.success(this.props.authGroups.groupsMessageData);
         this.setState({
           selectedRows: [],
@@ -346,9 +333,7 @@ export default class Group extends PureComponent {
         ids: row.id
       },
       callback: () => {
-        this.props.dispatch({
-          type: 'authGroups/fetch'
-        });
+        this.refresh();
         message.success(this.props.authGroups.groupsMessageData);
         this.setState({
           selectedRows: [],
@@ -390,15 +375,16 @@ export default class Group extends PureComponent {
         type: 'authGroups/createOrUpdate',
         payload: fields,
         callback: () => {
-          this.props.dispatch({
-            type: 'authGroups/fetch',
-            callback: (res) => {
-              this.props.dispatch({
-                type: 'authGroups/changeStatus',
-                payload: res
-              })
-            }
-          });
+          this.refresh();
+          // this.props.dispatch({
+          //   type: 'authGroups/fetch',
+          //   callback: (res) => {
+          //     this.props.dispatch({
+          //       type: 'authGroups/changeStatus',
+          //       payload: res
+          //     })
+          //   }
+          // });
           self.setState({
             isCreate: false
           });
@@ -422,7 +408,7 @@ export default class Group extends PureComponent {
       //     }
       //   });
       // }
-    } else if (activeKey === 'group') {
+    // } else if (activeKey === 'group') {
       // TODO
     }
   }
@@ -455,16 +441,16 @@ export default class Group extends PureComponent {
           userTargetKeys: []
         });
       }
-    } else if (activeKey === 'group') {
-      this.props.dispatch({
-        type: 'authGroups/fetchUserGroups',
-        payload: this.props.authGroups.groupsBasicInfo.id,
-        callback: () => {
-          this.setState({
-            userGroups: this.props.authGroups.userGroups
-          });
-        }
-      });
+    // } else if (activeKey === 'group') {
+    //   this.props.dispatch({
+    //     type: 'authGroups/fetchUserGroups',
+    //     payload: this.props.authGroups.groupsBasicInfo.id,
+    //     callback: () => {
+    //       this.setState({
+    //         userGroups: this.props.authGroups.userGroups
+    //       });
+    //     }
+    //   });
     }
   }
 
@@ -485,9 +471,51 @@ export default class Group extends PureComponent {
 
   // user穿梭框change
   handleUserTrans = (groupId, key) => {
-    this.setState({
-      userTargetKeys: key
-    });
+    const userKey = [];
+    for (const item of this.props.authGroups.groupUsers) {
+      userKey.push(item.id);
+    }
+    const data = [];
+    if (key.length > userKey.length) {
+      for (let i = 0; i < key.length; i++) {
+        if (userKey.indexOf(key[i]) === -1) {
+          data.push(key[i]);
+        }
+      }
+      this.props.dispatch({
+        type: 'authGroups/groupAddUsers',
+        payload: {
+          id: groupId,
+          ids: data.toString()
+        },
+        callback: () => {
+          this.props.dispatch({
+            type: 'authGroups/fetchGroupUsers',
+            payload: groupId
+          })
+        }
+      });
+    }
+    if (key.length < userKey.length) {
+      for (let i = 0; i < userKey.length; i++) {
+        if (key.indexOf(userKey[i]) === -1) {
+          data.push(userKey[i]);
+        }
+      }
+      this.props.dispatch({
+        type: 'authGroups/groupDeleteUsers',
+        payload: {
+          id: groupId,
+          ids: data.toString()
+        },
+        callback: () => {
+          this.props.dispatch({
+            type: 'authGroups/fetchGroupUsers',
+            payload: groupId
+          })
+        }
+      });
+    }
   }
 
   // 查看基本信息
@@ -509,15 +537,15 @@ export default class Group extends PureComponent {
         });
       }
     });
-    this.props.dispatch({
-      type: 'authGroups/fetchUserGroups',
-      payload: record.id,
-      callback: () => {
-        this.setState({
-          userGroups: this.props.authGroups.userGroups
-        });
-      }
-    });
+    // this.props.dispatch({
+    //   type: 'authGroups/fetchUserGroups',
+    //   payload: record.id,
+    //   callback: () => {
+    //     this.setState({
+    //       userGroups: this.props.authGroups.userGroups
+    //     });
+    //   }
+    // });
   }
 
   // 关闭基本信息
@@ -527,29 +555,8 @@ export default class Group extends PureComponent {
     });
   }
 
-  onSuggest = (query, matchStr)=>{
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/queryData',
-      payload: matchStr
-    });
-  }
-
-  onSearchResult = (param)=>{
-    const { authGroups: { pagination = {}} } = this.props;
-    this.props.dispatch({
-      type: 'authGroups/fetch',
-      payload: {
-        currentPage: pagination.current,
-        pageSize: pagination.pageSize,
-        extraParams: param,
-      }
-    });
-  }
-
   render() {
-    const { authGroups: { groupsData }, loading,
-      global: {searchOptions, size} } = this.props;
+    const { loading, global: { size, oopSearchGrid: {list, pagination}} } = this.props;
     const { modalVisible, selectedRows, selectedRowKeys,
       currentTabKey, userTargetKeys, viewVisible, userInfoView,
       groupUsers, userGroups, isCreate } = this.state;
@@ -609,13 +616,10 @@ export default class Group extends PureComponent {
 
     return (
       <PageHeaderLayout content={
-        <OSearch
-          searchOptions={searchOptions}
+        <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          size={size}
-          onSuggest={this.onSuggest}
-          onSearchResult={this.onSearchResult}
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
@@ -637,10 +641,12 @@ export default class Group extends PureComponent {
             <Table
               loading= {loading}
               rowSelection={rowSelection}
-              dataSource={groupsData}
+              dataSource={list}
               columns={columns}
               rowKey={record => record.id}
               size={size}
+              pagination={pagination}
+              onChange={this.onChange}
             />
           </div>
         </Card>
@@ -657,33 +663,30 @@ export default class Group extends PureComponent {
           footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={()=>this.handleViewModalVisible(false)}
         >
-          <DescriptionList size="small" col="1">
-            <Description term="名称">
-              {userInfoView.name}
-            </Description>
-            <Description term="顺序">
-              {userInfoView.seq}
-            </Description>
-            <Description term="描述">
-              {userInfoView.description}
-            </Description>
-            <p>
-              <Badge status={userInfoView.badge} text={userInfoView.enableLabel} />
-            </p>
-          </DescriptionList>
-          <Divider style={{ marginBottom: 16 }} />
-          <DescriptionList size={size} col="1" title="包含的用户信息">
-            <Description>{groupUsers.map(item=>item.name.concat(', '))}</Description>
-          </DescriptionList>
-          <Divider style={{ marginBottom: 16 }} />
-          <DescriptionList size={size} col="1" title="用户组信息">
-            <Description>{userGroups.map(item=>item.name.concat(', '))}</Description>
-          </DescriptionList>
-          {loading && (
-            <div className={styles.viewModalLoading}>
-              <Spin />
-            </div>
-          )}
+          <Spin spinning={loading}>
+            <DescriptionList size="small" col="1">
+              <Description term="名称">
+                {userInfoView.name}
+              </Description>
+              <Description term="顺序">
+                {userInfoView.seq}
+              </Description>
+              <Description term="描述">
+                {userInfoView.description}
+              </Description>
+              <p>
+                <Badge status={userInfoView.badge} text={userInfoView.enableLabel} />
+              </p>
+            </DescriptionList>
+            <Divider style={{ marginBottom: 16 }} />
+            <DescriptionList size={size} col="1" title="包含的用户信息">
+              <Description>{groupUsers.map(item=>item.name.concat(', '))}</Description>
+            </DescriptionList>
+            {/* <Divider style={{ marginBottom: 16 }} />
+            <DescriptionList size={size} col="1" title="用户组信息">
+              <Description>{userGroups.map(item=>item.name.concat(', '))}</Description>
+            </DescriptionList> */}
+          </Spin>
         </Modal>
       </PageHeaderLayout>
     );

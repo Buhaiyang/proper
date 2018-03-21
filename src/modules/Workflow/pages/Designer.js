@@ -6,7 +6,6 @@ import cookie from 'react-cookies'
 import { inject } from './../../../common/inject';
 import styles from './Designer.less';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Oopsearch';
 import Ellipsis from '../../../components/Ellipsis';
 
 const FormItem = Form.Item;
@@ -84,10 +83,9 @@ const CreateModal = connect()((props) => {
   );
 });
 
-@inject(['workflowDesigner', 'global'])
-@connect(({ workflowDesigner, global, loading }) => ({
+@inject(['workflowDesigner'])
+@connect(({ workflowDesigner, loading }) => ({
   workflowDesigner,
-  global,
   loading: loading.models.workflowDesigner
 }))
 @Form.create()
@@ -106,26 +104,18 @@ export default class Designer extends PureComponent {
     this.props.dispatch({
       type: 'workflowDesigner/fetch',
       payload: {
-        filter: 'myProcesses',
         modelType: '0',
         sort: 'modifiedDesc'
       }
     });
   }
 
-  onSuggest = (query, matchStr)=>{
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/queryData',
-      payload: matchStr
-    });
-  }
-
-  onSearchResult = (param)=>{
+  // 查询
+  handleSearch = (value) => {
     this.props.dispatch({
       type: 'workflowDesigner/fetch',
       payload: {
-        extraParams: param,
+        filter: value,
       }
     });
   }
@@ -310,12 +300,15 @@ export default class Designer extends PureComponent {
       type: 'workflowDesigner/repository',
       payload: item.id,
       callback: () => {
+        // this.refresh();
         for (let i = 0; i < this.state.lists.length; i++) {
           if (this.state.lists[i].id === this.props.workflowDesigner.deployData.id) {
-            this.state.lists[i].disposeTime = this.props.workflowDesigner.deployData.deployTime;
-            this.state.lists[i].status.content = '已部署';
+            this.state.lists[i].deploymentTime =
+              this.props.workflowDesigner.deployData.deploymentTime;
+            this.state.lists[i].status.name = '已部署';
             this.state.lists[i].status.code = '1';
-            this.state.lists[i].version = this.props.workflowDesigner.deployData.version;
+            this.state.lists[i].processVersion =
+              this.props.workflowDesigner.deployData.processVersion;
           }
         }
         this.props.dispatch({
@@ -332,7 +325,7 @@ export default class Designer extends PureComponent {
   }
 
   render() {
-    const { workflowDesigner: { data }, global: {searchOptions, size}, loading } = this.props;
+    const { workflowDesigner: { data }, loading } = this.props;
     const { buttonSize, showUploadList, viewVisible } = this.state;
 
     this.state.lists = data.data;
@@ -352,14 +345,7 @@ export default class Designer extends PureComponent {
     return (
       <PageHeaderLayout content={
         <div>
-          <OSearch
-            searchOptions={searchOptions}
-            placeholder="请输入"
-            enterButtonText="搜索"
-            size={size}
-            onSuggest={this.onSuggest}
-            onSearchResult={this.onSearchResult}
-          />
+          <Input.Search style={{marginBottom: '16px'}} onSearch={value => this.handleSearch(value)} enterButton="搜索" size="small" />
           <Button className={styles.headerButton} icon="plus" type="primary" size={buttonSize} onClick={() => this.create(true)}>
             新建
           </Button>
@@ -447,19 +433,19 @@ export default class Designer extends PureComponent {
                           <Ellipsis className={styles.item} lines={4}>
                             <Badge
                               status={ item.status ? (item.status.code === '0' ? 'default' : (item.status.code === '1' ? 'success' : (item.status.code === '2' ? 'processing' : 'error'))) : 'default' }
-                              text={ item.status ? item.status.content : '未部署' }
+                              text={ item.status ? item.status.name : '未部署' }
                               className={styles.status} />
                             <Ellipsis className={styles.item} lines={1}>
-                              版本号: { item.version }
+                              版本号: { item.processVersion }
                             </Ellipsis>
                             <Ellipsis className={styles.item} lines={1}>
-                              部署时间: { item.disposeTime }
+                              部署时间: { item.deploymentTime }
                             </Ellipsis>
                             <Ellipsis className={styles.item} lines={1}>
                               最后更新: { item.lastUpdated }
                             </Ellipsis>
                             <Ellipsis className={styles.item} lines={1}>
-                              创建时间: { item.createTime }
+                              创建时间: { item.created }
                             </Ellipsis>
                         </Ellipsis>
                         </div>

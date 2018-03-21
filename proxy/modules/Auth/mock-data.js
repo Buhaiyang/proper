@@ -1,8 +1,8 @@
 module.exports = {
-  "GET:/currentUser": {
+  "GET:/auth/login/user": {
     "name": "Serati Ma",
     "avatar": "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
-    "userid": "00000001",
+    "userId": "00000001",
     "notifyCount": 12
   },
   "POST:/auth/login": (req, res)=>{
@@ -409,6 +409,12 @@ module.exports = {
     "enable": true,
     "superuser": false
   },
+  'POST:/auth/users/:id/role/:roleId':(req , res)=>{
+    res.send({})
+  },
+  'DELETE:/auth/users/:id/role/:roleId':(req , res)=>{
+    res.send({})
+  },
   'GET:/auth/users/:id/roles':[
     {"id":"1","name":"普通管理员"},
     {"id":"2","name":"住院部功能"},
@@ -575,6 +581,18 @@ module.exports = {
       "seq": 1,
       "enable": false
     });
+  },
+  'POST:/auth/user-groups/:id/user/:userId':(req , res)=>{
+    res.send({})
+  },
+  'DELETE:/auth/user-groups/:id/user/:userId':(req , res)=>{
+    res.send({})
+  },
+  'PUT:/auth/user-groups/:id/users':(req , res)=>{
+    res.send({})
+  },
+  'DELETE:/auth/user-groups/:id/users':(req , res)=>{
+    res.send({})
   },
   'POST:/auth/user-groups':(req , res)=>{
     res.send({

@@ -161,7 +161,7 @@ export default {
       return {
         ...state,
         oopSearchGrid: {
-          list: payload
+          list: payload.data
         }
       }
     },

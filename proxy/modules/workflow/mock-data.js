@@ -1,5 +1,5 @@
 module.exports = {
-  "GET:/workflow/service/app/rest/models": {
+  "GET:/repository/models": {
     "size":3,
     "total":3,
     "start":0,
@@ -13,14 +13,14 @@ module.exports = {
         "createdBy": "pep-sysadmin",
         "lastUpdatedBy": "pep-sysadmin",
         "lastUpdated": "2018-01-18T09:45:59.635+0000",
-        "disposeTime": "2018-03-14 13:53:54",
-        "createTime": "2018-01-14 09:34:50",
+        "deploymentTime": "2018-03-14 13:53:54",
+        "created": "2018-01-14 09:34:50",
         "latestVersion": true,
-        "version": 1,
+        "processVersion": 1,
         "comment": null,
         "modelType": 0,
         "status": {
-          "content": "未部署",
+          "name": "未部署",
           "code": "0"
         }
       },
@@ -33,11 +33,11 @@ module.exports = {
         "lastUpdatedBy": "pep-sysadmin",
         "lastUpdated": "2018-01-18T09:45:59.635+0000",
         "latestVersion": true,
-        "version": 1,
+        "processVersion": 1,
         "comment": null,
         "modelType": 0,
         "status": {
-          "content": "已部署",
+          "name": "已部署",
           "code": "1"
         }
       },
@@ -50,11 +50,11 @@ module.exports = {
         "lastUpdatedBy": "pep-sysadmin",
         "lastUpdated": "2018-01-18T09:45:51.657+0000",
         "latestVersion": true,
-        "version": 1,
+        "processVersion": 1,
         "comment": null,
         "modelType": 0,
         "status": {
-          "content": "启用",
+          "name": "启用",
           "code": "2"
         }
       },
@@ -67,11 +67,11 @@ module.exports = {
         "lastUpdatedBy": "pep-sysadmin",
         "lastUpdated": "2018-01-18T08:59:59.262+0000",
         "latestVersion": true,
-        "version": 1,
+        "processVersion": 1,
         "comment": null,
         "modelType": 0,
         "status": {
-          "content": "停用",
+          "name": "停用",
           "code": "3"
         }
       }
@@ -79,7 +79,7 @@ module.exports = {
   },
   "POST:/repository/models/:id/deployment": {
     "id": "0",
-    "version": "2",
-    "deployTime": "2020-06-17 15:15:15"
+    "processVersion": "2",
+    "deploymentTime": "2020-06-17 15:15:15"
   }
 }

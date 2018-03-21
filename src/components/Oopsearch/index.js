@@ -290,9 +290,9 @@ export default class OopSearch extends React.Component {
     const params = {
       pageNo: 1,
       pageSize: 10,
+      moduleName: 'userRoleConfigTest',
       ...param,
       req: JSON.stringify(this.getCurrentParam()),
-      moduleName: 'userRoleConfigTest'
     }
     this.props.dispatch({type: 'global/oopSearchResult', payload: params});
   }

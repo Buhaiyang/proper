@@ -5,7 +5,7 @@ export async function query() {
   return request('/api/users');
 }
 export async function queryCurrent() {
-  return request('/api/currentUser');
+  return request('/api/auth/login/user');
 }
 export async function queryCurrentMenus() {
   return request('/api/auth/menus');

@@ -146,10 +146,10 @@ const UserBasicInfoForm = Form.create()((props) => {
     </Spin>);
 });
 const RoleInfoForm = Form.create()((props) => {
-  const {form, userRoles, userRolesAll, loading} = props;
+  const {form, userRoles, userRolesAll, loading, userAddRoles} = props;
   const {getFieldDecorator} = form;
   const handleChange = (value) => {
-    console.log(value);
+    userAddRoles(value);
   };
   return (
     <Form>
@@ -181,10 +181,10 @@ const RoleInfoForm = Form.create()((props) => {
   );
 });
 const UserGroupInfoForm = Form.create()((props) => {
-  const {form, userGroups, userGroupsAll, loading} = props;
+  const {form, userGroups, userGroupsAll, loading, userAddGroups} = props;
   const {getFieldDecorator} = form;
   const handleChange = (value) => {
-    console.log(value);
+    userAddGroups(value);
   };
   return (
     <Form>
@@ -218,7 +218,7 @@ const ModalForm = connect()((props) => {
   const {
     visible, size, handleTabChange, currentTabKey, onSubmitForm, userBasicInfo,
     clearModalForms, userRoles, userRolesAll, userGroups, userGroupsAll,
-    isCreate, loading
+    isCreate, loading, userAddRoles, userAddGroups
   } = props;
   const onCancel = () => {
     // 隐藏窗口时
@@ -256,6 +256,7 @@ const ModalForm = connect()((props) => {
       }}
       userRoles={userRoles}
       userRolesAll={userRolesAll}
+      userAddRoles={userAddRoles}
       loading={loading} />
   }, {
     key: 'userGroups',
@@ -267,6 +268,7 @@ const ModalForm = connect()((props) => {
       }}
       userGroups={userGroups}
       userGroupsAll={userGroupsAll}
+      userAddGroups={userAddGroups}
       loading={loading} />
 
   }];
@@ -299,13 +301,21 @@ export default class User extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.oopSearch.load()
+    this.refresh();
   }
+
+  refresh() {
+    this.oopSearch.load({
+      moduleName: 'authUser'
+    });
+  }
+
   onChange = (pagination, filters, sorter) => {
     console.log(pagination, sorter);
     this.oopSearch.load({
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
+      moduleName: 'authUser'
     })
   }
   onEdit = (record) => {
@@ -397,7 +407,7 @@ export default class User extends React.PureComponent {
             isCreate: false
           });
           message.success('保存成功');
-          me.props.dispatch({type: 'authUser/fetch'});
+          me.refresh();
         }
       });
     } else if (activeKey === 'roleUser') {
@@ -440,11 +450,69 @@ export default class User extends React.PureComponent {
               selectedRowKeys: []
             });
             message.success('删除成功');
-            me.props.dispatch({type: 'authUser/fetch'});
+            me.refresh();
           }
         })
       }
     });
+  }
+  userAddDel = (value, typeAdd, typeDel, typeRoles) => {
+    const userIds = [];
+    for (let i = 0; i < this.props.authUser.userRoles.length; i++) {
+      userIds.push(this.props.authUser.userRoles[i].id);
+    }
+    if (value.length > userIds.length) {
+      for (let i = 0; i < value.length; i++) {
+        if (userIds.indexOf(value[i]) === -1) {
+          this.props.dispatch({
+            type: typeAdd,
+            payload: {
+              userId: this.props.authUser.userBasicInfo.id,
+              id: value[i]
+            },
+            callback: () => {
+              this.props.dispatch({
+                type: typeRoles,
+                payload: this.props.authUser.userBasicInfo.id
+              })
+            }
+          });
+        }
+      }
+    }
+    if (value.length < userIds.length) {
+      for (let i = 0; i < userIds.length; i++) {
+        if (value.indexOf(userIds[i]) === -1) {
+          this.props.dispatch({
+            type: typeDel,
+            payload: {
+              userId: this.props.authUser.userBasicInfo.id,
+              id: userIds[i]
+            },
+            callback: () => {
+              this.props.dispatch({
+                type: typeRoles,
+                payload: this.props.authUser.userBasicInfo.id
+              })
+            }
+          });
+        }
+      }
+    }
+  }
+  // 用户添加角色
+  userAddRoles = (value) => {
+    const typeAdd = 'authUser/userAddRole';
+    const typeDel = 'authUser/userDelRole';
+    const typeRoles = 'authUser/fetchUserRoles';
+    this.userAddDel(value, typeAdd, typeDel, typeRoles);
+  }
+  // 用户添加用户组
+  userAddGroups = (value) => {
+    const typeAdd = 'authUser/userAddGroup';
+    const typeDel = 'authUser/userDelGroup';
+    const typeRoles = 'authUser/fetchUserGroups';
+    this.userAddDel(value, typeAdd, typeDel, typeRoles);
   }
   render() {
     const {
@@ -547,8 +615,10 @@ export default class User extends React.PureComponent {
           userBasicInfo={userBasicInfo}
           userRoles={userRoles}
           userRolesAll={userRolesAll}
+          userAddRoles={this.userAddRoles}
           userGroups={userGroups}
           userGroupsAll={userGroupsAll}
+          userAddGroups={this.userAddGroups}
           clearModalForms={this.clearModalForms}
           isCreate={this.state.isCreate}
           size={size}

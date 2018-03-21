@@ -1,4 +1,6 @@
-import { queryUsers, queryUsersById, deleteUsers, queryUserRoles, queryUserRolesAll, queryUserGroups, queryUserGroupsAll, saveOrUpdateUser} from '../services/authUserS';
+import { queryUsers, queryUsersById, deleteUsers, queryUserRoles,
+  userAddRole, userDelRole, userAddGroup, userDelGroup,
+  queryUserRolesAll, queryUserGroups, queryUserGroupsAll, saveOrUpdateUser} from '../services/authUserS';
 
 export default {
   namespace: 'authUser',
@@ -83,6 +85,24 @@ export default {
         payload: resp
       })
       if (callback) callback(resp)
+    },
+    // 用户添加角色
+    *userAddRole({ payload, callback }, { call }) {
+      yield call(userAddRole, payload);
+      if (callback) callback();
+    },
+    *userDelRole({ payload, callback }, { call }) {
+      yield call(userDelRole, payload);
+      if (callback) callback();
+    },
+    // 用户组添加用户
+    *userAddGroup({ payload, callback }, { call }) {
+      yield call(userAddGroup, payload);
+      if (callback) callback();
+    },
+    *userDelGroup({ payload, callback }, { call }) {
+      yield call(userDelGroup, payload);
+      if (callback) callback();
     },
   },
 

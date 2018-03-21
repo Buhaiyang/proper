@@ -5,7 +5,7 @@ import { connect } from 'dva';
 import styles from './Role.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OSearch from '../../../components/Oopsearch';
+import OopSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
 
 const { Description } = DescriptionList;
@@ -37,23 +37,19 @@ export default class Role extends PureComponent {
     this.refresh();
   }
 
-  onSuggest = (query, matchStr)=>{
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/queryData',
-      payload: matchStr
-    });
+  onChange = (pagination, filters, sorter) => {
+    console.log(pagination, sorter);
+    this.oopSearch.load({
+      pageNo: pagination.current,
+      pageSize: pagination.pageSize,
+      moduleName: 'authRole'
+    })
   }
 
-  onSearchResult = (param)=>{
-    const { authRole: { pagination = {}} } = this.props;
-    this.props.dispatch({
-      type: 'authRole/fetch',
-      payload: {
-        currentPage: pagination.current,
-        pageSize: pagination.pageSize,
-        extraParams: param,
-      }
+  // 刷新角色列表
+  refresh = () => {
+    this.oopSearch.load({
+      moduleName: 'authRole'
     });
   }
 
@@ -99,13 +95,6 @@ export default class Role extends PureComponent {
     });
   }
 
-  // 刷新角色列表
-  refresh = () => {
-    this.props.dispatch({
-      type: 'authRole/fetch'
-    });
-  }
-
   // 删除功能
   handleRemove = (ids) => {
     let idsArray = [];
@@ -129,8 +118,8 @@ export default class Role extends PureComponent {
   }
 
   render() {
-    const { authRole: { roleList }, loading,
-      global: {searchOptions, size}} = this.props;
+    const { loading,
+      global: { size, oopSearchGrid: {list, pagination}} } = this.props;
 
     const { selectedRows, selectedRowKeys, viewVisible, roleInfo,
       roleUsers, roleGroups } = this.state;
@@ -178,13 +167,10 @@ export default class Role extends PureComponent {
 
     return (
       <PageHeaderLayout content={
-        <OSearch
-          searchOptions={searchOptions}
+        <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          size={size}
-          onSuggest={this.onSuggest}
-          onSearchResult={this.onSearchResult}
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
@@ -208,10 +194,12 @@ export default class Role extends PureComponent {
             <Table
               loading= {loading}
               rowSelection={rowSelection}
-              dataSource={roleList}
+              dataSource={list}
               columns={columns}
               rowKey={record => record.id}
               size={size}
+              pagination={pagination}
+              onChange={this.onChange}
             />
           </div>
         </Card>
@@ -224,30 +212,27 @@ export default class Role extends PureComponent {
           footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={()=>this.handleViewModalVisible(false)}
         >
-          <DescriptionList size="small" col="1">
-            <Description term="名称">
-              {roleInfo.name}
-            </Description>
-            <Description term="功能描述说明">
-              {roleInfo.description}
-            </Description>
-            <p>
-              <Badge status={roleInfo.badge} text={roleInfo.enableLabel} />
-            </p>
-          </DescriptionList>
-          <Divider style={{ marginBottom: 16 }} />
-          <DescriptionList size={size} col="1" title="包含的用户信息">
-            <Description>{roleUsers.map(item=>item.name.concat(', '))}</Description>
-          </DescriptionList>
-          <Divider style={{ marginBottom: 16 }} />
-          <DescriptionList size={size} col="1" title="用户组信息">
-            <Description>{roleGroups.map(item=>item.name.concat(', '))}</Description>
-          </DescriptionList>
-          {loading && (
-            <div className={styles.viewModalLoading}>
-              <Spin />
-            </div>
-          )}
+          <Spin spinning={loading}>
+            <DescriptionList size="small" col="1">
+              <Description term="名称">
+                {roleInfo.name}
+              </Description>
+              <Description term="功能描述说明">
+                {roleInfo.description}
+              </Description>
+              <p>
+                <Badge status={roleInfo.badge} text={roleInfo.enableLabel} />
+              </p>
+            </DescriptionList>
+            <Divider style={{ marginBottom: 16 }} />
+            <DescriptionList size={size} col="1" title="包含的用户信息">
+              <Description>{roleUsers.map(item=>item.name.concat(', '))}</Description>
+            </DescriptionList>
+            <Divider style={{ marginBottom: 16 }} />
+            <DescriptionList size={size} col="1" title="用户组信息">
+              <Description>{roleGroups.map(item=>item.name.concat(', '))}</Description>
+            </DescriptionList>
+          </Spin>
         </Modal>
       </PageHeaderLayout>
     );

@@ -1,3 +1,5 @@
+var url = require('url');
+
 module.exports = {
   "GET:/fake_chart_data":{
     "visitData":
@@ -1955,7 +1957,178 @@ module.exports = {
     },
   ],
   'GET:/search/inverse':[{"id":"5aab6ea828cc0f09784a0730","con":"用户1","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|45f438a3-1af0-4c27-9850-04e046adb6d3"},{"id":"5aab6ea828cc0f09784a0733","con":"用户2","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|b18de59a-261a-4df6-9327-30ba7e00f8f1"},{"id":"5aab6ea828cc0f09784a072c","con":"用户3","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|000673e6-e87a-4d6b-a641-b2fcf8bb9cb3"}],
-  'GET:/search/query':[
-    {"id":"1","username":"denggy","password":"123456","name":"7954","email":"1015182620@qq.com","phone":"15904015593","enable":true,"superuser":false},{"id":"2","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"3","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"4","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"5","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"6","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"7","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"8","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"9","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"10","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"11","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false}
-  ],
+  'GET:/search/query':getQueryList,
+}
+
+const authUser = {
+  "total":11,
+  "data": [
+    {"id":"1","username":"denggy","password":"123456","name":"7954","email":"1015182620@qq.com","phone":"15904015593","enable":true,"superuser":false},
+    {"id":"2","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"3","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"4","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"5","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"6","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"7","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"8","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"9","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"10","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"11","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false}
+  ]
+};
+
+const authGroup = {
+  "total":12,
+  "data": [
+    {"id": "1","name": "高管用户","description": "高管角色用户组","seq": 1,"enable": true},
+    {"id": "2","name": "管理员用户","description": "管理员角色用户组","seq": 2,"enable": true},
+    {"id": "3","name": "内勤用户","description": "内勤角色用户组","seq": 3,"enable": false},
+    {"id": "4","name": "其他用户","description": "其他角色用户组","seq": 4,"enable": false},
+    {"id": "5","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    { "id": "6","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "7","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "8","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "9","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "10","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "11","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false},
+    {"id": "12","name": "其他用户2","description": "其他角色2用户组","seq": 5,"enable": false}
+  ]
+};
+
+const authRole = {
+  "total":4,
+  "data": [
+  {
+    "id": "1",
+    "name": "普通管理员",
+    "description": "普通权限管理员",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "普通权限"
+  },
+  {
+    "id": "2",
+    "name": "住院部功能",
+    "description": "住院部所有功能",
+    "enable": false,
+    "parentId": "1",
+    "parentName": "XX医院功能"
+  },
+  {
+    "id": "3",
+    "name": "研发部功能",
+    "description": "研发部所有功能",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "普日基本权限功能"
+  },
+  {
+    "id": "4",
+    "name": "开发部功能",
+    "description": "开发部所有功能",
+    "enable": false,
+    "parentId": "1",
+    "parentName": "普日基本权限功能"
+  },
+]};
+
+const workflowDesigner = {
+  "total":3,
+  "data":
+  [
+    {
+      "id": "0",
+      "name": "测试名字长度测试名字长度测试名字长度费用报销流程",
+      "key": "123",
+      "description": "费用报销",
+      "createdBy": "pep-sysadmin",
+      "lastUpdatedBy": "pep-sysadmin",
+      "lastUpdated": "2018-01-18T09:45:59.635+0000",
+      "disposeTime": "2018-03-14 13:53:54",
+      "createTime": "2018-01-14 09:34:50",
+      "latestVersion": true,
+      "version": 1,
+      "comment": null,
+      "modelType": 0,
+      "status": {
+        "content": "未部署",
+        "code": "0"
+      }
+    },
+    {
+      "id": "1",
+      "name": "测试名字长度测试名字长度测试名字长度费用报销流程",
+      "key": "123",
+      "description": "费用报销",
+      "createdBy": "pep-sysadmin",
+      "lastUpdatedBy": "pep-sysadmin",
+      "lastUpdated": "2018-01-18T09:45:59.635+0000",
+      "latestVersion": true,
+      "version": 1,
+      "comment": null,
+      "modelType": 0,
+      "status": {
+        "content": "已部署",
+        "code": "1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "会议申请流程",
+      "key": "124",
+      "description": "会议申请流程会议申请流程会议申请流程会议申请流程会议申请流程",
+      "createdBy": "pep-sysadmin",
+      "lastUpdatedBy": "pep-sysadmin",
+      "lastUpdated": "2018-01-18T09:45:51.657+0000",
+      "latestVersion": true,
+      "version": 1,
+      "comment": null,
+      "modelType": 0,
+      "status": {
+        "content": "启用",
+        "code": "2"
+      }
+    },
+    {
+      "id": "3",
+      "name": "请假申请流程",
+      "key": "125",
+      "description": "请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程",
+      "createdBy": "pep-sysadmin",
+      "lastUpdatedBy": "pep-sysadmin",
+      "lastUpdated": "2018-01-18T08:59:59.262+0000",
+      "latestVersion": true,
+      "version": 1,
+      "comment": null,
+      "modelType": 0,
+      "status": {
+        "content": "停用",
+        "code": "3"
+      }
+    }
+  ]
+}
+
+function queryList(type, pageNo) {
+  let list = {};
+  if (type === 'authUser') {
+    list = authUser;
+  } else if (type === 'authGroup') {
+    list = authGroup;
+  } else if (type === 'authRole') {
+    list = authRole;
+  } else if (type === 'workflowDesigner') {
+    list = workflowDesigner;
+  }
+  return list;
+}
+
+function getQueryList(req, res) {
+  const result = queryList(url.parse(req.url, true).query.moduleName, url.parse(req.url, true).query.pageNo);
+
+  if (res && res.json) {
+    res.json(result);
+  } else {
+    return result;
+  }
 }

@@ -1,8 +1,7 @@
 import { stringify } from 'qs';
 import request from '../../../utils/request';
 
-export async function queryUsers() {
-  const params = {pageNo: '1', pageSize: '10'};
+export async function queryUsers(params) {
   return request(`/api/auth/users?${stringify(params)}`);
 }
 export async function queryUsersById(params) {
@@ -35,3 +34,24 @@ export async function saveOrUpdateUser(params) {
     body: params
   });
 }
+export async function userAddRole(params) {
+  return request(`/api/auth/users/${params.userId}/role/${params.id}`, {
+    method: 'POST'
+  });
+}
+export async function userDelRole(params) {
+  return request(`/api/auth/users/${params.userId}/role/${params.id}`, {
+    method: 'delete'
+  });
+}
+export async function userAddGroup(params) {
+  return request(`/api/auth/user-groups/${params.id}/user/${params.userId}`, {
+    method: 'POST'
+  });
+}
+export async function userDelGroup(params) {
+  return request(`/api/auth/user-groups/${params.id}/user/${params.userId}`, {
+    method: 'delete'
+  });
+}
+
