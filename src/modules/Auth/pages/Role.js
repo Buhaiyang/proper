@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
-import { Card, Button, Table, Switch, Divider, Modal, Spin, Badge,
+import { Card, Button, Switch, Divider, Modal, Spin, Badge,
   Form, message, Popconfirm } from 'antd';
 import { connect } from 'dva';
-import styles from './Role.less';
+// import styles from './Role.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
+import OopTable from '../../../components/OopTable';
 
 const { Description } = DescriptionList;
 
@@ -20,10 +21,6 @@ const { Description } = DescriptionList;
 @Form.create()
 export default class Role extends PureComponent {
   state = {
-    // 选中的行
-    selectedRows: [],
-    // 选中的行的id
-    selectedRowKeys: [],
     // 是否显示个人信息
     viewVisible: false,
     // 个人信息
@@ -35,20 +32,12 @@ export default class Role extends PureComponent {
   };
 
   componentDidMount() {
-    this.refresh();
-  }
-
-  onChange = (pagination, filters, sorter) => {
-    console.log(pagination, sorter);
-    this.oopSearch.load({
-      pageNo: pagination.current,
-      pageSize: pagination.pageSize
-    })
+    this.onLoad();
   }
 
   // 刷新角色列表
-  refresh = () => {
-    this.oopSearch.load();
+  onLoad = (param) => {
+    this.oopSearch.load(param);
   }
 
   // 关闭基本信息
@@ -106,32 +95,38 @@ export default class Role extends PureComponent {
       payload: { ids: idsArray.toString() },
       callback: () => {
         message.success(this.props.authRole.messageText);
-        this.refresh();
-        this.setState({
-          selectedRows: [],
-          selectedRowKeys: []
-        });
+        this.onLoad();
       }
     });
   }
+
+  // 切换状态功能
+  handleSwitchOnChange = (value, record) => {
+    const self = this;
+    const ids = [];
+    ids.push(record.id);
+    this.props.dispatch({
+      type: 'authRole/fetchUpdateStatus',
+      payload: {
+        enable: value,
+        ids
+      },
+      callback: () => {
+        self.onLoad();
+      }
+    });
+  }
+
+  // 编辑功能
   handleEdit = ()=>{
   }
+
   render() {
-    const { loading,
-      global: { size, oopSearchGrid: {list, pagination}}, gridLoading } = this.props;
+    const { loading, gridLoading,
+      global: { size, oopSearchGrid } } = this.props;
 
-    const { selectedRows, selectedRowKeys, viewVisible, roleInfo,
+    const { viewVisible, roleInfo,
       roleUsers, roleGroups } = this.state;
-
-
-    const rowSelection = {
-      onChange: (keys, rows) => {
-        this.setState({
-          selectedRows: rows,
-          selectedRowKeys: keys
-        });
-      }
-    };
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -164,6 +159,23 @@ export default class Role extends PureComponent {
       }
     ];
 
+    const topButtons = [
+      {
+        text: '新建',
+        name: 'create',
+        type: 'primary',
+        icon: 'plus',
+        onClick: ()=>{ this.handleCreate(true) }
+      },
+      {
+        text: '删除',
+        name: 'delete',
+        icon: 'delete',
+        onClick: (items)=>{ this.handleRemove(items) },
+        display: items=>(items.length),
+      }
+    ];
+
     return (
       <PageHeaderLayout content={
         <OopSearch
@@ -174,34 +186,15 @@ export default class Role extends PureComponent {
         />
       }>
         <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleCreate(true)}>
-                新建
-              </Button>
-              {
-                selectedRows.length > 0 && (
-                  <span>
-                    {<Popconfirm
-                      title={`确定删除选中的${this.state.selectedRowKeys.length}条数据吗?`}
-                      onConfirm={() => this.handleRemove(selectedRowKeys)}>
-                      <Button icon="delete">批量删除</Button>
-                    </Popconfirm>}
-                  </span>
-                )
-              }
-            </div>
-            <Table
-              loading= {gridLoading}
-              rowSelection={rowSelection}
-              dataSource={list}
-              columns={columns}
-              rowKey={record => record.id}
-              size={size}
-              pagination={pagination}
-              onChange={this.onChange}
-            />
-          </div>
+          <OopTable
+            grid={oopSearchGrid}
+            columns={columns}
+            loading={gridLoading}
+            onLoad={this.onLoad}
+            size={size}
+            topButtons={topButtons}
+            ref={(el)=>{ this.oopTable = el }}
+          />
         </Card>
         <Modal
           title="角色信息"

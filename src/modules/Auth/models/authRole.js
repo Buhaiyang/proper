@@ -1,6 +1,6 @@
 // import { queryGroups } from '../services/authGroupsS';
 // import { queryUsers } from '../services/authUserS';
-import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups } from '../services/authRoleS';
+import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups, fetchUpdateStatus } from '../services/authRoleS';
 
 export default {
   namespace: 'authRole',
@@ -62,6 +62,11 @@ export default {
       });
       if (callback) callback(response);
     },
+    // 更新角色列表的状态信息
+    *fetchUpdateStatus({ payload, callback }, { call }) {
+      yield call(fetchUpdateStatus, payload);
+      if (callback) callback();
+    }
   },
 
   reducers: {

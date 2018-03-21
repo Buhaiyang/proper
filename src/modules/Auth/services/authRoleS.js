@@ -27,3 +27,11 @@ export async function queryRoleUsers(params) {
 export async function queryRoleGroups(params) {
   return request(`/auth/roles/${params}/user-groups`);
 }
+
+// 更新角色列表的状态信息
+export async function fetchUpdateStatus(params) {
+  return request('/auth/roles', {
+    method: 'POST',
+    body: params
+  });
+}

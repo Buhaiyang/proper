@@ -648,6 +648,9 @@ module.exports = {
       "parentName": "普日基本权限功能"
     },
   ],
+  'POST:/auth/roles':(req , res)=>{
+    res.send({})
+  },
   'DELETE:/auth/roles':{
     type:"ok"
   },
