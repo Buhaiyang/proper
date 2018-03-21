@@ -306,7 +306,7 @@ export default class Designer extends PureComponent {
             this.state.lists[i].deploymentTime =
               this.props.workflowDesigner.deployData.deploymentTime;
             this.state.lists[i].status.name = '已部署';
-            this.state.lists[i].status.code = '1';
+            this.state.lists[i].status.code = 'DEPLOYED';
             this.state.lists[i].processVersion =
               this.props.workflowDesigner.deployData.processVersion;
           }
@@ -432,7 +432,7 @@ export default class Designer extends PureComponent {
                           </Ellipsis>
                           <Ellipsis className={styles.item} lines={4}>
                             <Badge
-                              status={ item.status ? (item.status.code === '0' ? 'default' : (item.status.code === '1' ? 'success' : (item.status.code === '2' ? 'processing' : 'error'))) : 'default' }
+                              status={ item.status ? (item.status.code === 'UN_DEPLOYED' ? 'default' : (item.status.code === 'DEPLOYED' ? 'success' : (item.status.code === '2' ? 'processing' : 'error'))) : 'default' }
                               text={ item.status ? item.status.name : '未部署' }
                               className={styles.status} />
                             <Ellipsis className={styles.item} lines={1}>

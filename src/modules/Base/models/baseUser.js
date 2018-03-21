@@ -46,9 +46,13 @@ export default {
       };
     },
     saveCurrentUser(state, action) {
+      const data = action.payload;
+      if (data.name == null) {
+        data.name = 'null';
+      }
       return {
         ...state,
-        currentUser: action.payload,
+        currentUser: data,
       };
     },
     changeNotifyCount(state, action) {

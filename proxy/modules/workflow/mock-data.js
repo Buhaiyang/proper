@@ -21,7 +21,7 @@ module.exports = {
         "modelType": 0,
         "status": {
           "name": "未部署",
-          "code": "0"
+          "code": "UN_DEPLOYED"
         }
       },
       {
@@ -38,7 +38,7 @@ module.exports = {
         "modelType": 0,
         "status": {
           "name": "已部署",
-          "code": "1"
+          "code": "DEPLOYED"
         }
       },
       {
