@@ -341,6 +341,7 @@ module.exports = {
       "icon": "lock",
       "parentId": null,
       "route": "auth",
+      "enable": true,
       "sequenceNumber": 1
     },
     {
@@ -351,6 +352,7 @@ module.exports = {
       "root": false,
       "icon": "",
       "route": "user",
+      "enable": true,
       "sequenceNumber": 2
     },
     {
@@ -361,6 +363,7 @@ module.exports = {
       "root": false,
       "icon": "",
       "route": "role",
+      "enable": true,
       "sequenceNumber": 2
     },
     {
@@ -371,6 +374,18 @@ module.exports = {
       "root": false,
       "icon": "",
       "route": "group",
+      "enable": true,
+      "sequenceNumber": 2
+    },
+    {
+      "id": "9901004",
+      "name": "功能管理",
+      "parentId": "99010",
+      "leaf": true,
+      "root": false,
+      "icon": "",
+      "route": "group",
+      "enable": false,
       "sequenceNumber": 2
     },
     {
@@ -380,6 +395,7 @@ module.exports = {
       "root": true,
       "icon": "database",
       "parentId": null,
+      "enable": true,
       "route": "workflow",
       "sequenceNumber": 1
     },
@@ -389,6 +405,7 @@ module.exports = {
       "parentId": "99011",
       "leaf": true,
       "root": false,
+      "enable": true,
       "icon": "",
       "route": "designer",
       "sequenceNumber": 2
@@ -614,6 +631,28 @@ module.exports = {
       "enable": false
     })
   },
+  'GET:/auth/roles/:id/menus':[
+    {"id": "9901001","icon": "icon","name": "用户管理","route": "","enable": true,"root": false,"leaf": true,"parentId": "99010","menuType": {"code": "1"}},
+    {"id": "9901003","icon": "icon","name": "角色管理","route": "","enable": true,"root": false,"leaf": true,"parentId": "99010","menuType": {"code": "1"}},
+  ],
+  'POST:/auth/roles/:id/menus':(req , res)=>{
+    res.send({msg: '添加成功'})
+  },
+  'DELETE:/auth/roles/:id/menus':(req , res)=>{
+    res.send({msg: '删除成功'})
+  },
+  'GET:/auth/roles/parents':[
+    {"id": "1", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "1", "parentName": "父节点1"},
+    {"id": "2", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "2", "parentName": "父节点2"},
+    {"id": "3", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "3", "parentName": "父节点3"},
+    {"id": "4", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "4", "parentName": "父节点4"},
+    {"id": "5", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "5", "parentName": "父节点5"},
+  ],
+  'GET:/auth/roles/:id/parents':[
+    {"id": "1", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "1", "parentName": "父节点1"},
+    {"id": "2", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "2", "parentName": "父节点2"},
+    {"id": "3", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "3", "parentName": "父节点3"},
+  ],
   'GET:/auth/roles':[
     {
       "id": "1",
@@ -651,6 +690,9 @@ module.exports = {
   'POST:/auth/roles':(req , res)=>{
     res.send({})
   },
+  'PUT:/auth/roles':(req , res)=>{
+    res.send({})
+  },
   'DELETE:/auth/roles':{
     type:"ok"
   },
@@ -661,6 +703,9 @@ module.exports = {
     "enable": true,
     "parentId": "1",
     "parentName": "普通权限"
+  },
+  'PUT:/auth/roles/:id':(req , res)=>{
+    res.send({})
   },
   'GET:/auth/roles/:id/users':[
     {
