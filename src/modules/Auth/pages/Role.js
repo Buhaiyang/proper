@@ -29,7 +29,14 @@ const formItemLayout = {
 };
 
 const BasicInfoForm = Form.create()((props) => {
-  const { form, roleInfo, roleParents } = props;
+  const { form, roleInfo, roleList, roleListEx } = props;
+  let data;
+
+  if (roleInfo.id) {
+    data = roleListEx;
+  } else {
+    data = roleList;
+  }
 
   return (
     <Form>
@@ -65,7 +72,7 @@ const BasicInfoForm = Form.create()((props) => {
               option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             {
-              roleParents ? roleParents.map(item => (
+              data ? data.map(item => (
                 <Option key={item.parentId}>{item.parentName}</Option>
               )) : null
             }
@@ -145,7 +152,8 @@ const ManagerInfoForm = Form.create()((props) => {
 
 const CreateForm = connect()((props) => {
   const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleParents, roleMenus, checkedMenuKeys, handleTabChange, handleMenuKeys } = props;
+    roleInfo, roleList, roleListEx, roleMenus, checkedMenuKeys,
+    handleTabChange, handleMenuKeys } = props;
 
   // 取消
   const handleCancel = () => {
@@ -185,7 +193,8 @@ const CreateForm = connect()((props) => {
       content: <BasicInfoForm
         ref = {(el) => { this.basic = el; }}
         roleInfo = {roleInfo}
-        roleParents={roleParents}
+        roleList={roleList}
+        roleListEx={roleListEx}
         loading = {loading}
       />
     },
@@ -243,6 +252,8 @@ export default class Role extends PureComponent {
     isCreate: !this.props.authRole.roleInfo.id,
     // 菜单被选择的项
     checkedMenuKeys: [],
+    // 除掉当前roleid的角色列表
+    roleListEx: [],
   };
 
   componentDidMount() {
@@ -354,22 +365,30 @@ export default class Role extends PureComponent {
         });
       }
     });
-    this.getParentNode(record.id);
+    this.getAllRoles(record.id);
   }
 
   // 新建功能
   handleCreate = (flag) => {
-    this.getParentNode(null);
+    this.getAllRoles(null);
     this.setState({
       formVisible: flag
     });
   }
 
-  // 取得角色的父节点
-  getParentNode = (roleId) => {
+  // 取得角色列表
+  getAllRoles = (roleId) => {
+    const self = this;
     this.props.dispatch({
-      type: 'authRole/fetchParents',
-      payload: { roleId }
+      type: 'authRole/fetch',
+      callback: (res) => {
+        if (roleId) {
+          res.splice(res.findIndex(item => item.id === roleId), 1);
+          self.setState({
+            roleListEx: res
+          })
+        }
+      }
     })
   }
 
@@ -479,10 +498,11 @@ export default class Role extends PureComponent {
   render() {
     const { loading, gridLoading,
       global: { size, oopSearchGrid },
-      authRole: { roleInfo, roleUsers, roleGroups, roleParents,
+      authRole: { roleInfo, roleUsers, roleGroups, roleList,
         roleMenus } } = this.props;
 
-    const { viewVisible, formVisible, currentTabKey, isCreate, checkedMenuKeys } = this.state;
+    const { viewVisible, formVisible, currentTabKey, isCreate,
+      checkedMenuKeys, roleListEx } = this.state;
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -561,7 +581,8 @@ export default class Role extends PureComponent {
           submitForm={this.submitForm}
           isCreate={isCreate}
           roleInfo={roleInfo}
-          roleParents={roleParents}
+          roleList={roleList}
+          roleListEx={roleListEx}
           roleMenus={roleMenus}
           checkedMenuKeys={checkedMenuKeys}
           handleMenuKeys={this.handleMenuKeys}

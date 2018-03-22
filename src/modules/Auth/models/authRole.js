@@ -27,7 +27,7 @@ export default {
         type: 'saveRoleList',
         payload: Array.isArray(response) ? response : [],
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 取得指定角色ID详情信息
     *fetchById({ payload, callback }, { call, put }) {

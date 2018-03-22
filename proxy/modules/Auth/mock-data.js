@@ -378,17 +378,6 @@ module.exports = {
       "sequenceNumber": 2
     },
     {
-      "id": "9901004",
-      "name": "功能管理",
-      "parentId": "99010",
-      "leaf": true,
-      "root": false,
-      "icon": "",
-      "route": "group",
-      "enable": false,
-      "sequenceNumber": 2
-    },
-    {
       "id": "99011",
       "name": "流程设置",
       "leaf": false,
@@ -667,7 +656,7 @@ module.exports = {
       "name": "住院部功能",
       "description": "住院部所有功能",
       "enable": false,
-      "parentId": "1",
+      "parentId": "2",
       "parentName": "XX医院功能"
     },
     {
@@ -675,16 +664,16 @@ module.exports = {
       "name": "研发部功能",
       "description": "研发部所有功能",
       "enable": true,
-      "parentId": "1",
-      "parentName": "普日基本权限功能"
+      "parentId": "3",
+      "parentName": "普日基本权限功能1"
     },
     {
       "id": "4",
       "name": "开发部功能",
       "description": "开发部所有功能",
       "enable": false,
-      "parentId": "1",
-      "parentName": "普日基本权限功能"
+      "parentId": "4",
+      "parentName": "普日基本权限功能2"
     },
   ],
   'POST:/auth/roles':(req , res)=>{
@@ -701,7 +690,7 @@ module.exports = {
     "name": "普通管理员",
     "description": "显示角色信息，普通权限管理员",
     "enable": true,
-    "parentId": "1",
+    "parentId": "4",
     "parentName": "普通权限"
   },
   'PUT:/auth/roles/:id':(req , res)=>{
