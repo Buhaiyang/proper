@@ -167,7 +167,7 @@ const CreateForm = connect()((props) => {
     {
       key: 'user',
       tab: '用户信息',
-      disabled: isCreate,
+      disabled: isCreate || !groupsBasicInfo.enable,
       content: <UserInfoForm
         ref = {(el) => { this.user = el; }}
         groupsBasicInfo = {groupsBasicInfo}
@@ -243,8 +243,12 @@ export default class Group extends PureComponent {
     this.refresh();
   }
 
-  refresh() {
-    this.oopSearch.load();
+  refresh(param) {
+    const params = {
+      ...param,
+      userGroupEnable: 'ALL'
+    }
+    this.oopSearch.load(params);
   }
 
   onChange = (pagination, filters, sorter) => {
@@ -284,13 +288,13 @@ export default class Group extends PureComponent {
           payload: {
             ids: selectedRowKeys.toString()
           },
-          callback: () => {
-            this.refresh();
-            message.success(this.props.authGroups.groupsMessageData);
-            this.setState({
+          callback: (msg) => {
+            msg ? message.error(msg) : message.success('删除成功');
+            me.setState({
               selectedRows: [],
               selectedRowKeys: []
             });
+            me.refresh();
           }
         });
       }
@@ -299,18 +303,19 @@ export default class Group extends PureComponent {
 
   // 单个删除
   handleRemove = (row) => {
+    const me = this;
     this.props.dispatch({
       type: 'authGroups/remove',
       payload: {
         ids: row.id
       },
-      callback: () => {
-        this.refresh();
-        message.success(this.props.authGroups.groupsMessageData);
-        this.setState({
+      callback: (msg) => {
+        msg ? message.error(msg) : message.success('删除成功');
+        me.setState({
           selectedRows: [],
           selectedRowKeys: []
         });
+        me.refresh();
       }
     });
   }

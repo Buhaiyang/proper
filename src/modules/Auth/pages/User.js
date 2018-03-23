@@ -191,7 +191,7 @@ const UserGroupInfoForm = Form.create()((props) => {
     <Form>
       <FormItem
         {...formItemLayout}
-        label="角色"
+        label="用户组"
       >
         {getFieldDecorator('roles', {
           initialValue: userGroups && userGroups.map(item => item.id)
@@ -199,7 +199,7 @@ const UserGroupInfoForm = Form.create()((props) => {
           <Select
             mode="multiple"
             style={{width: '100%'}}
-            placeholder="请选择角色 "
+            placeholder="请选择用户组"
             onChange={handleChange}
           >
             {userGroupsAll.length ? userGroupsAll.map(item =>
@@ -250,7 +250,7 @@ const ModalForm = connect()((props) => {
   }, {
     key: 'roleUser',
     tab: '角色信息',
-    disabled: isCreate,
+    disabled: isCreate || !userBasicInfo.enable,
     content: <RoleInfoForm
       ref={(el) => {
         this.roleUser = el;
@@ -262,7 +262,7 @@ const ModalForm = connect()((props) => {
   }, {
     key: 'userGroups',
     tab: '用户组信息',
-    disabled: isCreate,
+    disabled: isCreate || !userBasicInfo.enable,
     content: <UserGroupInfoForm
       ref={(el) => {
         this.userGroups = el;
@@ -435,8 +435,13 @@ export default class User extends React.PureComponent {
       }
     });
   }
+  // 查询方法 加载所有数据
   onLoad = (param)=> {
-    this.oopSearch.load(param)
+    const params = {
+      ...param,
+      userEnable: 'ALL'
+    }
+    this.oopSearch.load(params)
   }
   userAddDel = (value, typeAdd, typeDel, typeRoles, data) => {
     const userIds = [];

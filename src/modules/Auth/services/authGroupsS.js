@@ -2,7 +2,11 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 export async function queryGroups(params) {
-  return request(`/auth/user-groups?${stringify(params)}`);
+  const p = {
+    ...params,
+    userGroupEnable: 'ENABLE',
+  }
+  return request(`/auth/user-groups?${stringify(p)}`);
 }
 
 export async function updateUserGroups(params) {
@@ -39,7 +43,11 @@ export async function queryUserGroupsById(params) {
 }
 
 export async function queryGroupUsers(params) {
-  return request(`/auth/user-groups/${params}/users`);
+  const p = {
+    userGroupEnable: 'ENABLE',
+    userEnable: 'ENABLE'
+  }
+  return request(`/auth/user-groups/${params}/users?${stringify(p)}`);
 }
 
 export async function groupAddUsers(params) {

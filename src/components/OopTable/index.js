@@ -46,7 +46,6 @@ export default class OopTable extends PureComponent {
     ))
   }
   createRowButtons = (columns, rowButtons)=>{
-    console.log(rowButtons)
     const cols = [...columns]
     rowButtons.length && cols.push({
       title: '操作',

@@ -1,7 +1,6 @@
 // const host = 'http://127.0.0.1:8080/pep/';
 // const host = 'http://172.168.5.251:8080/pep/';
 const host = 'http://172.168.3.29:8081/pep/';
-const host = 'http://127.0.0.1:8080/pep/';
 // const host2 = 'http://172.168.3.167:8080/pep/';
 const host2 = 'http://172.168.4.198:8080/pep/';
 export default {

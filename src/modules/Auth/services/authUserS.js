@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 export async function queryUsers() {
-  const params = {pageNo: 1, pageSize: 999, enable: true};
+  const params = {pageNo: 1, pageSize: 999, userEnable: 'ENABLE'};
   return request(`/auth/users?${stringify(params)}`);
 }
 export async function queryUsersById(params) {
@@ -14,16 +14,28 @@ export async function deleteUsers(params) {
   });
 }
 export async function queryUserRoles(params) {
-  return request(`/auth/users/${params}/roles`);
+  const p = {
+    roleEnable: 'ENABLE'
+  }
+  return request(`/auth/users/${params}/roles?${stringify(p)}`);
 }
 export async function queryUserRolesAll() {
-  return request('/auth/roles');
+  const p = {
+    roleEnable: 'ENABLE',
+  }
+  return request(`/auth/roles?${stringify(p)}`);
 }
 export async function queryUserGroups(params) {
-  return request(`/auth/users/${params}/user-groups?enable=true`);
+  const p = {
+    userGroupEnable: 'ENABLE',
+  }
+  return request(`/auth/users/${params}/user-groups?${stringify(p)}`);
 }
 export async function queryUserGroupsAll() {
-  return request('/auth/user-groups');
+  const p = {
+    userGroupEnable: 'ENABLE',
+  }
+  return request(`/auth/user-groups?${stringify(p)}`);
 }
 export async function saveOrUpdateUser(params) {
   const userId = params.id;
