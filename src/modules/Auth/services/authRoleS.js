@@ -72,3 +72,31 @@ export async function menusDelete(params) {
     method: 'DELETE'
   });
 }
+
+// 角色添加用户
+export async function userAddRole(params) {
+  return request(`/auth/users/${params.userOrGroupId}/role/${params.roleId}`, {
+    method: 'POST'
+  });
+}
+
+// 角色删除用户
+export async function userDelRole(params) {
+  return request(`/auth/users/${params.userOrGroupId}/role/${params.roleId}`, {
+    method: 'DELETE'
+  });
+}
+
+// 角色添加用户组
+export async function GroupAddRole(params) {
+  return request(`/auth/user-groups/${params.userOrGroupId}/role/${params.roleId}`, {
+    method: 'POST'
+  });
+}
+
+// 角色删除用户组
+export async function GroupDelRole(params) {
+  return request(`/auth/user-groups/${params.userOrGroupId}/role/${params.roleId}`, {
+    method: 'DELETE'
+  });
+}

@@ -403,18 +403,17 @@ module.exports = {
   "GET:/auth/users": {
     "count":100,
     "data":[
-      {
-        "id":"1",
-        "username":"denggy",
-        "password":"123456",
-        "name":"7954",
-        "email":"1015182620@qq.com",
-        "phone":"15904015593",
-        "enable":true,
-        "superuser":false,
-        "roleName":"yonghujuese"
-      },
-      {"id":"2","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"3","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"4","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"5","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"6","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"7","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"8","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"9","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"10","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},{"id":"11","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false}]
+      {"id":"1","username":"denggy","password":"123456","name":"邓广义","email":"1015182620@qq.com","phone":"15904015593","enable":true,"superuser":false,"roleName":"yonghujuese"},
+      {"id":"2","username":"zhangjianlin","password":"123456","name":"张建林","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"3","username":"wanghe","password":"123456","name":"王贺","email":"wanghe@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"4","username":"wanghaopeng","password":"123456","name":"王浩鹏","email":"wanghaopeng@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"5","username":"liyiming","password":"123456","name":"李一鸣","email":"liyiming@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"6","username":"wangyi","password":"123456","name":"王怡","email":"wangyi@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"7","username":"wangwei","password":"123456","name":"王维","email":"wangwei@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"8","username":"shihaoyu","password":"123456","name":"时浩宇","email":"shihaoyu@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"9","username":"buhaiyang","password":"123456","name":"步海洋","email":"buhaiyang@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"10","username":"sunshuai","password":"123456","name":"孙帅","email":"sunshuai@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"11","username":"xuyang","password":"123456","name":"徐洋","email":"xuyang@qq.com","phone":"15912345678","enable":true,"superuser":false}]
   },
   'GET:/auth/users/:id':{
     "id": "2",
@@ -427,10 +426,10 @@ module.exports = {
     "superuser": false
   },
   'POST:/auth/users/:id/role/:roleId':(req , res)=>{
-    res.send({})
+    res.send('添加成功')
   },
   'DELETE:/auth/users/:id/role/:roleId':(req , res)=>{
-    res.send({})
+    res.send('删除成功')
   },
   'GET:/auth/users/:id/roles':[
     {"id":"1","name":"普通管理员"},
@@ -477,35 +476,35 @@ module.exports = {
   'GET:/auth/user-groups':[
     {
       "id": "ggjs",
-      "name": "高管用户",
+      "name": "高管用户组",
       "description": "高管角色用户组",
       "seq": 1,
       "enable": true
     },
     {
       "id": "glyjs",
-      "name": "管理员用户",
+      "name": "管理员用户组",
       "description": "管理员角色用户组",
       "seq": 2,
       "enable": true
     },
     {
       "id": "nqjs",
-      "name": "内勤用户",
+      "name": "内勤用户组",
       "description": "内勤角色用户组",
       "seq": 3,
       "enable": false
     },
     {
       "id": "oer2",
-      "name": "其他用户",
+      "name": "其他用户组",
       "description": "其他角色用户组",
       "seq": 4,
       "enable": false
     },
     {
       "id": "oer1",
-      "name": "其他用户2",
+      "name": "其他用户组2",
       "description": "其他角色2用户组",
       "seq": 5,
       "enable": false
@@ -604,6 +603,12 @@ module.exports = {
   },
   'DELETE:/auth/user-groups/:id/user/:userId':(req , res)=>{
     res.send({})
+  },
+  'POST:/auth/user-groups/:id/role/:roleId':(req , res)=>{
+    res.send('添加成功')
+  },
+  'DELETE:/auth/user-groups/:id/role/:roleId':(req , res)=>{
+    res.send('删除成功')
   },
   'PUT:/auth/user-groups/:id/users':(req , res)=>{
     res.send({})
@@ -710,10 +715,10 @@ module.exports = {
     },
     {
       "id": "2",
-      "username": "cbj",
+      "username": "zhangjianlin",
       "pwd": "123456",
-      "name": "陈冰洁",
-      "email": "cbj@test.com",
+      "name": "张建林",
+      "email": "zjl@test.com",
       "phone": "13012345678",
       "enable": true,
       "superuser": false,
@@ -721,10 +726,10 @@ module.exports = {
     },
     {
       "id": "3",
-      "username": "lym",
+      "username": "wanghe",
       "pwd": "123456",
-      "name": "李一鸣",
-      "email": "lym@test.com",
+      "name": "王贺",
+      "email": "wh@test.com",
       "phone": "13012345678",
       "enable": true,
       "superuser": false,
@@ -740,20 +745,9 @@ module.exports = {
       "enable": true,
       "superuser": false,
       "pepDtype": "pepDtype"
-    },
-    {
-      "id": "5",
-      "username": "wh",
-      "pwd": "123456",
-      "name": "王贺",
-      "email": "wh@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
     }
   ],
   'GET:/auth/roles/:id/user-groups':[
-    {"id":"ggjs","name":"高管用户"},
+    {"id":"ggjs","name":"高管用户组"},
   ],
 }

@@ -1,8 +1,9 @@
-// import { queryGroups } from '../services/authGroupsS';
-// import { queryUsers } from '../services/authUserS';
+import { queryGroups } from '../services/authGroupsS';
+import { queryUsers } from '../services/authUserS';
 import { queryCurrentMenus } from '../../Base/services/baseS';
 import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups, fetchUpdateStatus,
-  createOrUpdate, queryParents, queryCheckedMenus, menusAdd, menusDelete } from '../services/authRoleS';
+  createOrUpdate, queryParents, queryCheckedMenus, menusAdd, menusDelete,
+  userAddRole, userDelRole, GroupAddRole, GroupDelRole } from '../services/authRoleS';
 import { formatter, controlMenu } from '../../../utils/utils';
 
 export default {
@@ -13,7 +14,9 @@ export default {
     messageText: '',
     roleInfo: {},
     roleUsers: [],
+    allUsers: [],
     roleGroups: [],
+    allGroups: [],
     roleParents: [],
     roleMenus: [],
     roleMenusChecked: [],
@@ -118,6 +121,60 @@ export default {
       yield call(menusDelete, payload);
       if (callback) callback();
     },
+    // 取得所有用户
+    *fetchAllUsers({ payload, callback }, { call, put }) {
+      const response = yield call(queryUsers, payload);
+      yield put({
+        type: 'saveAllUsers',
+        payload: response.data,
+      });
+      if (callback) callback();
+    },
+    // 取得所有用户组
+    *fetchAllGroups({ payload, callback }, { call, put }) {
+      const response = yield call(queryGroups, payload);
+      yield put({
+        type: 'saveAllGroups',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 角色添加用户
+    *roleAddUsers({ payload, callback }, { call, put }) {
+      const response = yield call(userAddRole, payload);
+      yield put({
+        type: 'getMessages',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 角色删除用户
+    *roleDelUsers({ payload, callback }, { call, put }) {
+      const response = yield call(userDelRole, payload);
+      yield put({
+        type: 'getMessages',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 角色添加用户组
+    *roleAddGroups({ payload, callback }, { call, put }) {
+      const response = yield call(GroupAddRole, payload);
+      yield put({
+        type: 'getMessages',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 角色删除用户组
+    *userDelGroups({ payload, callback }, { call, put }) {
+      const response = yield call(GroupDelRole, payload);
+      yield put({
+        type: 'getMessages',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   reducers: {
@@ -164,12 +221,26 @@ export default {
         roleMenusChecked: action.payload.checked
       };
     },
+    saveAllUsers(state, action) {
+      return {
+        ...state,
+        allUsers: action.payload
+      };
+    },
+    saveAllGroups(state, action) {
+      return {
+        ...state,
+        allGroups: action.payload
+      };
+    },
     clear(state) {
       return {
         ...state,
         roleInfo: {},
         roleUsers: [],
-        roleGroups: []
+        roleGroups: [],
+        allUsers: [],
+        allGroups: []
       }
     },
   },
