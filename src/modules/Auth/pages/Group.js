@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Table, Switch, Divider, Spin, Transfer,
   Form, Modal, Input, message, Tabs, Radio, Badge, Popconfirm } from 'antd';
 import { connect } from 'dva';
@@ -26,67 +26,69 @@ const formItemLayout = {
 };
 
 const BasicInfoForm = Form.create()((props) => {
-  const { form, groupsBasicInfo } = props;
+  const { form, groupsBasicInfo, loading } = props;
 
   return (
-    <Form>
-      <FormItem>
-        {form.getFieldDecorator('id', {
-          initialValue: groupsBasicInfo.id,
-        })(
-          <Input type="hidden" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="名称"
-      >
-        {form.getFieldDecorator('name', {
-          initialValue: groupsBasicInfo.name,
-          rules: [{ required: true, message: '名称不能为空' }],
-        })(
-          <Input placeholder="请输入名称" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="顺序"
-      >
-        {form.getFieldDecorator('seq', {
-          initialValue: groupsBasicInfo.seq,
-          rules: [
-            { required: true, message: '顺序不能为空' },
-            { pattern: /\d+/i, message: '顺序只能为数字'}
-          ],
-        })(
-          <Input placeholder="请输入顺序" />
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="状态"
-      >
-        {form.getFieldDecorator('enable', {
-          initialValue: groupsBasicInfo.enable == null ? true : groupsBasicInfo.enable
-        })(
-          <RadioGroup>
-            <Radio value={true}>启用</Radio>
-            <Radio value={false}>停用</Radio>
-          </RadioGroup>
-        )}
-      </FormItem>
-      <FormItem
-        {...formItemLayout}
-        label="描述"
-      >
-        {form.getFieldDecorator('description', {
-          initialValue: groupsBasicInfo.description,
-          rules: [{ required: true, message: '描述不能为空' }]
-        })(
-          <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
-        )}
-      </FormItem>
-    </Form>
+    <Spin spinning={loading}>
+      <Form>
+        <FormItem>
+          {form.getFieldDecorator('id', {
+            initialValue: groupsBasicInfo.id,
+          })(
+            <Input type="hidden" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="名称"
+        >
+          {form.getFieldDecorator('name', {
+            initialValue: groupsBasicInfo.name,
+            rules: [{ required: true, message: '名称不能为空' }],
+          })(
+            <Input placeholder="请输入名称" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="顺序"
+        >
+          {form.getFieldDecorator('seq', {
+            initialValue: groupsBasicInfo.seq,
+            rules: [
+              { required: true, message: '顺序不能为空' },
+              { pattern: /\d+/i, message: '顺序只能为数字'}
+            ],
+          })(
+            <Input placeholder="请输入顺序" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="状态"
+        >
+          {form.getFieldDecorator('enable', {
+            initialValue: groupsBasicInfo.enable == null ? true : groupsBasicInfo.enable
+          })(
+            <RadioGroup>
+              <Radio value={true}>启用</Radio>
+              <Radio value={false}>停用</Radio>
+            </RadioGroup>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="描述"
+        >
+          {form.getFieldDecorator('description', {
+            initialValue: groupsBasicInfo.description,
+            rules: [{ required: true, message: '描述不能为空' }]
+          })(
+            <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
+          )}
+        </FormItem>
+      </Form>
+    </Spin>
   )
 });
 
@@ -100,7 +102,7 @@ const UserInfoForm = Form.create()((props) => {
   const handleChange = (tKeys) => {
     handleUserTrans(groupsBasicInfo.id, tKeys);
   }
-
+  console.log('userTargetKeys', userTargetKeys)
   return (
     <Form>
       <FormItem>
@@ -127,39 +129,6 @@ const UserInfoForm = Form.create()((props) => {
     </Form>
   )
 });
-
-// const GroupInfoForm = Form.create()((props) => {
-//   const { form, groupAll, userGroups, loading } = props;
-
-//   return (
-//     <Form>
-//       <FormItem
-//         {...formItemLayout}
-//         label="用户组"
-//       >
-//         {form.getFieldDecorator('groups', {
-//           initialValue: userGroups && userGroups.map(item => item.id),
-//           rules: [{ required: true, message: '用户组不能为空' }],
-//         })(
-//           <Select
-//             mode="multiple"
-//             style={{ width: '100%' }}
-//             placeholder="请选择用户组 "
-//           >
-//             {groupAll.length ? groupAll.map(item=>
-//               <Option key={item.id}>{item.name}</Option>
-//             ) : groupAll}
-//           </Select>
-//         )}
-//         {loading && (
-//           <div className={styles.selectLoading}>
-//             <Spin size="small" />
-//           </div>
-//         )}
-//       </FormItem>
-//     </Form>
-//   )
-// });
 
 const CreateForm = connect()((props) => {
   const { modalVisible, handleFormSubmit, closeForm, groupUsers,
@@ -222,12 +191,16 @@ const CreateForm = connect()((props) => {
     //   />
     // }
   ];
-
+  const footer = (
+    <Fragment>
+      <Button onClick={handleCancel}>取消</Button>
+      {currentTabKey === 'basic' && <Button type="primary" onClick={okHandle} loading={loading}>保存</Button>}
+    </Fragment>);
   return (
     <Modal
       visible={modalVisible}
-      onOk={okHandle}
       onCancel={handleCancel}
+      footer={footer}
     >
       <Tabs
         onChange={onTabChange}
@@ -291,33 +264,34 @@ export default class Group extends PureComponent {
         ids: [record.id]
       },
       callback: () => {
+        checked ? message.success('已启用') : message.error('已禁用')
         this.refresh();
-        // this.props.dispatch({
-        //   type: 'authGroups/fetch',
-        //   callback: (res) => {
-        //     this.props.dispatch({
-        //       type: 'authGroups/changeStatus',
-        //       payload: res
-        //     })
-        //   }
-        // });
       }
     });
   }
 
   // 批量删除
   handleRemoveAll = (selectedRowKeys) => {
-    this.props.dispatch({
-      type: 'authGroups/removeAll',
-      payload: {
-        ids: selectedRowKeys.toString()
-      },
-      callback: () => {
-        this.refresh();
-        message.success(this.props.authGroups.groupsMessageData);
-        this.setState({
-          selectedRows: [],
-          selectedRowKeys: []
+    const me = this;
+    Modal.confirm({
+      title: '提示',
+      content: `确定删除选中的${selectedRowKeys.length}条数据吗`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        me.props.dispatch({
+          type: 'authGroups/removeAll',
+          payload: {
+            ids: selectedRowKeys.toString()
+          },
+          callback: () => {
+            this.refresh();
+            message.success(this.props.authGroups.groupsMessageData);
+            this.setState({
+              selectedRows: [],
+              selectedRowKeys: []
+            });
+          }
         });
       }
     });
@@ -375,6 +349,7 @@ export default class Group extends PureComponent {
         type: 'authGroups/createOrUpdate',
         payload: fields,
         callback: () => {
+          message.success('保存成功');
           this.refresh();
           // this.props.dispatch({
           //   type: 'authGroups/fetch',
@@ -390,26 +365,6 @@ export default class Group extends PureComponent {
           });
         }
       });
-    } else if (activeKey === 'user') {
-      // for (let j = 0; j < this.state.userTargetKeys.length; j++) {
-      //   this.props.dispatch({
-      //     type: 'authGroups/groupAddUsers',
-      //     payload: {
-      //       id: fields.id,
-      //       userId: this.state.userTargetKeys[j]
-      //     },
-      //     callback: () => {
-      //       this.props.dispatch({
-      //         type: 'authGroups/fetch'
-      //       });
-      //       self.setState({
-      //         isCreate: false
-      //       });
-      //     }
-      //   });
-      // }
-    // } else if (activeKey === 'group') {
-      // TODO
     }
   }
 
@@ -418,6 +373,7 @@ export default class Group extends PureComponent {
     this.setState({
       currentTabKey: activeKey
     });
+    console.log(activeKey)
     if (activeKey === 'user') {
       this.props.dispatch({
         type: 'authGroups/fetchUserAll',
@@ -456,21 +412,19 @@ export default class Group extends PureComponent {
 
   // 点击编辑按钮
   handleEdit = (record) => {
-    const self = this;
+    this.setState({
+      modalVisible: true,
+      isCreate: !record.id
+    });
     this.props.dispatch({
       type: 'authGroups/fetchById',
-      payload: record.id,
-      callback() {
-        self.setState({
-          modalVisible: true,
-          isCreate: !record.id
-        });
-      }
+      payload: record.id
     });
   }
 
   // user穿梭框change
   handleUserTrans = (groupId, key) => {
+    const me = this;
     const userKey = [];
     for (const item of this.props.authGroups.groupUsers) {
       userKey.push(item.id);
@@ -489,9 +443,14 @@ export default class Group extends PureComponent {
           ids: data.toString()
         },
         callback: () => {
-          this.props.dispatch({
+          me.props.dispatch({
             type: 'authGroups/fetchGroupUsers',
-            payload: groupId
+            payload: groupId,
+            callback: (userTargetKeys) => {
+              me.setState({
+                userTargetKeys: userTargetKeys.map(item=>item.id)
+              })
+            }
           })
         }
       });
@@ -509,9 +468,14 @@ export default class Group extends PureComponent {
           ids: data.toString()
         },
         callback: () => {
-          this.props.dispatch({
+          me.props.dispatch({
             type: 'authGroups/fetchGroupUsers',
-            payload: groupId
+            payload: groupId,
+            callback: (userTargetKeys) => {
+              me.setState({
+                userTargetKeys: userTargetKeys.map(item=>item.id)
+              })
+            }
           })
         }
       });
@@ -575,10 +539,11 @@ export default class Group extends PureComponent {
       groupsBasicInfo: this.props.authGroups.groupsBasicInfo,
       groupUsers: this.props.authGroups.groupUsers,
       allUsers: this.props.authGroups.allUsers,
-      groupAll: this.props.authGroups.groupsData,
+      groupAll: this.props.authGroups.groupAll,
       userGroups: this.props.authGroups.userGroups,
       handleTabChange: this.handleTabChange,
       handleUserTrans: this.handleUserTrans,
+      loading: !!loading,
       isCreate,
       currentTabKey,
       userTargetKeys
@@ -597,12 +562,12 @@ export default class Group extends PureComponent {
       { title: '状态', dataIndex: 'enable', key: 'enable', render: (text, record) => (
           <Switch
             size="small"
-            checked = { record.enable }
+            defaultChecked = { record.enable }
             onChange={(value) => {
               this.handleSwitchOnChange(value, record);
             }} />)},
       {
-        title: '操作', key: 'action', render: record => (
+        title: '操作', width: 150, key: 'action', render: record => (
           <span>
             <a onClick={() => this.handleEdit(record)}>编辑</a>
             <Divider type="vertical" />
@@ -619,7 +584,7 @@ export default class Group extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$auth$groups"
+          moduleName="$auth$user-groups"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
@@ -632,9 +597,7 @@ export default class Group extends PureComponent {
               {
                 selectedRows.length > 0 && (
                   <span>
-                    {<Popconfirm title={`确定删除选中的${this.state.selectedRowKeys.length}条数据吗?`} onConfirm={() => this.handleRemoveAll(selectedRowKeys)}>
-                      <Button icon="delete">批量删除</Button>
-                    </Popconfirm>}
+                      <Button icon="delete" onClick={() => this.handleRemoveAll(selectedRowKeys)}>删除</Button>
                   </span>
                 )
               }

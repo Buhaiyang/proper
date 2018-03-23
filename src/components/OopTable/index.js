@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import {Table, Button} from 'antd';
+import React, { PureComponent, Fragment } from 'react';
+import {Table, Button, Divider, Popconfirm} from 'antd';
 import styles from './index.less';
 
 export default class OopTable extends PureComponent {
@@ -30,10 +30,10 @@ export default class OopTable extends PureComponent {
       selectedRowKeys: []
     })
   }
-  createButtons = (topButtons)=>{
-    return topButtons.map((btn) =>{
+  createTopButtons = (topButtons)=>{
+    return topButtons.map(btn =>(
       // 1.btn属性配置了displayReg并且displayReg执行返回结果为true 或者 2.没有配置displayReg 渲染按钮
-      return ((btn.display && btn.display(this.state.selectedRowKeys)) || !btn.display) &&
+      ((btn.display && btn.display(this.state.selectedRowKeys)) || !btn.display) &&
       (
         <Button
           key={btn.name}
@@ -43,10 +43,39 @@ export default class OopTable extends PureComponent {
           {btn.text}
         </Button>
       )
+    ))
+  }
+  createRowButtons = (columns, rowButtons)=>{
+    console.log(rowButtons)
+    const cols = [...columns]
+    rowButtons.length && cols.push({
+      title: '操作',
+      width: 150,
+      render: (text, record)=>{
+        return rowButtons.map((item, index)=> (
+          item.display(record) ? (
+            <Fragment key={item.name}>
+            {
+              item.confirm ? (
+                <Popconfirm
+                  title={item.confirm}
+                  onConfirm={() => item.onClick(record)}>
+                  <a>{item.text}</a>
+                </Popconfirm>
+                )
+                : (<a onClick={() => item.onClick(record)}>{item.text}</a>)
+            }
+            {(rowButtons.length - 1 !== index) && <Divider type="vertical" />}
+          </Fragment>) : '')
+        )
+      }
     })
+    return cols
   }
   render() {
-    const { grid: {list, pagination }, columns, loading, topButtons = [] } = this.props
+    const { grid: {list, pagination },
+      columns, loading, topButtons = [], rowButtons = [], size } = this.props
+    const cols = this.createRowButtons(columns, rowButtons)
     const rowSelectionCfg = {
       onChange: this.rowSelectionChange,
       selectedRowKeys: this.state.selectedRowKeys,
@@ -58,17 +87,18 @@ export default class OopTable extends PureComponent {
       <div className={styles.oopTableWrapper}>
         <div className={styles.toolbar}>
           {
-            this.createButtons(topButtons)
+            this.createTopButtons(topButtons)
           }
         </div>
         <Table
           dataSource={list}
           rowKey={record => record.id}
           rowSelection={rowSelectionCfg}
-          columns={columns}
+          columns={cols}
           loading={loading}
           pagination={pagination}
           onChange={this.onChange}
+          size={size}
         />
       </div>
     )

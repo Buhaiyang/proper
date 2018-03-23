@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Popconfirm, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/Oopsearch';
@@ -135,7 +135,7 @@ const UserBasicInfoForm = Form.create()((props) => {
           label="状态"
         >
           {getFieldDecorator('enable', {
-            initialValue: userBasicInfo.enable || true
+            initialValue: userBasicInfo.enable == null ? true : userBasicInfo.enable
           })(
             <RadioGroup>
               <Radio value={true}>启用</Radio>
@@ -274,7 +274,10 @@ const ModalForm = connect()((props) => {
 
   }];
   const footer = (
-    <Fragment><Button onClick={onCancel}>取消</Button><Button type="primary" onClick={onOk} loading={loading}>保存</Button></Fragment>);
+    <Fragment>
+      <Button onClick={onCancel}>取消</Button>
+      {currentTabKey === 'basicUser' && <Button type="primary" onClick={onOk} loading={loading}>保存</Button>}
+    </Fragment>);
   return (
     <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer}>
       <Tabs size={size} animated={false} onChange={onTabChange} activeKey={currentTabKey}>
@@ -331,10 +334,8 @@ export default class User extends React.PureComponent {
       type: 'authUser/deleteUsers',
       payload: {ids: record.id},
       callback() {
-        me.setState({
-          selectedRowKeys: []
-        });
         message.success('删除成功');
+        me.onLoad()
       }
     })
   }
@@ -437,10 +438,10 @@ export default class User extends React.PureComponent {
   onLoad = (param)=> {
     this.oopSearch.load(param)
   }
-  userAddDel = (value, typeAdd, typeDel, typeRoles) => {
+  userAddDel = (value, typeAdd, typeDel, typeRoles, data) => {
     const userIds = [];
-    for (let i = 0; i < this.props.authUser.userRoles.length; i++) {
-      userIds.push(this.props.authUser.userRoles[i].id);
+    for (let i = 0; i < data.length; i++) {
+      userIds.push(data[i].id);
     }
     if (value.length > userIds.length) {
       for (let i = 0; i < value.length; i++) {
@@ -486,14 +487,16 @@ export default class User extends React.PureComponent {
     const typeAdd = 'authUser/userAddRole';
     const typeDel = 'authUser/userDelRole';
     const typeRoles = 'authUser/fetchUserRoles';
-    this.userAddDel(value, typeAdd, typeDel, typeRoles);
+    const data = this.props.authUser.userRoles;
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data);
   }
   // 用户添加用户组
   userAddGroups = (value) => {
     const typeAdd = 'authUser/userAddGroup';
     const typeDel = 'authUser/userDelGroup';
     const typeRoles = 'authUser/fetchUserGroups';
-    this.userAddDel(value, typeAdd, typeDel, typeRoles);
+    const data = this.props.authUser.userGroups;
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data);
   }
   render() {
     const {
@@ -520,30 +523,8 @@ export default class User extends React.PureComponent {
             {text === true ? '已启用' : '已停用'}
           </Fragment>
         )
-      },
-      // {title:'是否为超级用户',dataIndex:'superuser',render(text){
-      //       return <div>
-      //         {text==true?'是':'否'}
-      //       </div>
-      //   }},
-      {
-        title: '操作', render: (text, record) => {
-          if (record.superuser) {
-            return null;
-          } else {
-            return (
-              <Fragment>
-                <a onClick={() => this.onEdit(record)}>编辑</a>
-                <Divider type="vertical" />
-                {<Popconfirm title="是否要删除此行？" onConfirm={() => this.onDelete(record)}>
-                  <a>删除</a>
-                </Popconfirm>}
-              </Fragment>
-            )
-          }
-        }
       }
-    ];
+    ]
     const topButtons = [
       {
         text: '新建',
@@ -559,13 +540,21 @@ export default class User extends React.PureComponent {
         onClick: (items)=>{ this.batchDelete(items) },
         display: items=>(items.length),
       }
-      // {
-      //   text: '按钮3',
-      // },
-      // {
-      //   text: '按钮4',
-      // }
-    ];
+    ]
+    const rowButtons = [
+      {
+        text: '编辑',
+        name: 'edit',
+        onClick: (record)=>{ this.onEdit(record) },
+        display: record=>(!record.superuser)
+      }, {
+        text: '删除',
+        name: 'delete',
+        confirm: '是否要删除此行',
+        onClick: (record)=>{ this.onDelete(record) },
+        display: record=>(!record.superuser)
+      },
+    ]
     return (
       <PageHeaderLayout content={
         <OopSearch
@@ -583,6 +572,7 @@ export default class User extends React.PureComponent {
             onLoad={this.onLoad}
             size={size}
             topButtons={topButtons}
+            rowButtons={rowButtons}
             ref={(el)=>{ this.oopTable = el }}
           />
         </Card>
@@ -605,6 +595,7 @@ export default class User extends React.PureComponent {
         <Modal
           visible={this.state.viewModalVisible}
           destroyOnClose={true}
+          width={600}
           footer={<Button type="primary" onClick={() => this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={() => this.handleViewModalVisible(false)}>
           <Spin spinning={loading}>

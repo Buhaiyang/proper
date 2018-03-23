@@ -65,9 +65,13 @@ export default {
           groupUsers: Array.isArray(response) ? response : [],
         }
       })
-      if (callback) callback();
+      if (callback) callback(response);
     },
     *update({ payload, callback }, { call, put }) {
+      yield put({
+        type: 'getMessages',
+        payload: response,
+      });
       const response = yield call(updateUserGroups, payload);
       yield put({
         type: 'getMessages',

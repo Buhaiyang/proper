@@ -86,9 +86,7 @@ export default function request(url, options) {
       const { dispatch } = store;
       const status = e.name;
       if (status === 401) {
-        dispatch({
-          type: 'login/logout',
-        });
+        dispatch(routerRedux.push('/base/login'));
         return;
       }
       if (status === 409) {

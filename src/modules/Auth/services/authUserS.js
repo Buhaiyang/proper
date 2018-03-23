@@ -1,7 +1,8 @@
 import { stringify } from 'qs';
 import request from '../../../utils/request';
 
-export async function queryUsers(params) {
+export async function queryUsers() {
+  const params = {pageNo: 1, pageSize: 999, enable: true};
   return request(`/auth/users?${stringify(params)}`);
 }
 export async function queryUsersById(params) {
@@ -19,7 +20,7 @@ export async function queryUserRolesAll() {
   return request('/auth/roles');
 }
 export async function queryUserGroups(params) {
-  return request(`/auth/users/${params}/user-groups`);
+  return request(`/auth/users/${params}/user-groups?enable=true`);
 }
 export async function queryUserGroupsAll() {
   return request('/auth/user-groups');
