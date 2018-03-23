@@ -2113,7 +2113,7 @@ function queryList(type) {
   let list = {};
   if (type === '$auth$users') {
     list = authUser;
-  } else if (type === '$auth$groups') {
+  } else if (type === '$auth$user-groups') {
     list = authGroup;
   } else if (type === '$auth$roles') {
     list = authRole;

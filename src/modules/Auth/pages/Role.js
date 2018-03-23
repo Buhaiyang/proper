@@ -110,7 +110,7 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const ManagerInfoForm = Form.create()((props) => {
-  const { loading, roleMenus, checkedMenuKeys, handleMenuKeys, roleInfo } = props;
+  const { loading, roleMenus, checkedMenuKeys, handleMenuKeys, roleInfo, labelText } = props;
 
   const renderTreeNodes = (data) => {
     return data.map((item) => {
@@ -136,7 +136,7 @@ const ManagerInfoForm = Form.create()((props) => {
       <Form>
         <FormItem
           {...formItemLayout}
-          label="权限管理"
+          label={labelText}
         >
           <Tree
             checkable
@@ -288,6 +288,7 @@ const CreateForm = connect()((props) => {
         handleMenuKeys = {handleMenuKeys}
         roleMenus = {roleMenus}
         loading = {loading}
+        labelText = "权限管理"
       />
     },
     {
@@ -409,6 +410,7 @@ export default class Role extends PureComponent {
       type: 'authRole/fetchRoleGroupsById',
       payload: record.id,
     });
+    this.getMenus(record.id);
   }
 
   // 删除功能
@@ -545,6 +547,9 @@ export default class Role extends PureComponent {
       });
     }
   }
+
+  // 显示层的菜单
+  handleMenuKeysView = () => {}
 
   // tab切换
   handleTabChange = (activeKey, id) => {
@@ -776,30 +781,38 @@ export default class Role extends PureComponent {
           footer={<Button type="primary" onClick={()=>this.handleViewModalVisible(false)}>确定</Button>}
           onCancel={()=>this.handleViewModalVisible(false)}
         >
-          <Spin spinning={loading}>
-            <DescriptionList size={size} col="1">
-              <Description term="名称">
-                {roleInfo.name}
-              </Description>
-              <Description term="功能描述说明">
-                {roleInfo.description}
-              </Description>
-              <Description term="继承">
-                {roleInfo.parentName}
-              </Description>
-              <p>
-                <Badge status={roleInfo.badge} text={roleInfo.enableLabel} />
-              </p>
-            </DescriptionList>
-            <Divider style={{ marginBottom: 16 }} />
-            <DescriptionList size={size} col="1" title="包含的用户信息">
-              <Description>{roleUsers.map(item=>item.name.concat(', '))}</Description>
-            </DescriptionList>
-            <Divider style={{ marginBottom: 16 }} />
-            <DescriptionList size={size} col="1" title="用户组信息">
-              <Description>{roleGroups.map(item=>item.name.concat(', '))}</Description>
-            </DescriptionList>
-          </Spin>
+          <DescriptionList size={size} col="1">
+            <Description term="名称">
+              {roleInfo.name}
+            </Description>
+            <Description term="功能描述说明">
+              {roleInfo.description}
+            </Description>
+            <Description term="继承">
+              {roleInfo.parentName}
+            </Description>
+            <Description term="权限">
+              <ManagerInfoForm
+                roleInfo = {roleInfo}
+                checkedMenuKeys = {checkedMenuKeys}
+                handleMenuKeys = {this.handleMenuKeysView}
+                roleMenus = {roleMenus}
+                loading = {loading}
+                labelText = ""
+              />
+            </Description>
+            <p>
+              <Badge status={roleInfo.badge} text={roleInfo.enableLabel} />
+            </p>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="1" title="包含的用户信息">
+            <Description>{roleUsers.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 16 }} />
+          <DescriptionList size={size} col="1" title="用户组信息">
+            <Description>{roleGroups.map(item=>item.name.concat(', '))}</Description>
+          </DescriptionList>
         </Modal>
       </PageHeaderLayout>
     );
