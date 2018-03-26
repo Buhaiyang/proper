@@ -166,7 +166,7 @@ export default {
           list: payload.data,
           pagination: {
             ...state.oopSearchGrid.pagination,
-            total: payload.total
+            total: payload.count
           }
         }
       }

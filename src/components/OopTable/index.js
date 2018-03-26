@@ -51,22 +51,24 @@ export default class OopTable extends PureComponent {
       title: '操作',
       width: 150,
       render: (text, record)=>{
-        return rowButtons.map((item, index)=> (
-          item.display(record) ? (
-            <Fragment key={item.name}>
+        const renderButtons = ((item, index)=> (
+          <Fragment key={item.name}>
             {
               item.confirm ? (
-                <Popconfirm
-                  title={item.confirm}
-                  onConfirm={() => item.onClick(record)}>
-                  <a>{item.text}</a>
-                </Popconfirm>
+                  <Popconfirm
+                    title={item.confirm}
+                    onConfirm={() => item.onClick(record)}>
+                    <a>{item.text}</a>
+                  </Popconfirm>
                 )
                 : (<a onClick={() => item.onClick(record)}>{item.text}</a>)
             }
             {(rowButtons.length - 1 !== index) && <Divider type="vertical" />}
-          </Fragment>) : '')
-        )
+          </Fragment>
+        ))
+        return rowButtons.map((item, index)=> (
+          item.display ? (item.display(record) ? renderButtons(item, index) : '') : renderButtons(item, index)
+        ))
       }
     })
     return cols

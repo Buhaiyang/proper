@@ -388,11 +388,11 @@ export default class User extends React.PureComponent {
       this.props.dispatch({
         type: 'authUser/saveOrUpdateUser',
         payload: data,
-        callback() {
+        callback(param) {
           me.setState({
             isCreate: false
           });
-          message.success('保存成功');
+          param ? message.success('保存成功') : message.error('保存失败');
           me.onLoad();
         }
       });

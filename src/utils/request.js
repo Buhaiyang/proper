@@ -26,9 +26,12 @@ function checkStatus(response) {
     return response;
   }
   const errortext = codeMessage[response.status] || response.statusText;
-  notification.error({
-    message: `请求错误 ${response.status}: ${response.url}`,
-    description: errortext,
+  response.text().then((msg)=>{
+    notification.error({
+      // message: `请求错误 ${response.status}: ${response.url}`,
+      message: `请求错误 ${response.status}`,
+      description: msg,
+    });
   });
   const error = new Error(errortext);
   error.name = response.status;

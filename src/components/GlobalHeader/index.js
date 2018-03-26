@@ -86,6 +86,7 @@ export default class GlobalHeader extends PureComponent {
         />
         <div className={styles.right}>
           <HeaderSearch
+            style={{display: 'none'}}
             className={`${styles.action} ${styles.search}`}
             placeholder="站内搜索"
             dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}

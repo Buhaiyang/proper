@@ -1,11 +1,11 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Card, Button, Table, Switch, Divider, Spin, Transfer,
-  Form, Modal, Input, message, Tabs, Radio, Badge, Popconfirm } from 'antd';
+import { Card, Button, Switch, Divider, Spin, Transfer,
+  Form, Modal, Input, message, Tabs, Radio, Badge } from 'antd';
 import { connect } from 'dva';
-import styles from './Group.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/Oopsearch';
+import OopTable from '../../../components/OopTable';
 import DescriptionList from '../../../components/DescriptionList';
 
 const FormItem = Form.Item;
@@ -224,12 +224,9 @@ const CreateForm = connect()((props) => {
   loading: loading.models.authGroups,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
-@Form.create()
 export default class Group extends PureComponent {
   state = {
     modalVisible: false,
-    selectedRows: [],
-    selectedRowKeys: [],
     currentTabKey: 'basic',
     userTargetKeys: [],
     viewVisible: false,
@@ -243,7 +240,7 @@ export default class Group extends PureComponent {
     this.refresh();
   }
 
-  refresh(param) {
+  refresh = (param)=>{
     const params = {
       ...param,
       userGroupEnable: 'ALL'
@@ -290,10 +287,7 @@ export default class Group extends PureComponent {
           },
           callback: (msg) => {
             msg ? message.error(msg) : message.success('删除成功');
-            me.setState({
-              selectedRows: [],
-              selectedRowKeys: []
-            });
+            me.oopTable.clearSelection()
             me.refresh();
           }
         });
@@ -311,10 +305,7 @@ export default class Group extends PureComponent {
       },
       callback: (msg) => {
         msg ? message.error(msg) : message.success('删除成功');
-        me.setState({
-          selectedRows: [],
-          selectedRowKeys: []
-        });
+        me.oopTable.clearSelection()
         me.refresh();
       }
     });
@@ -356,15 +347,6 @@ export default class Group extends PureComponent {
         callback: () => {
           message.success('保存成功');
           this.refresh();
-          // this.props.dispatch({
-          //   type: 'authGroups/fetch',
-          //   callback: (res) => {
-          //     this.props.dispatch({
-          //       type: 'authGroups/changeStatus',
-          //       payload: res
-          //     })
-          //   }
-          // });
           self.setState({
             isCreate: false
           });
@@ -525,18 +507,9 @@ export default class Group extends PureComponent {
   }
 
   render() {
-    const { loading, global: { size, oopSearchGrid: {list, pagination}}, gridLoading } = this.props;
-    const { modalVisible, selectedRows, selectedRowKeys,
-      currentTabKey, userTargetKeys, viewVisible, userInfoView,
+    const { loading, global: { size, oopSearchGrid}, gridLoading } = this.props;
+    const { modalVisible, currentTabKey, userTargetKeys, viewVisible, userInfoView,
       groupUsers, userGroups, isCreate } = this.state;
-    const rowSelection = {
-      onChange: (keys, rows) => {
-        this.setState({
-          selectedRows: rows,
-          selectedRowKeys: keys
-        });
-      }
-    };
 
     const parentMethods = {
       handleFormSubmit: this.handleFormSubmit,
@@ -568,22 +541,39 @@ export default class Group extends PureComponent {
           <Switch
             size="small"
             defaultChecked = { record.enable }
+            checked={ record.enable }
             onChange={(value) => {
               this.handleSwitchOnChange(value, record);
-            }} />)},
-      {
-        title: '操作', width: 150, key: 'action', render: record => (
-          <span>
-            <a onClick={() => this.handleEdit(record)}>编辑</a>
-            <Divider type="vertical" />
-            {<Popconfirm title="是否要删除此条信息？" onConfirm={() => this.handleRemove(record)}>
-              <a>删除</a>
-            </Popconfirm>}
-          </span>
-        )
-      }
+            }} />)}
     ];
-
+    const topButtons = [
+      {
+        text: '新建',
+        name: 'create',
+        type: 'primary',
+        icon: 'plus',
+        onClick: ()=>{ this.handleCreate(true) }
+      },
+      {
+        text: '删除',
+        name: 'delete',
+        icon: 'delete',
+        onClick: (items)=>{ this.handleRemoveAll(items) },
+        display: items=>(items.length),
+      }
+    ]
+    const rowButtons = [
+      {
+        text: '编辑',
+        name: 'edit',
+        onClick: (record)=>{ this.handleEdit(record) }
+      }, {
+        text: '删除',
+        name: 'delete',
+        confirm: '是否要删除此条信息',
+        onClick: (record)=>{ this.handleRemove(record) }
+      },
+    ]
     return (
       <PageHeaderLayout content={
         <OopSearch
@@ -594,30 +584,16 @@ export default class Group extends PureComponent {
         />
       }>
         <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleCreate(true)}>
-                新建
-              </Button>
-              {
-                selectedRows.length > 0 && (
-                  <span>
-                      <Button icon="delete" onClick={() => this.handleRemoveAll(selectedRowKeys)}>删除</Button>
-                  </span>
-                )
-              }
-            </div>
-            <Table
-              loading= {gridLoading}
-              rowSelection={rowSelection}
-              dataSource={list}
-              columns={columns}
-              rowKey={record => record.id}
-              size={size}
-              pagination={pagination}
-              onChange={this.onChange}
-            />
-          </div>
+          <OopTable
+            grid={oopSearchGrid}
+            columns={columns}
+            loading={gridLoading}
+            onLoad={this.refresh}
+            size={size}
+            topButtons={topButtons}
+            rowButtons={rowButtons}
+            ref={(el)=>{ this.oopTable = el }}
+          />
         </Card>
         <CreateForm
           {...parentMethods}

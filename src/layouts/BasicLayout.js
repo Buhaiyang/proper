@@ -124,7 +124,7 @@ export default class BasicLayout extends React.PureComponent {
       payload: collapsed,
     });
     this.setState({
-      marginLeft: collapsed ? '80px' : '256px'
+      marginLeft: isMobile ? 0 : (collapsed ? '80px' : '256px')
     })
   }
   handleNoticeClear = (type) => {
@@ -187,7 +187,7 @@ export default class BasicLayout extends React.PureComponent {
     // console.log('routes',routes);
     const layout = (
       <Layout className={styles.placeholder}>
-        <div style={{position: 'fixed', top: 0, left: 0}}>
+        <div style={this.state.isMobile ? {position: 'relative'} : {position: 'fixed', top: 0, left: 0}}>
           <SiderMenu
             logo={logo}
             // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面

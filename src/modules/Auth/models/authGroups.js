@@ -105,9 +105,9 @@ export default {
       const response = yield call(createOrUpdateUserGroups, payload);
       yield put({
         type: 'getGroupsBasicInfo',
-        payload: response,
+        payload: response || {},
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 用户组添加用户
     *groupAddUsers({ payload, callback }, { call }) {
