@@ -32,6 +32,12 @@ export const dynamicWrapper = (component) => {
   });
 };
 let _routerData = {
+  '/customframe': {
+    component: dynamicWrapper(()=>import('../layouts/CustomFrameLayout'))
+  },
+  '/customframe/exam': {
+    component: dynamicWrapper(()=>import('../components/CustomFrame/Exam/index'))
+  },
   '/base': {
     component: dynamicWrapper(()=>import('../layouts/UserLayout'))
   },

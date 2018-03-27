@@ -1961,7 +1961,7 @@ module.exports = {
 }
 
 const authUser = {
-  "total":11,
+  "count":11,
   "data": [
     {"id":"1","username":"denggy","password":"123456","name":"7954","email":"1015182620@qq.com","phone":"15904015593","enable":true,"superuser":false},
     {"id":"2","username":"zhangjianlin","password":"123456","name":"66666","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
@@ -1978,7 +1978,7 @@ const authUser = {
 };
 
 const authGroup = {
-  "total":12,
+  "count":12,
   "data": [
     {"id": "1","name": "高管用户","description": "高管角色用户组","seq": 1,"enable": true},
     {"id": "2","name": "管理员用户","description": "管理员角色用户组","seq": 2,"enable": true},
@@ -1996,7 +1996,7 @@ const authGroup = {
 };
 
 const authRole = {
-  "total":4,
+  "count":4,
   "data": [
   {
     "id": "1",
@@ -2031,83 +2031,6 @@ const authRole = {
     "parentName": "普日基本权限功能"
   },
 ]};
-
-const workflowDesigner = {
-  "total":3,
-  "data":
-  [
-    {
-      "id": "0",
-      "name": "测试名字长度测试名字长度测试名字长度费用报销流程",
-      "key": "123",
-      "description": "费用报销",
-      "createdBy": "pep-sysadmin",
-      "lastUpdatedBy": "pep-sysadmin",
-      "lastUpdated": "2018-01-18T09:45:59.635+0000",
-      "disposeTime": "2018-03-14 13:53:54",
-      "createTime": "2018-01-14 09:34:50",
-      "latestVersion": true,
-      "version": 1,
-      "comment": null,
-      "modelType": 0,
-      "status": {
-        "content": "未部署",
-        "code": "0"
-      }
-    },
-    {
-      "id": "1",
-      "name": "测试名字长度测试名字长度测试名字长度费用报销流程",
-      "key": "123",
-      "description": "费用报销",
-      "createdBy": "pep-sysadmin",
-      "lastUpdatedBy": "pep-sysadmin",
-      "lastUpdated": "2018-01-18T09:45:59.635+0000",
-      "latestVersion": true,
-      "version": 1,
-      "comment": null,
-      "modelType": 0,
-      "status": {
-        "content": "已部署",
-        "code": "1"
-      }
-    },
-    {
-      "id": "2",
-      "name": "会议申请流程",
-      "key": "124",
-      "description": "会议申请流程会议申请流程会议申请流程会议申请流程会议申请流程",
-      "createdBy": "pep-sysadmin",
-      "lastUpdatedBy": "pep-sysadmin",
-      "lastUpdated": "2018-01-18T09:45:51.657+0000",
-      "latestVersion": true,
-      "version": 1,
-      "comment": null,
-      "modelType": 0,
-      "status": {
-        "content": "启用",
-        "code": "2"
-      }
-    },
-    {
-      "id": "3",
-      "name": "请假申请流程",
-      "key": "125",
-      "description": "请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程请假申请流程",
-      "createdBy": "pep-sysadmin",
-      "lastUpdatedBy": "pep-sysadmin",
-      "lastUpdated": "2018-01-18T08:59:59.262+0000",
-      "latestVersion": true,
-      "version": 1,
-      "comment": null,
-      "modelType": 0,
-      "status": {
-        "content": "停用",
-        "code": "3"
-      }
-    }
-  ]
-}
 
 function queryList(type) {
   let list = {};

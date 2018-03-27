@@ -1,0 +1,18 @@
+@bgColor: #fff;
+.blockBg(@bgColor) {
+  background-color: @bgColor;
+}
+
+:global {
+  .ant-layout-header,.ant-layout-content,.ant-layout-footer {
+    .blockBg(@bgColor)
+  }
+
+  .ant-layout-header,.ant-layout-footer {
+    text-align: center;
+  }
+
+  .ant-layout-header {
+    height: 0;
+  }
+}
