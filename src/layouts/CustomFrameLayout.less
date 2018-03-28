@@ -1,18 +1,32 @@
+
 @bgColor: #fff;
+
 .blockBg(@bgColor) {
-  background-color: @bgColor;
+  background: @bgColor;
 }
 
 :global {
-  .ant-layout-header,.ant-layout-content,.ant-layout-footer {
-    .blockBg(@bgColor)
+
+  .ant-layout {
+    .blockBg(@bgColor);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
   }
 
-  .ant-layout-header,.ant-layout-footer {
+  .ant-layout-content {
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .ant-layout-footer {
+    .blockBg(@bgColor);
+    padding: 0;
     text-align: center;
-  }
-
-  .ant-layout-header {
-    height: 0;
+    height: 48px;
+    line-height: 48px;
+    border-top: 1px solid #d9d9d9;
   }
 }
