@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Row, Col, Input, Button, Icon } from 'antd';
+import { Row, Col, Input, Button, Icon, Modal } from 'antd';
 import styles from './index.less';
 import { inject } from './../../../common/inject';
 import SelectOne from './../SelectOne/index';
@@ -17,7 +17,6 @@ const { TextArea } = Input;
 export default class Exam extends React.PureComponent {
   state = {
     answer: [],
-    inputValue: ''
   }
   componentWillMount() {
     this.loadData();
@@ -31,8 +30,11 @@ export default class Exam extends React.PureComponent {
 
   // 单选
   handlSelectOneChange = (val, questionId) => {
-    this.state.answer.splice(
-      this.state.answer.findIndex(item => item.questionId === questionId), 1);
+    let index = -1;
+    index = this.state.answer.findIndex(item => item.questionId === questionId);
+    if (index !== -1) {
+      this.state.answer.splice(index, 1);
+    }
     const obj = {
       questionId,
       choidId: val.target.value
@@ -42,8 +44,11 @@ export default class Exam extends React.PureComponent {
 
   // 多选
   handlSelectMoreChange = (val, questionId) => {
-    this.state.answer.splice(
-      this.state.answer.findIndex(item => item.questionId === questionId), 1);
+    let index = -1;
+    index = this.state.answer.findIndex(item => item.questionId === questionId);
+    if (index !== -1) {
+      this.state.answer.splice(index, 1);
+    }
     const obj = {
       questionId,
       choidId: val.toString()
@@ -51,14 +56,40 @@ export default class Exam extends React.PureComponent {
     this.state.answer.push(obj);
   }
 
-  // 填空
-  handleInputChange = (val) => {
-    console.log(val);
+  // 填空和简答
+  handleInputChange = (val, questionId) => {
+    const { value } = val.target;
+    let index = -1;
+    index = this.state.answer.findIndex(item => item.questionId === questionId);
+    if (index !== -1) {
+      this.state.answer.splice(index, 1);
+    }
+    const obj = {
+      questionId,
+      answer: value
+    }
+    this.state.answer.push(obj);
+  }
+
+  // 弹出提示框
+  showConfirm = () => {
+    const self = this;
+    Modal.confirm({
+      title: '确认提交试卷吗?',
+      content: '提交试卷后无法撤销更改',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        self.props.dispatch({
+          type: 'baseFrame/submit',
+          payload: self.state.answer,
+        });
+      },
+    });
   }
 
   render() {
     const { baseFrame: {examContent, examLists } } = this.props;
-    const { inputValue } = this.state;
 
     return (
       <div className={styles.examWrapper}>
@@ -77,10 +108,20 @@ export default class Exam extends React.PureComponent {
                       component = <SelectMore key={`select_one_${item.questionId}`} item={item} handlSelectMoreChange={this.handlSelectMoreChange} />;
                     }
                     if (item.type === 'FILL_IN') {
-                      component = <Input value={inputValue} onChange={this.handleInputChange(inputValue, item.questionId)} placeholder="填写答案，空格分隔" />
+                      component =
+                        (<Input
+                            onChange={value => this.handleInputChange(value, item.questionId)}
+                            placeholder="填写答案，空格分隔" />
+                        );
                     }
                     if (item.type === 'SUBJECTIVE_ITEM') {
-                      component = <TextArea style={{marginBottom: '5px'}} placeholder="填写答案" autosize={{ minRows: 2 }} />
+                      component =
+                        (<TextArea
+                            onChange={value => this.handleInputChange(value, item.questionId)}
+                            style={{marginBottom: '5px'}}
+                            placeholder="填写答案"
+                            autosize={{ minRows: 2 }} />
+                        )
                     }
                     return (
                       <div key={`questionId_${item.questionId}`}>
@@ -97,7 +138,10 @@ export default class Exam extends React.PureComponent {
                       </div>
                     );
                   })}
-                  <Button type="primary" style={{margin: '50px 0', width: '100%'}}>提交试卷</Button>
+                  <Button
+                    type="primary"
+                    onClick={this.showConfirm}
+                    style={{margin: '50px 0', width: '100%'}}>提交试卷</Button>
                 </div>
               ) : null
             }

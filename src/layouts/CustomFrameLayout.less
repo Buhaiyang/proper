@@ -5,28 +5,33 @@
   background: @bgColor;
 }
 
-:global {
+.customFrame {
+  height: 100%;
 
-  .ant-layout {
-    .blockBg(@bgColor);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-  }
+  :global {
 
-  .ant-layout-content {
-    display: flex;
-    flex: 1;
-    overflow-y: auto;
-  }
+    .ant-layout {
+      .blockBg(@bgColor);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
 
-  .ant-layout-footer {
-    .blockBg(@bgColor);
-    padding: 0;
-    text-align: center;
-    height: 48px;
-    line-height: 48px;
-    border-top: 1px solid #d9d9d9;
+    .ant-layout-content {
+      display: flex;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .ant-layout-footer {
+      .blockBg(@bgColor);
+      padding: 0;
+      text-align: center;
+      height: 48px;
+      line-height: 48px;
+      border-top: 1px solid #d9d9d9;
+    }
   }
 }
+

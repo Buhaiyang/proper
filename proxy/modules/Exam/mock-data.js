@@ -70,4 +70,5 @@ module.exports = {
       }
     ]
   },
+  "POST:/exam": { status: 'ok' },
 }
