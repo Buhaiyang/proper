@@ -17,6 +17,7 @@ const { TextArea } = Input;
 export default class Exam extends React.PureComponent {
   state = {
     answer: [],
+    btnDisabled: false
   }
   componentWillMount() {
     this.loadData();
@@ -83,13 +84,25 @@ export default class Exam extends React.PureComponent {
         self.props.dispatch({
           type: 'baseFrame/submit',
           payload: self.state.answer,
+          callback: () => {
+            self.setState({
+              btnDisabled: true
+            })
+          }
         });
       },
     });
   }
 
+  // 获得焦点
+  onFocus = (elementId) => {
+    document.getElementById(elementId).scrollIntoView();
+  }
+
   render() {
     const { baseFrame: {examContent, examLists } } = this.props;
+    const { btnDisabled } = this.state;
+    const copyright = <div>Copyright <Icon type="copyright" /> 2018 普日软件技术有限公司</div>;
 
     return (
       <div className={styles.examWrapper}>
@@ -110,6 +123,8 @@ export default class Exam extends React.PureComponent {
                     if (item.type === 'FILL_IN') {
                       component =
                         (<Input
+                            id={`el_id_${item.questionId}`}
+                            onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
                             placeholder="填写答案，空格分隔" />
                         );
@@ -117,6 +132,8 @@ export default class Exam extends React.PureComponent {
                     if (item.type === 'SUBJECTIVE_ITEM') {
                       component =
                         (<TextArea
+                            id={`el_id_${item.questionId}`}
+                            onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
                             style={{marginBottom: '5px'}}
                             placeholder="填写答案"
@@ -140,10 +157,15 @@ export default class Exam extends React.PureComponent {
                   })}
                   <Button
                     type="primary"
+                    disabled={btnDisabled}
                     onClick={this.showConfirm}
                     style={{margin: '50px 0', width: '100%'}}>提交试卷</Button>
                 </div>
               ) : null
+            }
+            {
+              examLists.length > 0 ? (
+                <footer className={styles.examNameFooter}>{copyright}</footer>) : null
             }
           </Col>
         </Row>

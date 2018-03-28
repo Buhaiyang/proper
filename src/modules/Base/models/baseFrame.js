@@ -14,8 +14,9 @@ export default {
         payload: response,
       });
     },
-    *submit({ payload }, { call }) {
+    *submit({ callback, payload }, { call }) {
       yield call(submitAnswer, payload);
+      if (callback) callback();
     },
   },
   reducers: {

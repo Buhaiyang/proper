@@ -1,37 +1,30 @@
 
-@bgColor: #fff;
-
-.blockBg(@bgColor) {
-  background: @bgColor;
-}
-
 .customFrame {
-  height: 100%;
 
   :global {
+    height: 100%;
 
     .ant-layout {
-      .blockBg(@bgColor);
-      display: flex;
-      flex-direction: column;
       height: 100%;
+      background: #fff;
       overflow: hidden;
     }
 
     .ant-layout-content {
+      height: 100%;
       display: flex;
       flex: 1;
-      overflow-y: auto;
     }
+  }
+}
 
-    .ant-layout-footer {
-      .blockBg(@bgColor);
-      padding: 0;
-      text-align: center;
-      height: 48px;
-      line-height: 48px;
-      border-top: 1px solid #d9d9d9;
-    }
+@media screen and (min-width: 760px) {
+  body {
+    background: #d9d9d9;
+  }
+  .customFrame {
+    width: 660px;
+    margin: 0 auto;
   }
 }
 
