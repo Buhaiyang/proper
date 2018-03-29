@@ -7,6 +7,10 @@ import { getRouterData } from '../common/frameHelper';
 const { Content } = Layout;
 
 export default class CustomFrameLayout extends React.PureComponent {
+  componentWillMount() {
+    window.localStorage.setItem('proper-auth-login-token', this.props.location.search.replace('?token=', ''));
+  }
+
   render() {
     return (
       <div className={styles.customFrame}>
