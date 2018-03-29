@@ -1,5 +1,5 @@
 module.exports = {
-  "GET:/exam": {
+  "GET:/questionnaire": {
     "name": "沈阳普日软件公司前端考试题",
     "total": 20,
     "list": [
@@ -70,5 +70,5 @@ module.exports = {
       }
     ]
   },
-  "POST:/exam": { status: 'ok' },
+  "POST:/questionnaire": { status: 'ok' },
 }
