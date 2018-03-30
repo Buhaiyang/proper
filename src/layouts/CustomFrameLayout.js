@@ -8,7 +8,11 @@ const { Content } = Layout;
 
 export default class CustomFrameLayout extends React.PureComponent {
   componentWillMount() {
-    window.localStorage.setItem('proper-auth-login-token', this.props.location.search.replace('?token=', ''));
+    if (this.props.location.search != null) {
+      const transParams = this.props.location.search.split('&');
+      window.localStorage.setItem('proper-auth-login-token', transParams[0].replace('?token=', ''));
+      window.localStorage.setItem('questionnaireNo', transParams[1].replace('questionnaireNo=', ''));
+    }
   }
 
   render() {

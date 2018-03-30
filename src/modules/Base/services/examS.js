@@ -1,13 +1,12 @@
-import {stringify} from 'qs';
 import request from '../../../utils/request';
 
 export async function queryExamContent(params) {
-  return request(`/questionnaire?${stringify(params)}`);
+  return request(`/questionnaire/${params}`);
 }
 
 export async function submitAnswer(params) {
-  return request('/questionnaire', {
+  return request(`/questionnaire/${params.number}`, {
     method: 'POST',
-    body: params
+    body: params.data
   });
 }

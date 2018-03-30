@@ -25,7 +25,8 @@ export default class Exam extends React.PureComponent {
 
   loadData = () => {
     this.props.dispatch({
-      type: 'baseFrame/fetch'
+      type: 'baseFrame/fetch',
+      payload: window.localStorage.getItem('questionnaireNo')
     });
   }
 
@@ -38,7 +39,7 @@ export default class Exam extends React.PureComponent {
     }
     const obj = {
       questionId,
-      choidId: val.target.value
+      choiceId: val.target.value
     }
     this.state.answer.push(obj);
   }
@@ -52,7 +53,7 @@ export default class Exam extends React.PureComponent {
     }
     const obj = {
       questionId,
-      choidId: val.toString()
+      choiceId: val.toString()
     }
     this.state.answer.push(obj);
   }
@@ -83,7 +84,10 @@ export default class Exam extends React.PureComponent {
       onOk() {
         self.props.dispatch({
           type: 'baseFrame/submit',
-          payload: self.state.answer,
+          payload: {
+            number: window.localStorage.getItem('questionnaireNo'),
+            data: self.state.answer
+          },
           callback: () => {
             self.setState({
               btnDisabled: true

@@ -7,8 +7,8 @@ export default {
     examLists: [],
   },
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(queryExamContent);
+    *fetch({ payload }, { call, put }) {
+      const response = yield call(queryExamContent, payload);
       yield put({
         type: 'saveExamContent',
         payload: response,
