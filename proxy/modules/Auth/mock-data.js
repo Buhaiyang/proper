@@ -13,393 +13,7 @@ module.exports = {
       res.send('');
     }
   },
-  "GET:/auth/menus":[
-    // {
-    //   "id": "9901",
-    //   "name": "dashboard",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "dashboard",
-    //   "parentId": null,
-    //   "route": "dashboard",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990101",
-    //   "name": "分析页",
-    //   "parentId": "9901",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "analysis",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990102",
-    //   "name": "监控页",
-    //   "parentId": "9901",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "monitor",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990103",
-    //   "name": "工作台",
-    //   "parentId": "9901",
-    //   "leaf": true,
-    //   "icon": "",
-    //   "route": "workplace",
-    //   "sequenceNumber": 3
-    // },
-    // {
-    //   "id": "9902",
-    //   "name": "表单页",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "form",
-    //   "parentId": null,
-    //   "route": "forms",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990201",
-    //   "name": "基础表单",
-    //   "parentId": "9902",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "basic-form",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990202",
-    //   "name": "分步表单",
-    //   "parentId": "9902",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "step-form",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990203",
-    //   "name": "高级表单",
-    //   "parentId": "9902",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "advanced-form",
-    //   "sequenceNumber": 3
-    // },
-    // {
-    //   "id": "9903",
-    //   "name": "列表页",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "table",
-    //   "parentId": null,
-    //   "route": "list",
-    //   "sequenceNumber": 3
-    // },
-    // {
-    //   "id": "990301",
-    //   "name": "查询表格",
-    //   "parentId": "9903",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "table-list",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990302",
-    //   "name": "标准列表",
-    //   "parentId": "9903",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "basic-list",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990303",
-    //   "name": "卡片列表",
-    //   "parentId": "9903",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "card-list",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990304",
-    //   "name": "搜索列表",
-    //   "parentId": "9903",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "search-list",
-    //   "subRoute":true,
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "99030401",
-    //   "name": "搜索列表（文章）",
-    //   "parentId": "990304",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "articles",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "99030402",
-    //   "name": "搜索列表（项目）",
-    //   "parentId": "990304",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "projects",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "99030403",
-    //   "name": "搜索列表（应用）",
-    //   "parentId": "990304",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "applications",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "9904",
-    //   "name": "结果页",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "check-circle-o",
-    //   "parentId": null,
-    //   "route": "result",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990401",
-    //   "name": "成功",
-    //   "parentId": "9904",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "success",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990402",
-    //   "name": "失败",
-    //   "parentId": "9904",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "error",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "9905",
-    //   "name": "异常页",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "warning",
-    //   "parentId": null,
-    //   "route": "exception",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990501",
-    //   "name": "403",
-    //   "parentId": "9905",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "403",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990502",
-    //   "name": "404",
-    //   "parentId": "9905",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "404",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990503",
-    //   "name": "500",
-    //   "parentId": "9905",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "500",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990504",
-    //   "name": "触发异常",
-    //   "parentId": "9905",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "trigger-exception",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "9906",
-    //   "name": "账户",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "user",
-    //   "parentId": null,
-    //   "route": "base",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990601",
-    //   "name": "登录",
-    //   "parentId": "9906",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "login",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990602",
-    //   "name": "注册",
-    //   "parentId": "9906",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "register",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "990603",
-    //   "name": "注册结果",
-    //   "parentId": "9906",
-    //   "leaf": true,
-    //   "root": false,
-    //   "icon": "",
-    //   "route": "register-result",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "9908",
-    //   "name": "详情页",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "profile",
-    //   "parentId": null,
-    //   "route": "profile",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990801",
-    //   "name": "基础详情页",
-    //   "leaf": true,
-    //   "root": false,
-    //   "parentId": "9908",
-    //   "route": "basic-profile",
-    //   "sequenceNumber": 1
-    // },
-    // {
-    //   "id": "990802",
-    //   "name": "高级详情页",
-    //   "leaf": true,
-    //   "root": false,
-    //   "parentId": "9908",
-    //   "route": "advanced-profile",
-    //   "sequenceNumber": 2
-    // },
-    // {
-    //   "id": "9909",
-    //   "name": "使用文档",
-    //   "leaf": false,
-    //   "root": true,
-    //   "icon": "book",
-    //   "parentId": null,
-    //   "hideInMenu": true,
-    //   "route": "http://pro.ant.design/docs/getting-started",
-    //   "sequenceNumber": 1
-    // },
-    {
-      "id": "99010",
-      "name": "权限",
-      "leaf": false,
-      "root": true,
-      "icon": "lock",
-      "parentId": null,
-      "route": "auth",
-      "enable": true,
-      "sequenceNumber": 1
-    },
-    {
-      "id": "9901001",
-      "name": "用户权限",
-      "parentId": "99010",
-      "leaf": true,
-      "root": false,
-      "icon": "",
-      "route": "user",
-      "enable": true,
-      "sequenceNumber": 2
-    },
-    {
-      "id": "9901002",
-      "name": "角色权限",
-      "parentId": "99010",
-      "leaf": true,
-      "root": false,
-      "icon": "",
-      "route": "role",
-      "enable": true,
-      "sequenceNumber": 2
-    },
-    {
-      "id": "9901003",
-      "name": "用户组权限",
-      "parentId": "99010",
-      "leaf": true,
-      "root": false,
-      "icon": "",
-      "route": "group",
-      "enable": true,
-      "sequenceNumber": 2
-    },
-    {
-      "id": "99011",
-      "name": "流程设置",
-      "leaf": false,
-      "root": true,
-      "icon": "database",
-      "parentId": null,
-      "enable": true,
-      "route": "workflow",
-      "sequenceNumber": 1
-    },
-    {
-      "id": "9901101",
-      "name": "流程设计器",
-      "parentId": "99011",
-      "leaf": true,
-      "root": false,
-      "enable": true,
-      "icon": "",
-      "route": "designer",
-      "sequenceNumber": 2
-    },
-  ],
+  "GET:/auth/menus":[{"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth-users","name":"用户管理","route":"user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-functions","name":"功能管理","route":"func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-roles","name":"角色管理","route":"role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-user-groups","name":"用户组管理","route":"group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-workflow-designer","name":"流程设计","route":"designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-workflow","menuCode":null,"root":false}],
   "GET:/auth/users": {
     "count":100,
     "data":[
@@ -750,4 +364,64 @@ module.exports = {
   'GET:/auth/roles/:id/user-groups':[
     {"id":"ggjs","name":"高管用户组"},
   ],
+  'POST:/auth/menus':{
+    "id": "9",
+    enable: true
+  },
+  'PUT:/auth/menus/:id':{
+    "id": "9",
+    enable: true
+  },
+  'GET:/auth/menus/:id':{
+    "id": "9901001",
+    "icon": "icon",
+    "name": "用户管理",
+    "route": "user",
+    "enable": true,
+    "root": false,
+    "leaf": true,
+    "parentId": "pep-auth",
+    "sequenceNumber": "3",
+    "menuType": {"code": "1"}
+  },
+  'GET:/auth/menus/parents':[
+    {"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true}
+  ],
+  'DELETE:/auth/menus':{
+    type:"ok"
+  },
+  'GET:/auth/menus/:id/resources':[
+    {
+      id:'1',
+      name:'新建',
+      identifier:'add',
+      enable:true,
+    },
+    {
+      id:'2',
+      name:'编辑',
+      identifier:'edit',
+      enable:true,
+    },
+    {
+      id:'3',
+      name:'删除',
+      identifier:'delete',
+      enable:true,
+    }
+  ],
+  'POST:/auth/menus/:id/resources': {
+      id:'4',
+      name:'其他',
+      identifier:'save',
+      enable:true,
+  },
+  'PUT:/auth/resources':    {
+      id:'1',
+      name:'新建',
+      identifier:'add',
+      enable:true,
+  },
+  'DELETE:/auth/resources/:id':{type:'ok'}
 }

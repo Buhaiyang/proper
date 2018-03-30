@@ -2032,6 +2032,11 @@ const authRole = {
   },
 ]};
 
+const authMenu = {
+  "count":7,
+  "data":[{"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth-users","name":"用户管理","route":"user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-functions","name":"功能管理","route":"func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-roles","name":"角色管理","route":"role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-user-groups","name":"用户组管理","route":"group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-workflow-designer","name":"流程设计","route":"designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-workflow","menuCode":null,"root":false}]
+}
+
 function queryList(type) {
   let list = {};
   if (type === '$auth$users') {
@@ -2040,6 +2045,8 @@ function queryList(type) {
     list = authGroup;
   } else if (type === '$auth$roles') {
     list = authRole;
+  }else if (type === '$auth$menus') {
+    list = authMenu;
   }
   return list;
 }

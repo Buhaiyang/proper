@@ -1,6 +1,8 @@
 const jsonServer = require('json-server')
 const getMockData = require('../proxy/readFile.js');
+const prefix = '/pep'
 getMockData((mockData)=> {
+  console.log(mockData)
   start(mockData)
 });
 const start = (mockData)=>{
@@ -14,25 +16,27 @@ const start = (mockData)=>{
 
 // Add custom routes before JSON Server router
   mockData.forEach(data=>{
-    for (let k in data){
+    for (let registerUrl in data){
       let method = '';
       let route = '';
-      if(k.indexOf('POST:') === 0){
-        route = k.replace('POST:','')
+      if(registerUrl.indexOf('POST:') === 0){
+        route = registerUrl.replace('POST:','')
         method = 'post'
-      }else if(k.indexOf('PUT:') === 0){
-        route = k.replace('PUT:','')
+      }else if(registerUrl.indexOf('PUT:') === 0){
+        route = registerUrl.replace('PUT:','')
         method = 'put'
-      }else if(k.indexOf('DELETE:') === 0){
-        route = k.replace('DELETE:','')
+      }else if(registerUrl.indexOf('DELETE:') === 0){
+        route = registerUrl.replace('DELETE:','')
         method = 'delete'
       }else{
-        route = k.replace('GET:','');
+        route = registerUrl.replace('GET:','');
         method = 'get';
       }
       console.log(`register route : ${method.toUpperCase()} /api${route}`)
-      server[method](`/pep${route}`, (req, res) => {
-        const result = data[k];
+      server[method](`${prefix}${route}`, (req, res) => {
+        const realUrl = `${req.method}:${req.url.replace(prefix,'')}`;
+        // 直接用真实的url获取数据 如果没有用注册的url获取数据
+        const result = data[realUrl] ? data[realUrl] : data[registerUrl] ;
         if(typeof result ==='object'){
           res.jsonp(result)
         }else if(typeof result ==='function'){
