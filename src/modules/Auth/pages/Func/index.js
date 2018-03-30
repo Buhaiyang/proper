@@ -4,15 +4,17 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Card, Tree, Row, Col, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, message} from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, Select, message } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../../components/Oopsearch';
-import OopTable from '../../../../components/OopTable';
+import OopTreeTable from '../../../../components/OopTreeTable';
 import TableForm from './TableForm'
 import styles from './index.less'
 
 const { TreeNode } = Tree;
+const { Option } = Select;
+const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const {TabPane} = Tabs;
@@ -105,7 +107,6 @@ const FuncBasicInfoForm = Form.create()((props) => {
             }],
           })(
             <TreeSelect
-              style={{ width: 300 }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={parentTreeData}
               placeholder="请选择父节点"
@@ -121,6 +122,23 @@ const FuncBasicInfoForm = Form.create()((props) => {
         </FormItem>
         <FormItem
           {...formItemLayout}
+          label="菜单类型"
+        >
+          {getFieldDecorator('menuType', {
+            initialValue: funcBasicInfo.menuCode,
+            rules: [{
+              required: true, message: '菜单类型不能为空',
+            }]
+          })(
+            <Select placeholder="菜单类型" >
+              <Option value="2">功能</Option>
+              <Option value="1">页面</Option>
+              <Option value="0">系统</Option>
+            </Select>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
           label="状态"
         >
           {getFieldDecorator('enable', {
@@ -130,6 +148,16 @@ const FuncBasicInfoForm = Form.create()((props) => {
               <Radio value={true}>启用</Radio>
               <Radio value={false}>停用</Radio>
             </RadioGroup>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="功能描述"
+        >
+          {getFieldDecorator('description', {
+            initialValue: funcBasicInfo.description
+          })(
+            <TextArea placeholder="功能描述" />
           )}
         </FormItem>
       </Form>
@@ -272,6 +300,9 @@ export default class Func extends PureComponent {
         });
         param ? message.success('保存成功') : message.error('保存失败');
         me.onLoad();
+        me.props.dispatch({
+          type: 'authFunc/fetchTreeData'
+        });
       }
     })
   }
@@ -325,8 +356,14 @@ export default class Func extends PureComponent {
     })
   }
   onLoad = (param)=>{
+    let p = null
+    if (Array.isArray(param) && param.length === 1) {
+      p = {
+        parentId: param[0]
+      }
+    }
     this.oopSearch.load({
-      ...param,
+      ...p,
       enable: 'funcEnable'
     })
   }
@@ -398,7 +435,7 @@ export default class Func extends PureComponent {
         title: '菜单名称', dataIndex: 'name'
       },
       {title: '标识', dataIndex: 'route'},
-      {title: '类别', dataIndex: 'menuType', render: (record)=>{
+      {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
         if (record) {
           const { code } = record
           if (code === '0') {
@@ -410,7 +447,6 @@ export default class Func extends PureComponent {
           }
         }
       }},
-      {title: '功能描述', dataIndex: 'description'},
       {
         title: '状态', dataIndex: 'enable', render: (record)=>{
           if (record) {
@@ -460,38 +496,17 @@ export default class Func extends PureComponent {
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
-        <Row gutter={16}>
-          <Col span={18} push={6}>
-            <Card bordered={false}>
-              <OopTable
-                grid={oopSearchGrid}
-                columns={column}
-                loading={gridLoading}
-                onLoad={this.onLoad}
-                size={size}
-                topButtons={topButtons}
-                rowButtons={rowButtons}
-                ref={(el)=>{ this.oopTable = el }}
-              />
-            </Card>
-          </Col>
-          <Col span={6} pull={18}>
-            <Card bordered={false}>
-              <Spin spinning={loading}>
-                <Tree
-                  showLine
-                  defaultSelectedKeys={['-1']}
-                  defaultExpandedKeys={['-1']}
-                  onSelect={this.handleOnSelect}
-                >
-                  <TreeNode title="菜单" key="-1">
-                    {this.renderTreeNodes(treeData)}
-                  </TreeNode>
-                </Tree>
-              </Spin>
-            </Card>
-          </Col>
-        </Row>
+        <OopTreeTable
+          grid={oopSearchGrid}
+          columns={column}
+          gridLoading={gridLoading}
+          treeLoading={loading}
+          onLoad={this.onLoad}
+          size={size}
+          topButtons={topButtons}
+          rowButtons={rowButtons}
+          treeData={treeData}
+        />
         <ModalForm
           resourceList={resourceList}
           funcBasicInfo={funcBasicInfo}

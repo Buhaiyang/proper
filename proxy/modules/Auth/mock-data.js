@@ -366,11 +366,13 @@ module.exports = {
   ],
   'POST:/auth/menus':{
     "id": "9",
-    enable: true
+    enable: true,
+    menuType: {code: 1}
   },
   'PUT:/auth/menus/:id':{
     "id": "9",
-    enable: true
+    enable: true,
+    menuType: {code: 1}
   },
   'GET:/auth/menus/:id':{
     "id": "9901001",

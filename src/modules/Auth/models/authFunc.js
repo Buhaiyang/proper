@@ -103,9 +103,13 @@ export default {
       }
     },
     saveFuncBasicInfo(state, action) {
+      const item = action.payload;
       return {
         ...state,
-        funcBasicInfo: action.payload
+        funcBasicInfo: {
+          ...item,
+          menuCode: item.menuType.code
+        }
       }
     },
     saveResourceList(state, action) {
