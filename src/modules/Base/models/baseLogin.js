@@ -16,7 +16,7 @@ export default {
       if (response) {
         window.localStorage.setItem('proper-auth-login-token', response);
         // yield put(routerRedux.push('/main'));
-        window.location.href = window.location.origin
+        window.location.href = `${window.location.origin}${window.location.pathname}`
         yield put({
           type: 'toggleShowError',
           payload: false
