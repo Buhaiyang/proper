@@ -44,8 +44,10 @@ const getMockData = (callback)=>{
     const map = require(relPath);
     const methods = 'GET,POST,PUT,DELETE';
     // TODO unused
-    if(methods.indexOf((Object.keys(map)[0]).split(':')[0]) !== -1){
-      fileList.push(map)
+    if (Object.keys(map)[0] != null) {
+      if(methods.indexOf((Object.keys(map)[0]).split(':')[0]) !== -1){
+        fileList.push(map)
+      }
     }
   }).then(function() {
     callback && callback(fileList)

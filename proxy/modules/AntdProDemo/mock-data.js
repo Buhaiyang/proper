@@ -2032,9 +2032,36 @@ const authRole = {
   },
 ]};
 
+const hrmEmployee = {
+  "count":11,
+  "data": [
+    {"id":"1","name":"何鑫","sex":"0","number":"01","email":"1015182620@qq.com","phone":"15904015593","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"2","name":"王浩鹏","sex":"0","number":"02","email":"276595311@qq.com","phone":"15912345678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"3","name":"王贺","sex":"0","number":"03","email":"1234567@qq.com","phone":"15914565478","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"4","name":"王怡","sex":"1","number":"04","email":"13457990@qq.com","phone":"15912222678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"5","name":"王维","sex":"0","number":"05","email":"3456457756@qq.com","phone":"15912333378","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"6","name":"张建林","sex":"0","number":"06","email":"23546546@qq.com","phone":"15911115678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"7","name":"刘德峰","sex":"0","number":"07","email":"4576867@qq.com","phone":"15912347778","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"8","name":"孙帅","sex":"0","number":"08","email":"344645547@qq.com","phone":"15912345999","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"9","name":"徐洋","sex":"0","number":"09","email":"5686785567@qq.com","phone":"15912654678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"10","name":"刘成尧","sex":"0","number":"10","email":"7567545646@qq.com","phone":"15974545678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
+    {"id":"11","name":"王丽莎","sex":"0","number":"11","email":"35346546754@qq.com","phone":"15923345678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"}
+  ]
+}
+
 const authMenu = {
   "count":7,
-  "data":[{"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},{"id":"pep-auth-users","name":"用户管理","route":"user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-functions","name":"功能管理","route":"func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-roles","name":"角色管理","route":"role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-auth-user-groups","name":"用户组管理","route":"group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},{"id":"pep-workflow-designer","name":"流程设计","route":"designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-workflow","menuCode":null,"root":false}]
+  "data":[
+    {"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-auth-users","name":"用户管理","route":"user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},
+    {"id":"pep-auth-functions","name":"功能管理","route":"func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},
+    {"id":"pep-auth-roles","name":"角色管理","route":"role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},
+    {"id":"pep-auth-user-groups","name":"用户组管理","route":"group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},
+    {"id":"pep-workflow-designer","name":"流程设计","route":"designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-workflow","menuCode":null,"root":false},
+    {"id":"pep-hrm", "name": "组织机构","leaf": false,"root": true,"icon": "team","parentId": null,"enable": true,"route": "hrm","sequenceNumber": 1},
+    {"id":"pep-hrm-employee","name": "人员管理","parentId": "pep-hrm","leaf": true,"root": false,"enable": true,"icon": "","route": "employee","sequenceNumber": 2},
+  ]
 }
 
 function queryList(type) {
@@ -2045,7 +2072,9 @@ function queryList(type) {
     list = authGroup;
   } else if (type === '$auth$roles') {
     list = authRole;
-  }else if (type === '$auth$menus') {
+  }  else if (type === '$hrm$employee') {
+    list = hrmEmployee;
+  } else if (type === '$auth$menus') {
     list = authMenu;
   }
   return list;
