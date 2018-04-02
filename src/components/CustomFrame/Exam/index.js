@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Row, Col, Input, Button, Icon, Modal } from 'antd';
+import { Row, Col, Input, Button, Icon, Modal, message } from 'antd';
 import styles from './index.less';
 import { inject } from './../../../common/inject';
 import SelectOne from './../SelectOne/index';
@@ -89,6 +89,7 @@ export default class Exam extends React.PureComponent {
             data: self.state.answer
           },
           callback: () => {
+            message.success('提交成功');
             self.setState({
               btnDisabled: true
             })
