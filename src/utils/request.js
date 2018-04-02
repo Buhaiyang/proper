@@ -2,7 +2,7 @@ import fetch from 'dva/fetch';
 import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
 import store from '../index';
-import prefix from '../config';
+import { prefix, devMode } from '../config';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -46,6 +46,7 @@ function checkStatus(response) {
  * @param  {object} [options] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  * @desc 如果url以"$"开头，那么在发送请求前此url不会被加前缀（主要为开发调用调试接口考虑。）
+ * @desc2 如果是开发模式下，并且在localStorage缓存中存在系统请求前缀，那么请求前缀都换成缓存的
  */
 export default function request(url, options) {
   let newUrl = '';
@@ -54,8 +55,14 @@ export default function request(url, options) {
   } else {
     newUrl = `${prefix}${url}`;
   }
+  const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix')
+  if (devMode === 'development' && peaDynamicRequestPrefix) {
+    if (peaDynamicRequestPrefix.indexOf('http:') === 0 || peaDynamicRequestPrefix.indexOf('https:') === 0) {
+      newUrl = `${peaDynamicRequestPrefix}${url}`;
+    }
+  }
   const defaultOptions = {
-    credentials: 'include',
+    // credentials: 'same-origin',
   };
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT' || newOptions.method === 'DELETE') {

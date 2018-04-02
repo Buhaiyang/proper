@@ -1,12 +1,33 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
-import { Checkbox, Alert, Icon } from 'antd';
+import { Checkbox, Alert, Icon, Modal, Form, Input, message } from 'antd';
 import Login from '../../../components/Login';
 import styles from './Login.less';
 import {inject} from '../../../common/inject';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const FormItem = Form.Item;
+const AddressForm = Form.create()((props)=>{
+  const { form, address } = props;
+  const {getFieldDecorator} = form;
+  return (
+    <Form>
+      <FormItem
+        label="请求地址"
+      >
+        {getFieldDecorator('address', {
+          initialValue: address,
+          rules: [{
+            pattern: /^http:\/\/|https:\/\/[A-Za-z0-9]+.[A-Za-z0-9]+[=?%\-&_~`@[\]':+!]*([^<>""])*$/, message: 'url地址格式不正确',
+          }]
+        })(
+          <Input placeholder="请输入请求地址" />
+        )}
+      </FormItem>
+    </Form>
+  )
+})
 
 @inject('baseLogin')
 @connect(({ baseLogin, loading }) => ({
@@ -16,7 +37,7 @@ const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 export default class LoginPage extends Component {
   state = {
     type: 'account',
-    autoLogin: true
+    autoLogin: true,
   }
 
   onTabChange = (type) => {
@@ -45,9 +66,29 @@ export default class LoginPage extends Component {
       <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
     );
   }
-
+  toggleModalShow = (flag)=>{
+    this.props.dispatch({
+      type: 'baseLogin/toggleShowModal',
+      payload: flag
+    })
+  }
+  handleOnOk = ()=>{
+    const me = this
+    const {validateFields} = me.addressForm;
+    validateFields((err, fieldsValue) => {
+      if (err) return;
+      me.props.dispatch({
+        type: 'baseLogin/setAddress',
+        payload: fieldsValue.address,
+        callback() {
+          message.success('后台地址切换成功!')
+        }
+      })
+    });
+  }
   render() {
     const { baseLogin, submitting } = this.props;
+    console.log(baseLogin.address)
     const { type } = this.state;
     return (
       <div className={styles.main}>
@@ -86,6 +127,13 @@ export default class LoginPage extends Component {
             <Link className={styles.register} to="/base/register">注册账户</Link>
           </div>
         </Login>
+        <Modal
+          visible={ baseLogin.modalVisible }
+           onCancel={()=>{ this.toggleModalShow(false) }}
+           onOk={this.handleOnOk}
+           destroyOnClose={true}>
+          <AddressForm address={baseLogin.address } ref={(el)=>{ this.addressForm = el }} />
+        </Modal>
       </div>
     );
   }

@@ -270,7 +270,7 @@ export default class Func extends PureComponent {
     this.onLoad({
       parentId: treeNode[0]
     })
-    this.oopTable.clearSelection()
+    this.oopTreeTable.table.clearSelection()
   }
   setModalVisible = (flag) => {
     this.setState({
@@ -379,7 +379,7 @@ export default class Func extends PureComponent {
           type: 'authFunc/deleteFunc',
           payload: {ids: items.toString()},
           callback() {
-            me.oopTable.clearSelection()
+            me.oopTreeTable.table.clearSelection()
             message.success('删除成功');
             me.onLoad()
           }
@@ -497,6 +497,7 @@ export default class Func extends PureComponent {
         />
       }>
         <OopTreeTable
+          ref={(el)=>{ this.oopTreeTable = el }}
           grid={oopSearchGrid}
           columns={column}
           gridLoading={gridLoading}

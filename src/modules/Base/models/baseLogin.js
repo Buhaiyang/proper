@@ -1,12 +1,15 @@
 import { routerRedux } from 'dva/router';
 import { login } from '../services/baseS';
+import { devMode } from '../../../config';
 
 export default {
   namespace: 'baseLogin',
 
   state: {
     status: undefined,
-    showError: false
+    showError: false,
+    modalVisible: false,
+    address: localStorage.getItem('pea_dynamic_request_prefix')
   },
 
   effects: {
@@ -31,6 +34,16 @@ export default {
     *logout(_, { put }) {
       window.localStorage.removeItem('proper-auth-login-token');
       yield put(routerRedux.push('/base/login'));
+    },
+    *setAddress({ payload, callback }, { put }) {
+      window.localStorage.setItem('pea_dynamic_request_prefix', payload);
+      yield put({
+        type: 'saveAddressCache',
+        payload
+      });
+      setTimeout(()=>{
+        callback && callback()
+      }, 200)
     }
   },
 
@@ -47,6 +60,52 @@ export default {
         ...state,
         showError: payload,
       };
+    },
+    toggleShowModal(state, { payload }) {
+      return {
+        ...state,
+        modalVisible: payload,
+      };
+    },
+    saveAddressCache(state, { payload }) {
+      return {
+        ...state,
+        address: payload,
+      };
     }
+  },
+  subscriptions: {
+    setup({dispatch}) {
+      if (devMode === 'development') {
+        let tid;
+        let total = 0;
+        let isOK = false;
+        window.onkeydown = (e)=>{
+          clearTimeout(tid);
+          tid = setTimeout(()=>{
+            const { keyCode } = e;
+            if (total !== 0) {
+              if ((total + keyCode) === 35) {
+                isOK = true;
+                total = 0;
+              } else {
+                isOK = false;
+              }
+            } else {
+              (keyCode === 17 || keyCode === 18) && (total = keyCode)
+            }
+          }, 0)
+        }
+        window.onclick = ()=>{
+          if (isOK) {
+            dispatch({
+              type: 'toggleShowModal',
+              payload: true
+            })
+            isOK = false;
+          }
+        }
+      }
+    },
   },
 };

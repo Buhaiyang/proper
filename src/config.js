@@ -1,2 +1,3 @@
-const prefix = '/api';
-export default prefix;
+export const prefix = '/api';
+export const devMode = 'development';
+// export const devMode = 'production';
