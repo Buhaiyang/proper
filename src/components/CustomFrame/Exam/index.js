@@ -76,13 +76,13 @@ export default class Exam extends React.PureComponent {
   // 弹出提示框
   showConfirm = () => {
     const self = this;
-    Modal.confirm({
-      title: '确认提交试卷吗?',
-      content: '提交试卷后无法撤销更改',
-      okText: '确认',
-      cancelText: '取消',
-      onOk() {
-        if (self.state.answer.length > 0) {
+    if (self.state.answer.length > 0) {
+      Modal.confirm({
+        title: '确认提交试卷吗?',
+        content: '提交试卷后无法撤销更改',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
           self.props.dispatch({
             type: 'baseFrame/submit',
             payload: {
@@ -96,11 +96,11 @@ export default class Exam extends React.PureComponent {
               })
             }
           });
-        } else {
-          message.success('至少回答一个题目');
         }
-      },
-    });
+      });
+    } else {
+      message.success('至少回答一个题目');
+    }
   }
 
   // 获得焦点
@@ -147,7 +147,7 @@ export default class Exam extends React.PureComponent {
                             defaultValue={item.answer ? item.answer.toString() : null}
                             onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
-                            placeholder="填写答案，空格分隔" />
+                            placeholder={examContent.hasAnswer ? '' : '填写答案，空格分隔'} />
                         );
                     }
                     if (item.type === 'SUBJECTIVE_ITEM') {
@@ -159,7 +159,7 @@ export default class Exam extends React.PureComponent {
                             onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
                             style={{marginBottom: '5px'}}
-                            placeholder="填写答案"
+                            placeholder={examContent.hasAnswer ? '' : '填写答案'}
                             autosize={{ minRows: 2 }} />
                         )
                     }
