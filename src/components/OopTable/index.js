@@ -20,7 +20,7 @@ export default class OopTable extends PureComponent {
   }
   onChange = (pagination, filters, sorter)=>{
     console.log(pagination, sorter);
-    this.props.onLoad({
+    this.props.onLoad && this.props.onLoad({
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
     })

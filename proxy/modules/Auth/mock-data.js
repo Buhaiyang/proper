@@ -429,7 +429,7 @@ module.exports = {
       identifier:'save',
       enable:true,
   },
-  'PUT:/auth/resources':    {
+  'PUT:/auth/resources/:id':    {
       id:'1',
       name:'新建',
       identifier:'add',

@@ -43,7 +43,7 @@ export async function saveResource(params) {
 }
 // 修改资源
 export async function updateResource(params) {
-  return request('/auth/resources', {
+  return request(`/auth/resources/${params.id}`, {
     method: 'PUT',
     body: params
   });

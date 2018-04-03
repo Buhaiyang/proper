@@ -9,7 +9,7 @@ export default class OopTreeTable extends PureComponent {
     // currentTreeNode: '',
   }
   handleOnSelect = (treeNode)=>{
-    this.props.onLoad(treeNode)
+    this.onLoad(treeNode)
   }
   renderTreeNodes = (data)=>{
     return data.map((item) => {
@@ -22,6 +22,9 @@ export default class OopTreeTable extends PureComponent {
       }
       return <TreeNode {...item} dataRef={item} />;
     });
+  }
+  onLoad = (param)=>{
+    this.props.onLoad(param)
   }
   render() {
     const { treeData, gridLoading, grid,

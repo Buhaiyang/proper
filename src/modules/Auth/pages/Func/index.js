@@ -191,7 +191,12 @@ const ModalForm = connect()((props) => {
     const {validateFields} = form;
     validateFields((err, fieldsValue) => {
       if (err) return;
-      onSubmitForm(fieldsValue);
+      const data = {
+        ...fieldsValue,
+        menuCode: fieldsValue.menuType
+      }
+      delete data.menuType
+      onSubmitForm(data);
     });
   };
   const onTabChange = (activeKey) => {
@@ -322,11 +327,21 @@ export default class Func extends PureComponent {
     const {dispatch, authFunc: {funcBasicInfo} } = this.props
     if (type === 'post') {
       if (item.id) {
+        const data = {
+          id: item.id,
+          name: item.name,
+          url: item.url,
+          method: item.method,
+        }
         dispatch({
           type: 'authFunc/updateResource',
-          payload: item,
+          payload: data,
           callback() {
             message.success('更新成功')
+            dispatch({
+              type: 'authFunc/fetchResourceList',
+              payload: funcBasicInfo.id
+            })
           }
         })
       } else {
@@ -338,6 +353,10 @@ export default class Func extends PureComponent {
           },
           callback() {
             message.success('保存成功')
+            dispatch({
+              type: 'authFunc/fetchResourceList',
+              payload: funcBasicInfo.id
+            })
           }
         })
       }
@@ -347,13 +366,13 @@ export default class Func extends PureComponent {
         payload: item.id,
         callback() {
           message.success('删除成功')
+          dispatch({
+            type: 'authFunc/fetchResourceList',
+            payload: funcBasicInfo.id
+          })
         }
       })
     }
-    dispatch({
-      type: 'authFunc/fetchResourceList',
-      payload: funcBasicInfo.id
-    })
   }
   onLoad = (param)=>{
     let p = null
@@ -364,7 +383,7 @@ export default class Func extends PureComponent {
     }
     this.oopSearch.load({
       ...p,
-      enable: 'funcEnable'
+      menuEnable: 'ALL'
     })
   }
   onBatchDelete = (items)=>{
@@ -399,7 +418,7 @@ export default class Func extends PureComponent {
   onDelete = (record)=>{
     const me = this
     me.props.dispatch({
-      type: 'authFunc/deleteUsers',
+      type: 'authFunc/deleteFunc',
       payload: {ids: record.id},
       callback() {
         message.success('删除成功');
@@ -478,13 +497,11 @@ export default class Func extends PureComponent {
         text: '编辑',
         name: 'edit',
         onClick: (record)=>{ this.onEdit(record) },
-        display: record=>(!record.superuser)
       }, {
         text: '删除',
         name: 'delete',
         confirm: '是否要删除此行',
         onClick: (record)=>{ this.onDelete(record) },
-        display: record=>(!record.superuser)
       },
     ]
     return (

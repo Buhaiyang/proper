@@ -56,6 +56,16 @@ export default {
     },
     *oopSearchResult({ payload }, { put, call }) {
       const res = yield call(searchResult, payload);
+      // TODO 不这样写  列表不出数据
+      // begin
+      // if (Array.isArray(res)) {
+      //   yield put({
+      //     type: 'saveOopSearchGrid',
+      //     payload: {data: res},
+      //   });
+      //   return
+      // }
+      // end
       yield put({
         type: 'saveOopSearchGrid',
         payload: res,

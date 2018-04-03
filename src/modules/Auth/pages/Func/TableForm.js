@@ -37,6 +37,7 @@ export default class TableForm extends PureComponent {
     }
     if (type === 'post' && data.id.indexOf('NEW_TEMP_ID_') === 0) {
       delete data.id
+      delete data.editable
     }
     // 调用父组件的方法 返回数据
     this.props.onChange(type, data)
@@ -45,8 +46,9 @@ export default class TableForm extends PureComponent {
     const newData = this.props.value
     newData.push({
       id: `NEW_TEMP_ID_${this.index}`,
-      identifier: '',
+      method: '',
       name: '',
+      resourceCode: '0',
       editable: true,
       enable: true,
       isNew: true,
@@ -77,7 +79,7 @@ export default class TableForm extends PureComponent {
         return;
       }
       const target = this.getRowByKey(key) || {};
-      if (!target.identifier || !target.name) {
+      if (!target.method || !target.name) {
         message.error('请填写完整信息。');
         e.target.focus();
         this.setState({
@@ -125,14 +127,14 @@ export default class TableForm extends PureComponent {
           return text;
         }
       },
-      {title: '标识', dataIndex: 'identifier', width: 100, render: (text, record) => {
+      {title: '请求方法', dataIndex: 'method', width: 100, render: (text, record) => {
         if (record.editable) {
           return (
             <Input
               style={{width: '100px'}}
               size="small"
               value={text}
-              onChange={e => this.handleFieldChange(e, 'identifier', record.id)}
+              onChange={e => this.handleFieldChange(e, 'method', record.id)}
               onKeyPress={e => this.handleKeyPress(e, record.id)}
               placeholder="标识"
             />

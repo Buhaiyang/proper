@@ -346,7 +346,6 @@ const CreateForm = connect()((props) => {
   loading: loading.models.authRole,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
-@Form.create()
 export default class Role extends PureComponent {
   state = {
     // 是否显示个人信息
