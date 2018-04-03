@@ -128,6 +128,7 @@ const CreateForm = Form.create()((props) => {
               >
                 {form.getFieldDecorator('organizationId', {
                   initialValue: employeeInfo.organizationId ? employeeInfo.organizationId : null,
+                  rules: [{ required: true, message: '部门不能为空' }],
                 })(
                   <TreeSelect
                     showSearch
@@ -390,9 +391,11 @@ export default class Employee extends React.PureComponent {
   // 新建或者更新的提交
   submitForm = (fields, form) => {
     const self = this;
+    const params = fields;
+    params.birthday = params.birthday ? params.birthday.format('YYYY-MM-DD') : null;
     this.props.dispatch({
       type: 'hrmEmployee/createOrUpdate',
-      payload: fields,
+      payload: params,
       callback: () => {
         message.success(self.props.hrmEmployee.messageText);
         this.closeForm(form);

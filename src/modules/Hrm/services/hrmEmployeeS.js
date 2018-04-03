@@ -18,7 +18,7 @@ export async function employeeAddUsers(params) {
 
 // 取得某个人员的信息
 export async function queryEmployeeInfo(params) {
-  return request(`/hr/employee/${params.employeeId}`);
+  return request(`/hr/employee/${params}`);
 }
 
 // 取得所有部门

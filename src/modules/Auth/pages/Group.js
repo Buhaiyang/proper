@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Card, Button, Switch, Divider, Spin, Transfer,
+import { Card, Button, Divider, Spin, Transfer,
   Form, Modal, Input, message, Tabs, Radio, Badge } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
@@ -537,14 +537,11 @@ export default class Group extends PureComponent {
       },
       { title: '描述说明', dataIndex: 'description', key: 'description', },
       { title: '顺序', dataIndex: 'seq', key: 'seq', },
-      { title: '状态', dataIndex: 'enable', key: 'enable', render: (text, record) => (
-          <Switch
-            size="small"
-            defaultChecked = { record.enable }
-            checked={ record.enable }
-            onChange={(value) => {
-              this.handleSwitchOnChange(value, record);
-            }} />)}
+      { title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
+        <Fragment>
+          {text === true ? '已启用' : '已停用'}
+        </Fragment>
+      )},
     ];
     const topButtons = [
       {
