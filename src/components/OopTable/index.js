@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import {Table, Button, Divider, Popconfirm} from 'antd';
+import {Table, Button, Divider, Popconfirm, Tooltip, Icon} from 'antd';
 import styles from './index.less';
 
 export default class OopTable extends PureComponent {
@@ -55,13 +55,26 @@ export default class OopTable extends PureComponent {
           <Fragment key={item.name}>
             {
               item.confirm ? (
-                  <Popconfirm
-                    title={item.confirm}
-                    onConfirm={() => item.onClick(record)}>
-                    <a>{item.text}</a>
-                  </Popconfirm>
-                )
-                : (<a onClick={() => item.onClick(record)}>{item.text}</a>)
+                <Popconfirm
+                  title={item.confirm}
+                  onConfirm={() => item.onClick(record)}>
+                  {item.icon ?
+                    (
+                      <Tooltip placement="bottom" title={item.text}>
+                        <a>
+                          <Icon type={item.icon} />
+                        </a>
+                      </Tooltip>) : <a>{item.text}</a>
+                  }
+                </Popconfirm>
+              ) : (
+                item.icon ? (
+                  <Tooltip placement="bottom" title={item.text}>
+                    <a onClick={() => item.onClick(record)}>
+                      <Icon type={item.icon} />
+                    </a>
+                  </Tooltip>) : <a onClick={() => item.onClick(record)}>{item.text}</a>
+              )
             }
             {(rowButtons.length - 1 !== index) && <Divider type="vertical" />}
           </Fragment>
