@@ -3,7 +3,7 @@ import { Checkbox } from 'antd';
 
 export default class SelectMore extends React.PureComponent {
   render() {
-    const { item, handlSelectMoreChange } = this.props;
+    const { item, handlSelectMoreChange, hasAnswer } = this.props;
 
     const options = item.choice;
 
@@ -28,6 +28,8 @@ export default class SelectMore extends React.PureComponent {
             <div>
               {
                 <Checkbox.Group
+                  disabled={hasAnswer}
+                  defaultValue={item.answer}
                   style={checkStyle}
                   options={options}
                   onChange={value => handlSelectMoreChange(value, item.questionId)} />

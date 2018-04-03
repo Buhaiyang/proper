@@ -1,6 +1,7 @@
 module.exports = {
   "GET:/questionnaire/:id": {
     "name": "沈阳普日软件公司前端考试题",
+    "hasAnswer": false,
     "total": 20,
     "list": [
       {
@@ -12,7 +13,8 @@ module.exports = {
           {choiceId: "103", choiceName: "var obj = {name:”zhangsan”,show:function(){alert(name);}};"},
           {choiceId: "104", choiceName: "var obj = {name:”zhangsan”,show:function(){alert(this.name);}};"}
         ],
-        type: "SELECT_ONE"
+        type: "SELECT_ONE",
+        answer: null
       },
       {
         questionId: "2",
@@ -23,7 +25,8 @@ module.exports = {
           {choiceId: "203", choiceName: "向数组的最后位置加一个新元素，可以用pop方法"},
           {choiceId: "204", choiceName: "unshift方法用于向数组删除第一个元素"}
         ],
-        type: "SELECT_MORE"
+        type: "SELECT_MORE",
+        answer: null
       },
       {
         questionId: "3",
@@ -34,7 +37,8 @@ module.exports = {
           {choiceId: "303", choiceName: "window.screen=”已经选中该文本框”"},
           {choiceId: "304", choiceName: "document.screen=”已经选中该文本框”"}
         ],
-        type: "SELECT_ONE"
+        type: "SELECT_ONE",
+        answer: null
       },
       {
         questionId: "4",
@@ -45,7 +49,8 @@ module.exports = {
           {choiceId: "403", choiceName: "在页面的第二个文本框中输入内容后，当鼠标离开第二个文本框时，将在第一个文本框中复制第二个文本框的内容"},
           {choiceId: "404", choiceName: "在页面的第一个文本框中输入内容后，当鼠标离开第一个文本框时，第二个文本框的内容不变"}
         ],
-        type: "SELECT_MORE"
+        type: "SELECT_MORE",
+        answer: null
       },
       {
         questionId: "5",
@@ -56,17 +61,20 @@ module.exports = {
           {choiceId: "503", choiceName: "在JavaScript里解析和处理xml数据时，因为浏览器的不同，其做法也不同"},
           {choiceId: "504", choiceName: "在IE浏览器里处理xml，首先需要创建ActiveXObject对象"}
         ],
-        type: "SELECT_MORE"
+        type: "SELECT_MORE",
+        answer: null
       },
       {
         questionId: "6",
         questionName: "《朝花夕拾》原名《_________》,是鲁迅的回忆性散文集,请简介一下其中的一篇（课内学过的除外）的主要内容 ：___________________________________.",
-        type: "FILL_IN"
+        type: "FILL_IN",
+        answer: null
       },
       {
         questionId: "7",
         questionName: "什么是跨域？跨域请求资源的方法有哪些？",
-        type: "SUBJECTIVE_ITEM"
+        type: "SUBJECTIVE_ITEM",
+        answer: null
       }
     ]
   },

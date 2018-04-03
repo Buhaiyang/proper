@@ -5,7 +5,7 @@ const RadioGroup = Radio.Group;
 
 export default class SelectOne extends React.PureComponent {
   render() {
-    const { item, handlSelectOneChange } = this.props;
+    const { item, handlSelectOneChange, hasAnswer } = this.props;
 
     const radioStyle = {
       display: 'block',
@@ -23,10 +23,15 @@ export default class SelectOne extends React.PureComponent {
               {
                 <RadioGroup
                   key={item.questionId}
+                  defaultValue={item.answer ? item.answer[0] : null}
                   onChange={value => handlSelectOneChange(value, item.questionId)}>
                   {
                     item.choice.map(citem => (
-                      <Radio key={citem.choiceId} style={radioStyle} value={citem.choiceId}>
+                      <Radio
+                        disabled={hasAnswer}
+                        key={citem.choiceId}
+                        style={radioStyle}
+                        value={citem.choiceId}>
                         {citem.choiceName}
                       </Radio>
                     ))

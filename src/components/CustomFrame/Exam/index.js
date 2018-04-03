@@ -82,19 +82,23 @@ export default class Exam extends React.PureComponent {
       okText: '确认',
       cancelText: '取消',
       onOk() {
-        self.props.dispatch({
-          type: 'baseFrame/submit',
-          payload: {
-            number: window.localStorage.getItem('questionnaireNo'),
-            data: self.state.answer
-          },
-          callback: () => {
-            message.success('提交成功');
-            self.setState({
-              btnDisabled: true
-            })
-          }
-        });
+        if (self.state.answer.length > 0) {
+          self.props.dispatch({
+            type: 'baseFrame/submit',
+            payload: {
+              number: window.localStorage.getItem('questionnaireNo'),
+              data: self.state.answer
+            },
+            callback: () => {
+              message.success('提交成功');
+              self.setState({
+                btnDisabled: true
+              })
+            }
+          });
+        } else {
+          message.success('至少回答一个题目');
+        }
       },
     });
   }
@@ -120,15 +124,27 @@ export default class Exam extends React.PureComponent {
                   {examLists.map((item) => {
                     let component;
                     if (item.type === 'SELECT_ONE') {
-                      component = <SelectOne key={`select_one_${item.questionId}`} item={item} handlSelectOneChange={this.handlSelectOneChange} />;
+                      component = (<SelectOne
+                        hasAnswer={examContent.hasAnswer}
+                        key={`select_one_${item.questionId}`}
+                        item={item}
+                        handlSelectOneChange={this.handlSelectOneChange} />
+                      );
                     }
                     if (item.type === 'SELECT_MORE') {
-                      component = <SelectMore key={`select_one_${item.questionId}`} item={item} handlSelectMoreChange={this.handlSelectMoreChange} />;
+                      component = (<SelectMore
+                        hasAnswer={examContent.hasAnswer}
+                        key={`select_one_${item.questionId}`}
+                        item={item}
+                        handlSelectMoreChange={this.handlSelectMoreChange} />
+                      );
                     }
                     if (item.type === 'FILL_IN') {
                       component =
                         (<Input
                             id={`el_id_${item.questionId}`}
+                            disabled={examContent.hasAnswer}
+                            defaultValue={item.answer ? item.answer.toString() : null}
                             onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
                             placeholder="填写答案，空格分隔" />
@@ -138,6 +154,8 @@ export default class Exam extends React.PureComponent {
                       component =
                         (<TextArea
                             id={`el_id_${item.questionId}`}
+                            disabled={examContent.hasAnswer}
+                            defaultValue={item.answer ? item.answer.toString() : null}
                             onFocus={() => this.onFocus(`el_id_${item.questionId}`)}
                             onChange={value => this.handleInputChange(value, item.questionId)}
                             style={{marginBottom: '5px'}}
@@ -162,7 +180,7 @@ export default class Exam extends React.PureComponent {
                   })}
                   <Button
                     type="primary"
-                    disabled={btnDisabled}
+                    disabled={btnDisabled || examContent.hasAnswer}
                     onClick={this.showConfirm}
                     style={{margin: '50px 0', width: '100%'}}>提交试卷</Button>
                 </div>
