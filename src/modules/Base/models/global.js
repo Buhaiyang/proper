@@ -116,7 +116,7 @@ export default {
             const i = text.indexOf(matchStr);
             const obj = {
               id: item.id,
-              col: item.col,
+              col: item.ali,
               label: text,
               desc: item.des,
               table: item.tab,

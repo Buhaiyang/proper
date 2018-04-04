@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
-import { Row, Col, Card, Tree, Spin } from 'antd';
+import { Row, Col, Card, Tree, Spin, Input } from 'antd';
 import OopTable from '../OopTable';
 
 
 const { TreeNode } = Tree
+const { Search } = Input
 export default class OopTreeTable extends PureComponent {
   state = {
     // currentTreeNode: '',
@@ -11,23 +12,35 @@ export default class OopTreeTable extends PureComponent {
   handleOnSelect = (treeNode)=>{
     this.onLoad(treeNode)
   }
-  renderTreeNodes = (data)=>{
-    return data.map((item) => {
+  renderTreeNodes = (data, treeTitle, treeKey, treeRoot)=> {
+    const treeNodes = data.map((node) => {
+      const item = {
+        ...node,
+      }
+      item.title = item.title || node[treeTitle]
+      item.key = item.key || node[treeKey]
       if (item.children) {
         return (
           <TreeNode title={item.title} key={item.key} dataRef={item}>
-            {this.renderTreeNodes(item.children)}
+            {this.renderTreeNodes(item.children, treeTitle, treeKey)}
           </TreeNode>
         );
       }
       return <TreeNode {...item} dataRef={item} />;
-    });
+    })
+    return treeRoot ?
+      (<TreeNode title={treeRoot.title} key={treeRoot.key}>{treeNodes}</TreeNode>)
+      : treeNodes
+  }
+  handleOnChange = (e)=>{
+    const v = e.target.value;
+    console.log(v)
   }
   onLoad = (param)=>{
     this.props.onLoad(param)
   }
   render() {
-    const { treeData, gridLoading, grid,
+    const { treeData, treeTitle, treeKey, treeRoot, gridLoading, grid,
       columns, treeLoading, topButtons = [], rowButtons = [], size } = this.props
     return (
       <Row gutter={16}>
@@ -48,15 +61,13 @@ export default class OopTreeTable extends PureComponent {
         <Col span={6} pull={18}>
           <Card bordered={false}>
             <Spin spinning={treeLoading}>
+              <Search style={{ marginBottom: 8 }} placeholder="搜索" onChange={this.handleOnChange} />
               <Tree
-                defaultSelectedKeys={['-1']}
-                defaultExpandedKeys={['-1']}
+                defaultExpandAll={true}
                 onSelect={this.handleOnSelect}
                 ref={(el)=>{ this.tree = el }}
               >
-                <TreeNode title="菜单" key="-1">
-                  {this.renderTreeNodes(treeData)}
-                </TreeNode>
+                {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot)}
               </Tree>
             </Spin>
           </Card>

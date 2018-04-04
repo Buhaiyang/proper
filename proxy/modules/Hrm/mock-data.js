@@ -125,4 +125,25 @@ module.exports = {
   'PUT:/hr/employee/:id':(req , res)=>{
     res.send('更新成功')
   },
+  'DELETE:/hr/orginization':(req , res)=>{
+    res.send('删除成功')
+  },
+  'PUT:/hr/orginization/:id':(req , res)=>{
+    res.send('更新成功')
+  },
+  'POST:/hr/orginization':(req , res)=>{
+    res.send('创建成功')
+  },
+  'GET:/hr/orginization/:id':{
+    "parentId": "1",
+    "parentName": "普日软件",
+    "id": "101",
+    "name": "产品研发",
+    "alias": "cpyf",
+    "number": "001",
+    "address": "沈阳铁西区兴隆大都会21层",
+    "phone": "13412578901",
+    "fax": "024-31353260",
+    "description": "这是产品研发部门"
+  }
 }
