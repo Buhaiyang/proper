@@ -59,15 +59,15 @@ const FuncBasicInfoForm = Form.create()((props) => {
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="标识"
+          label="前端路径"
         >
           {getFieldDecorator('route', {
             initialValue: funcBasicInfo.route,
             rules: [{
-              required: true, message: '标识不能为空',
+              required: true, message: '前端路径不能为空',
             }],
           })(
-            <Input placeholder="请输入标识" />
+            <Input placeholder="请输入前端路径" />
           )}
         </FormItem>
         <FormItem
@@ -453,7 +453,7 @@ export default class Func extends PureComponent {
       {
         title: '菜单名称', dataIndex: 'name'
       },
-      {title: '标识', dataIndex: 'route'},
+      {title: '前端路径', dataIndex: 'route'},
       {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
         if (record) {
           const { code } = record

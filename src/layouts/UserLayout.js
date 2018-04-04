@@ -8,19 +8,20 @@ import logo from '../assets/logo.svg';
 import { getRoutes } from '../utils/utils';
 import {inject} from '../common/inject';
 
-const links = [{
-  key: 'help',
-  title: '帮助',
-  href: '',
-}, {
-  key: 'privacy',
-  title: '隐私',
-  href: '',
-}, {
-  key: 'terms',
-  title: '条款',
-  href: '',
-}];
+// TODO
+// const links = [{
+//   key: 'help',
+//   title: '帮助',
+//   href: '',
+// }, {
+//   key: 'privacy',
+//   title: '隐私',
+//   href: '',
+// }, {
+//   key: 'terms',
+//   title: '条款',
+//   href: '',
+// }];
 
 const copyright = <div>Copyright <Icon type="copyright" /> 2018 普日软件技术有限公司</div>;
 @inject('baseLogin')
@@ -44,7 +45,8 @@ class UserLayout extends React.PureComponent {
               <div className={styles.header}>
                 <Link to="/">
                   <img alt="logo" className={styles.logo} src={logo} />
-                  <span className={styles.title}>Proper Enterprise App</span>
+                  {/* TODO <span className={styles.title}>Proper Enterprise App</span> */}
+                  <span className={styles.title}>普日协同办公</span>
                 </Link>
               </div>
               <div className={styles.desc}>Proper Enterprise App 是一体化管理平台</div>
@@ -62,7 +64,8 @@ class UserLayout extends React.PureComponent {
               )}
               <Redirect exact from="/base" to="/base/login" />
             </Switch>
-            <GlobalFooter links={links} copyright={copyright} />
+            {/* TODO <GlobalFooter links={links} copyright={copyright} /> */}
+            <GlobalFooter copyright={copyright} />
           </div>
         </div>
       </DocumentTitle>

@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Link } from 'dva/router';
-import { Checkbox, Alert, Icon, Modal, Form, Input, message } from 'antd';
+import { Alert, Modal, Form, Input, message } from 'antd';
+// TODO import { Link } from 'dva/router';
+// TODO import { Checkbox, Alert, Icon, Modal, Form, Input, message } from 'antd';
 import Login from '../../../components/Login';
 import styles from './Login.less';
 import {inject} from '../../../common/inject';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+// TODO const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const { Tab, UserName, Password, Submit } = Login;
 const FormItem = Form.Item;
 const AddressForm = Form.create()((props)=>{
   const { form, address } = props;
@@ -37,7 +39,7 @@ const AddressForm = Form.create()((props)=>{
 export default class LoginPage extends Component {
   state = {
     type: 'account',
-    autoLogin: true,
+    // TODO autoLogin: true,
   }
 
   onTabChange = (type) => {
@@ -55,11 +57,12 @@ export default class LoginPage extends Component {
     }
   }
 
-  changeAutoLogin = (e) => {
-    this.setState({
-      autoLogin: e.target.checked,
-    });
-  }
+  // TODO
+  // changeAutoLogin = (e) => {
+  //   this.setState({
+  //     autoLogin: e.target.checked,
+  //   });
+  // }
 
   renderMessage = (content) => {
     return (
@@ -104,7 +107,7 @@ export default class LoginPage extends Component {
             <UserName name="username" placeholder="admin" />
             <Password name="pwd" placeholder="123456" />
           </Tab>
-          <Tab key="mobile" tab="手机号登录">
+          {/* TODO <Tab key="mobile" tab="手机号登录">
             {
               baseLogin.status === 'error' &&
               baseLogin.type === 'mobile' &&
@@ -113,19 +116,19 @@ export default class LoginPage extends Component {
             }
             <Mobile name="mobile" />
             <Captcha name="captcha" />
-          </Tab>
-          <div>
+          </Tab> */}
+          {/* TODO <div>
             <Checkbox checked={this.state.autoLogin} onChange={this.changeAutoLogin}>自动登录</Checkbox>
             <a style={{ float: 'right' }} href="">忘记密码</a>
-          </div>
+          </div> */}
           <Submit loading={submitting}>登录</Submit>
-          <div className={styles.other}>
+          {/* TODO <div className={styles.other}>
             其他登录方式
             <Icon className={styles.icon} type="alipay-circle" />
             <Icon className={styles.icon} type="taobao-circle" />
             <Icon className={styles.icon} type="weibo-circle" />
             <Link className={styles.register} to="/base/register">注册账户</Link>
-          </div>
+          </div> */}
         </Login>
         <Modal
           visible={ baseLogin.modalVisible }
