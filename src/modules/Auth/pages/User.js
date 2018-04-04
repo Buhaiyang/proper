@@ -518,7 +518,6 @@ export default class User extends React.PureComponent {
           return <div onClick={() => this.onView(record)} style={{textDecoration: 'underline', cursor: 'pointer'}}>{text}</div>;
         }
       },
-      {title: '密码', dataIndex: 'password'},
       {title: '显示名', dataIndex: 'name'},
       {title: '电子邮箱', dataIndex: 'email'},
       {title: '手机号码', dataIndex: 'phone'},

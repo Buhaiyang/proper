@@ -29,7 +29,7 @@ const formItemLayout = {
   },
 };
 const FuncBasicInfoForm = Form.create()((props) => {
-  const {form, funcBasicInfo, parentTreeData, loading} = props;
+  const {form, funcBasicInfo, parentTreeData, loading, parentNode} = props;
   const {getFieldDecorator} = form;
   const onChange = (value)=>{
     console.log(value)
@@ -101,7 +101,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
           label="父节点"
         >
           {getFieldDecorator('parentId', {
-            initialValue: funcBasicInfo.parentId,
+            initialValue: (funcBasicInfo.parentId ? funcBasicInfo.parentId : parentNode),
             rules: [{
               required: true, message: '父节点不能为空',
             }],
@@ -179,7 +179,8 @@ const ResourceInfoForm = Form.create()((props) => {
 const ModalForm = connect()((props) => {
   const {
     visible, size, handleTabChange, currentTabKey, onSubmitForm, funcBasicInfo = {},
-    parentTreeData, clearModalForms, isCreate, loading, resourceList, handleResourceListChange
+    parentTreeData, clearModalForms, isCreate, loading, resourceList, handleResourceListChange,
+    parentNode
   } = props;
   const onCancel = () => {
     // 隐藏窗口时
@@ -212,6 +213,7 @@ const ModalForm = connect()((props) => {
       }}
       funcBasicInfo={funcBasicInfo}
       parentTreeData={parentTreeData}
+      parentNode={parentNode}
       loading={loading} />
   }, {
     key: 'resource',
@@ -251,7 +253,8 @@ export default class Func extends PureComponent {
   state = {
     modalVisible: false,
     currentTabKey: 'basic',
-    isCreate: true
+    isCreate: true,
+    parentNode: null,
   }
   componentDidMount() {
     this.props.dispatch({
@@ -288,6 +291,7 @@ export default class Func extends PureComponent {
       form.resetFields();
       this.setState({
         currentTabKey: 'basic',
+        parentNode: null,
       });
       this.props.dispatch({
         type: 'authFunc/clear'
@@ -442,6 +446,11 @@ export default class Func extends PureComponent {
       }
     });
   }
+  setParentNode = (parentNode) => {
+    this.setState({
+      parentNode,
+    });
+  }
   render() {
     const {
       loading,
@@ -449,6 +458,7 @@ export default class Func extends PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
+    const { parentNode } = this.state;
     const column = [
       {
         title: '菜单名称', dataIndex: 'name'
@@ -526,11 +536,13 @@ export default class Func extends PureComponent {
           topButtons={topButtons}
           rowButtons={rowButtons}
           treeData={treeData}
+          setParentNode={this.setParentNode}
         />
         <ModalForm
           resourceList={resourceList}
           funcBasicInfo={funcBasicInfo}
           parentTreeData={parentTreeData}
+          parentNode={parentNode}
           visible={this.state.modalVisible}
           currentTabKey={this.state.currentTabKey}
           handleTabChange={this.handleTabChange}

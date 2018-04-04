@@ -637,10 +637,10 @@ export default class Role extends PureComponent {
               roleId
             },
             callback: () => {
-              if (self.props.authRole.messageText == null || self.props.authRole.messageText === '') {
-                message.success('添加成功');
-              } else {
+              if (self.props.authRole.messageText instanceof String && self.props.authRole.messageText !== '') {
                 message.success(self.props.authRole.messageText);
+              } else {
+                message.success('添加成功');
               }
             }
           });
@@ -657,10 +657,10 @@ export default class Role extends PureComponent {
               roleId
             },
             callback: () => {
-              if (self.props.authRole.messageText == null || self.props.authRole.messageText === '') {
-                message.success('删除成功');
-              } else {
+              if (self.props.authRole.messageText instanceof String && self.props.authRole.messageText !== '') {
                 message.success(self.props.authRole.messageText);
+              } else {
+                message.success('删除成功');
               }
             }
           });
