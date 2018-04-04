@@ -563,10 +563,12 @@ export default class Group extends PureComponent {
       {
         text: '编辑',
         name: 'edit',
+        icon: 'edit',
         onClick: (record)=>{ this.handleEdit(record) }
       }, {
         text: '删除',
         name: 'delete',
+        icon: 'delete',
         confirm: '是否要删除此条信息',
         onClick: (record)=>{ this.handleRemove(record) }
       },

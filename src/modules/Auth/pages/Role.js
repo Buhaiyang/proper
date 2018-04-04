@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
-  Form, message, Popconfirm, Tabs, Input, Radio, Select, Tree } from 'antd';
+  Form, message, Tabs, Input, Radio, Select, Tree } from 'antd';
 import { connect } from 'dva';
 // import styles from './Role.less';
 import { inject } from './../../../common/inject';
@@ -697,18 +697,7 @@ export default class Role extends PureComponent {
           <Fragment>
             {text === true ? '已启用' : '已停用'}
           </Fragment>
-      )},
-      {
-        title: '操作', key: 'action', render: record => (
-          <span>
-            <a onClick={() => this.handleEdit(record)}>编辑</a>
-            <Divider type="vertical" />
-            {<Popconfirm title="是否要删除此条信息？" onConfirm={() => this.handleRemove(record.id)}>
-              <a>删除</a>
-            </Popconfirm>}
-          </span>
-        )
-      }
+      )}
     ];
 
     const topButtons = [
@@ -727,7 +716,20 @@ export default class Role extends PureComponent {
         display: items=>(items.length),
       }
     ];
-
+    const rowButtons = [
+      {
+        text: '编辑',
+        name: 'edit',
+        icon: 'edit',
+        onClick: (record)=>{ this.handleEdit(record) }
+      }, {
+        text: '删除',
+        name: 'delete',
+        icon: 'delete',
+        confirm: '是否要删除此条信息',
+        onClick: (record)=>{ this.handleRemove(record) }
+      },
+    ]
     return (
       <PageHeaderLayout content={
         <OopSearch
@@ -745,6 +747,7 @@ export default class Role extends PureComponent {
             onLoad={this.onLoad}
             size={size}
             topButtons={topButtons}
+            rowButtons={rowButtons}
             ref={(el)=>{ this.oopTable = el }}
           />
         </Card>

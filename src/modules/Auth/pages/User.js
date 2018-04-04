@@ -550,11 +550,13 @@ export default class User extends React.PureComponent {
       {
         text: '编辑',
         name: 'edit',
+        icon: 'edit',
         onClick: (record)=>{ this.onEdit(record) },
         display: record=>(!record.superuser)
       }, {
         text: '删除',
         name: 'delete',
+        icon: 'delete',
         confirm: '是否要删除此行',
         onClick: (record)=>{ this.onDelete(record) },
         display: record=>(!record.superuser)
