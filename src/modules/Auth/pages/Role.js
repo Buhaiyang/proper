@@ -85,8 +85,7 @@ const BasicInfoForm = Form.create()((props) => {
           label="描述"
         >
           {form.getFieldDecorator('description', {
-            initialValue: roleInfo.description,
-            rules: [{ required: true, message: '描述不能为空' }]
+            initialValue: roleInfo.description
           })(
             <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
           )}
@@ -638,7 +637,11 @@ export default class Role extends PureComponent {
               roleId
             },
             callback: () => {
-              message.success(self.props.authRole.messageText);
+              if (self.props.authRole.messageText == null || self.props.authRole.messageText === '') {
+                message.success('添加成功');
+              } else {
+                message.success(self.props.authRole.messageText);
+              }
             }
           });
         }
@@ -654,7 +657,11 @@ export default class Role extends PureComponent {
               roleId
             },
             callback: () => {
-              message.success(self.props.authRole.messageText);
+              if (self.props.authRole.messageText == null || self.props.authRole.messageText === '') {
+                message.success('删除成功');
+              } else {
+                message.success(self.props.authRole.messageText);
+              }
             }
           });
         }
@@ -735,7 +742,7 @@ export default class Role extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$auth$roles"
+          moduleName="authroles"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>

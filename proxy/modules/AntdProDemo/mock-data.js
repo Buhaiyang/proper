@@ -2066,15 +2066,15 @@ const authMenu = {
 
 function queryList(type) {
   let list = {};
-  if (type === '$auth$users') {
+  if (type === 'authusers') {
     list = authUser;
-  } else if (type === '$auth$user-groups') {
+  } else if (type === 'authusergroups') {
     list = authGroup;
-  } else if (type === '$auth$roles') {
+  } else if (type === 'authroles') {
     list = authRole;
   }  else if (type === '$hrm$employee') {
     list = hrmEmployee;
-  } else if (type === '$auth$menus') {
+  } else if (type === 'authmenus') {
     list = authMenu;
   }
   return list;

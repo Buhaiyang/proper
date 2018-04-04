@@ -81,8 +81,7 @@ const BasicInfoForm = Form.create()((props) => {
           label="描述"
         >
           {form.getFieldDecorator('description', {
-            initialValue: groupsBasicInfo.description,
-            rules: [{ required: true, message: '描述不能为空' }]
+            initialValue: groupsBasicInfo.description
           })(
             <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
           )}
@@ -578,7 +577,7 @@ export default class Group extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$auth$user-groups"
+          moduleName="authusergroups"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>

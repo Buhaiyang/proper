@@ -4,7 +4,7 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, Select, message } from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, message } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../../components/Oopsearch';
@@ -13,7 +13,7 @@ import TableForm from './TableForm'
 import styles from './index.less'
 
 const { TreeNode } = Tree;
-const { Option } = Select;
+// const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -120,7 +120,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
             </div>
           )}
         </FormItem>
-        <FormItem
+        {/* <FormItem
           {...formItemLayout}
           label="菜单类型"
         >
@@ -136,7 +136,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
               <Option value="0">系统</Option>
             </Select>
           )}
-        </FormItem>
+        </FormItem> */}
         <FormItem
           {...formItemLayout}
           label="状态"
@@ -454,18 +454,18 @@ export default class Func extends PureComponent {
         title: '菜单名称', dataIndex: 'name'
       },
       {title: '前端路径', dataIndex: 'route'},
-      {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
-        if (record) {
-          const { code } = record
-          if (code === '0') {
-            return '应用';
-          } else if (code === '1') {
-            return '页面';
-          } else if (code === '2') {
-            return '功能';
-          }
-        }
-      }},
+      // {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
+      //   if (record) {
+      //     const { code } = record
+      //     if (code === '0') {
+      //       return '应用';
+      //     } else if (code === '1') {
+      //       return '页面';
+      //     } else if (code === '2') {
+      //       return '功能';
+      //     }
+      //   }
+      // }},
       {
         title: '状态', dataIndex: 'enable', render: (record)=>{
           if (record) {
@@ -511,7 +511,7 @@ export default class Func extends PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$auth$menus"
+          moduleName="authmenus"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>

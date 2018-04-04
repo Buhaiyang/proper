@@ -567,7 +567,7 @@ export default class User extends React.PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$auth$users"
+          moduleName="authusers"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>

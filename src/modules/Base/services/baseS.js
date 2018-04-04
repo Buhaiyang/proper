@@ -31,10 +31,10 @@ export async function searchSuggest(params) {
 export async function searchResult(params) {
   // TODO 不这样写  列表不出数据
   // begin
-  // if (params.moduleName === '$auth$menus') {
+  // if (params.moduleName === 'authmenus') {
   //   return request(`/auth/menus?${stringify(params)}`);
   // }
-  // if (params.moduleName === '$auth$roles') {
+  // if (params.moduleName === 'authroles') {
   //   return request(`/auth/roles?${stringify(params)}`);
   // }
   // end

@@ -97,9 +97,17 @@ export default {
       }
     },
     saveParentTreeData(state, action) {
+      const parentData = {
+        id: '-1',
+        key: '-1',
+        value: '-1',
+        title: '菜单',
+        children: action.payload
+      };
+
       return {
         ...state,
-        parentTreeData: action.payload
+        parentTreeData: parentData
       }
     },
     saveFuncBasicInfo(state, action) {
