@@ -2174,7 +2174,7 @@ function queryList(type) {
     list = authGroup;
   } else if (type === 'authroles') {
     list = authRole;
-  }  else if (type === '$hrm$employee') {
+  }  else if (type === 'hrmemployee') {
     list = hrmEmployee;
   } else if (type === 'authmenus') {
     list = authMenu;

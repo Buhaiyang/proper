@@ -210,9 +210,10 @@ const CreateForm = Form.create()((props) => {
               >
                 {form.getFieldDecorator('phone', {
                   initialValue: employeeInfo.phone ? employeeInfo.phone : '',
-                  rules: [{
-                    pattern: /^(13[0-9]|14[0-9]|15[0-9]|17[0-9]|18[0-9])\d{8}$/i, message: '请输入正确的手机号码',
-                  }],
+                  rules: [
+                    { required: true, message: '手机号码不能为空' },
+                    { pattern: /^(13[0-9]|14[0-9]|15[0-9]|17[0-9]|18[0-9])\d{8}$/i, message: '请输入正确的手机号码' },
+                  ],
                 })(
                   <Input placeholder="请输入移动电话1" />
                 )}
@@ -480,7 +481,7 @@ export default class Employee extends React.PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="$hrm$employee"
+          moduleName="hrmemployee"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
