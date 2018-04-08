@@ -396,16 +396,27 @@ export default class Func extends PureComponent {
     }
   }
   onLoad = (param)=>{
-    let p = null
-    if (Array.isArray(param) && param.length === 1) {
-      p = {
-        parentId: param[0]
+    let p = null;
+    let parentNode = null;
+    if (param && Array.isArray(param)) {
+      // param为[]代表反选的时候
+      if (param.length === 0) {
+        return
+      }
+      // 正常树节点下查询的时候
+      if (param.length === 1) {
+        p = {
+          parentId: param[0]
+        };
+        [parentNode] = param
       }
     }
+    // 没穿参数全部查询
     this.oopSearch.load({
       ...p,
       menuEnable: 'ALL'
     })
+    this.setParentNode(parentNode)
   }
   onBatchDelete = (items)=>{
     const me = this;
@@ -553,7 +564,6 @@ export default class Func extends PureComponent {
           topButtons={topButtons}
           rowButtons={rowButtons}
           treeData={treeData}
-          setParentNode={this.setParentNode}
         />
         <ModalForm
           resourceList={resourceList}

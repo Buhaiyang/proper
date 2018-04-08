@@ -61,6 +61,10 @@ export default function request(url, options) {
       newUrl = `${peaDynamicRequestPrefix}${url}`;
     }
   }
+  // 如果是全路径以http或者https开头那么之前的前缀和缓存域 都无效
+  if (url.indexOf('http:') === 0 || url.indexOf('https:') === 0) {
+    newUrl = url
+  }
   const defaultOptions = {
     // credentials: 'same-origin',
   };
