@@ -386,7 +386,7 @@ module.exports = {
     menuType: {code: 1}
   },
   'GET:/auth/menus/:id':{
-    "id": "9901001",
+    "id": "pep-auth-users",
     "icon": "icon",
     "name": "用户管理",
     "route": "user",

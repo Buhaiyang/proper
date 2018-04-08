@@ -11,6 +11,8 @@ import OopSearch from '../../../../components/Oopsearch';
 import OopTreeTable from '../../../../components/OopTreeTable';
 import TableForm from './TableForm'
 import styles from './index.less'
+import { controlMenu } from '../../../../utils/utils';
+import { formatTreeNode } from '../../models/authFunc';
 
 const { TreeNode } = Tree;
 // const { Option } = Select;
@@ -28,11 +30,26 @@ const formItemLayout = {
     sm: {span: 16},
   },
 };
+
 const FuncBasicInfoForm = Form.create()((props) => {
-  const {form, funcBasicInfo, parentTreeData, loading, parentNode} = props;
+  const {form, funcBasicInfo, parentTreeData, loading, parentNode, originTreeData} = props;
   const {getFieldDecorator} = form;
   const onChange = (value)=>{
     console.log(value)
+  }
+  let data = parentTreeData;
+  if (funcBasicInfo.id) {
+    let index = null;
+    for (let i = 0; i < originTreeData.length; i++) {
+      if (originTreeData[i].parentId != null && originTreeData[i].id === funcBasicInfo.id) {
+        index = i;
+      }
+    }
+    if (index) {
+      originTreeData.splice(index, 1);
+    }
+    data = controlMenu(originTreeData);
+    formatTreeNode(data);
   }
   return (
     <Spin spinning={loading}>
@@ -107,8 +124,8 @@ const FuncBasicInfoForm = Form.create()((props) => {
             }],
           })(
             <TreeSelect
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={parentTreeData}
+              dropdownStyle={{ maxHeight: 250, overflow: 'auto' }}
+              treeData={data}
               placeholder="请选择父节点"
               treeDefaultExpandAll
               onChange={onChange}
@@ -180,7 +197,7 @@ const ModalForm = connect()((props) => {
   const {
     visible, size, handleTabChange, currentTabKey, onSubmitForm, funcBasicInfo = {},
     parentTreeData, clearModalForms, isCreate, loading, resourceList, handleResourceListChange,
-    parentNode
+    parentNode, originTreeData
   } = props;
   const onCancel = () => {
     // 隐藏窗口时
@@ -212,6 +229,7 @@ const ModalForm = connect()((props) => {
         this.basic = el;
       }}
       funcBasicInfo={funcBasicInfo}
+      originTreeData={originTreeData}
       parentTreeData={parentTreeData}
       parentNode={parentNode}
       loading={loading} />
@@ -290,8 +308,7 @@ export default class Func extends PureComponent {
     setTimeout(() => {
       form.resetFields();
       this.setState({
-        currentTabKey: 'basic',
-        parentNode: null,
+        currentTabKey: 'basic'
       });
       this.props.dispatch({
         type: 'authFunc/clear'
@@ -454,7 +471,7 @@ export default class Func extends PureComponent {
   render() {
     const {
       loading,
-      authFunc: { treeData, funcBasicInfo, parentTreeData, resourceList },
+      authFunc: { treeData, funcBasicInfo, parentTreeData, resourceList, originTreeData },
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
@@ -541,6 +558,7 @@ export default class Func extends PureComponent {
         <ModalForm
           resourceList={resourceList}
           funcBasicInfo={funcBasicInfo}
+          originTreeData={originTreeData}
           parentTreeData={parentTreeData}
           parentNode={parentNode}
           visible={this.state.modalVisible}

@@ -74,7 +74,7 @@ const BasicInfoForm = Form.create()((props) => {
             >
               {
                 data ? data.map(item => (
-                  <Option key={item.parentId}>{item.parentName}</Option>
+                  <Option key={item.id}>{item.name}</Option>
                 )) : null
               }
             </Select>

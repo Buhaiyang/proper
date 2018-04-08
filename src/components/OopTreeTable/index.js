@@ -7,14 +7,15 @@ const { TreeNode } = Tree
 const { Search } = Input
 export default class OopTreeTable extends PureComponent {
   state = {
-    currentTreeNode: null,
+    // currentTreeNode: null,
   }
   handleOnSelect = (treeNode)=>{
     if (treeNode.length > 0) {
-      this.state.currentTreeNode = treeNode[0].toString();
+      this.props.setParentNode(treeNode[0].toString());
       this.onLoad(treeNode);
+    } else {
+      this.props.setParentNode(null);
     }
-    this.props.setParentNode(this.state.currentTreeNode);
   }
   renderTreeNodes = (data, treeTitle, treeKey, treeRoot)=> {
     const treeNodes = data.map((node) => {

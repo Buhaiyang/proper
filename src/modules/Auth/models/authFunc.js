@@ -2,7 +2,7 @@ import { queryTreeData, queryParentTreeData, saveOrUpdateFunc, deleteFunc, query
   queryResourceList, saveResource, updateResource, deleteResource } from '../services/authFuncS';
 import { controlMenu } from '../../../utils/utils';
 
-const formatTreeNode = (data)=>{
+export function formatTreeNode(data) {
   data.forEach((d)=>{
     const item = d
     if (item) {
@@ -22,6 +22,7 @@ export default {
   namespace: 'authFunc',
   state: {
     treeData: [],
+    originTreeData: [],
     funcBasicInfo: {},
     parentTreeData: [],
     resourceList: []
@@ -33,7 +34,10 @@ export default {
       formatTreeNode(treeData)
       yield put({
         type: 'saveTreeData',
-        payload: treeData
+        payload: {
+          treeData,
+          originTreeData: resp
+        }
       })
       if (callback) callback(resp)
     },
@@ -93,7 +97,8 @@ export default {
     saveTreeData(state, action) {
       return {
         ...state,
-        treeData: action.payload
+        originTreeData: action.payload.originTreeData,
+        treeData: action.payload.treeData
       }
     },
     saveParentTreeData(state, action) {
