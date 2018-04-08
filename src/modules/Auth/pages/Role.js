@@ -29,14 +29,7 @@ const formItemLayout = {
 };
 
 const BasicInfoForm = Form.create()((props) => {
-  const { form, roleInfo, roleList, roleListEx, loading } = props;
-  let data;
-
-  if (roleInfo.id) {
-    data = roleListEx;
-  } else {
-    data = roleList;
-  }
+  const { form, roleInfo, roleList, loading } = props;
 
   return (
     <Spin spinning={loading}>
@@ -64,7 +57,7 @@ const BasicInfoForm = Form.create()((props) => {
           label="继承"
         >
           {form.getFieldDecorator('parentId', {
-            initialValue: roleInfo.parentId,
+            initialValue: roleList ? roleInfo.parentId : null,
           })(<Select
               showSearch
               placeholder="请选择"
@@ -73,8 +66,13 @@ const BasicInfoForm = Form.create()((props) => {
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
               {
-                data ? data.map(item => (
-                  <Option key={item.id}>{item.name}</Option>
+                roleList ? roleList.map(item => (
+                  <Option
+                    key={item.id}
+                    disabled={item.id === roleInfo.id}>
+                    {item.name}
+                  </Option>
+                  // <Option key={item.id}>{item.name}</Option>
                 )) : null
               }
             </Select>
@@ -223,7 +221,7 @@ const GroupInfoForm = Form.create()((props) => {
 
 const CreateForm = connect()((props) => {
   const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleList, roleListEx, roleMenus, checkedMenuKeys,
+    roleInfo, roleList, roleMenus, checkedMenuKeys,
     handleTabChange, handleMenuKeys, allUsers, roleUsers, allGroups, roleGroups,
     handleUserChange, handleGroupChange } = props;
 
@@ -272,7 +270,6 @@ const CreateForm = connect()((props) => {
         ref = {(el) => { this.basic = el; }}
         roleInfo = {roleInfo}
         roleList = {roleList}
-        roleListEx = {roleListEx}
         loading = {loading}
       />
     },
@@ -357,8 +354,6 @@ export default class Role extends PureComponent {
     isCreate: !this.props.authRole.roleInfo.id,
     // 菜单被选择的项
     checkedMenuKeys: [],
-    // 除掉当前roleid的角色列表
-    roleListEx: [],
     // 当前角色保存的用户
     userKey: [],
     // 当前角色保存的用户组
@@ -417,7 +412,7 @@ export default class Role extends PureComponent {
     if (ids instanceof Array) {
       idsArray = ids;
     } else {
-      idsArray.push(ids);
+      idsArray.push(ids.id);
     }
     this.props.dispatch({
       type: 'authRole/removeRoles',
@@ -463,30 +458,21 @@ export default class Role extends PureComponent {
         });
       }
     });
-    this.getAllRoles(record.id);
+    this.getAllRoles();
   }
 
   // 新建功能
   handleCreate = (flag) => {
-    this.getAllRoles(null);
+    this.getAllRoles();
     this.setState({
       formVisible: flag
     });
   }
 
   // 取得角色列表
-  getAllRoles = (roleId) => {
-    const self = this;
+  getAllRoles = () => {
     this.props.dispatch({
       type: 'authRole/fetch',
-      callback: (res) => {
-        if (roleId) {
-          res.splice(res.findIndex(item => item.id === roleId), 1);
-          self.setState({
-            roleListEx: res
-          })
-        }
-      }
     })
   }
 
@@ -612,6 +598,7 @@ export default class Role extends PureComponent {
         type: 'authRole/createOrUpdate',
         payload: fields,
         callback: () => {
+          this.getAllRoles();
           this.onLoad();
           self.setState({
             isCreate: false
@@ -686,7 +673,7 @@ export default class Role extends PureComponent {
         roleMenus, allUsers, allGroups } } = this.props;
 
     const { viewVisible, formVisible, currentTabKey, isCreate,
-      checkedMenuKeys, roleListEx } = this.state;
+      checkedMenuKeys } = this.state;
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -767,7 +754,6 @@ export default class Role extends PureComponent {
           isCreate={isCreate}
           roleInfo={roleInfo}
           roleList={roleList}
-          roleListEx={roleListEx}
           roleMenus={roleMenus}
           checkedMenuKeys={checkedMenuKeys}
           handleMenuKeys={this.handleMenuKeys}
