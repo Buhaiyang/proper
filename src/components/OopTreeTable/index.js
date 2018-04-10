@@ -121,6 +121,8 @@ export default class OopTreeTable extends PureComponent {
             <Spin spinning={treeLoading}>
               <Search style={{ marginBottom: 8 }} placeholder="搜索" onChange={this.handleOnChange} />
               <Tree
+                defaultExpandAll={true}
+                defaultSelectedKeys={treeRoot ? [treeRoot.key] : []}
                 onExpand={this.onExpand}
                 expandedKeys={expandedKeys}
                 autoExpandParent={autoExpandParent}

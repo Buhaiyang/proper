@@ -1,9 +1,8 @@
 import { queryGroups } from '../services/authGroupsS';
 import { queryUsers } from '../services/authUserS';
-import { queryCurrentMenus } from '../../Base/services/baseS';
 import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups, fetchUpdateStatus,
   createOrUpdate, queryParents, queryCheckedMenus, menusAdd, menusDelete,
-  userAddRole, userDelRole, GroupAddRole, GroupDelRole } from '../services/authRoleS';
+  userAddRole, userDelRole, GroupAddRole, GroupDelRole, menuResource } from '../services/authRoleS';
 import { formatter, controlMenu } from '../../../utils/utils';
 
 export default {
@@ -88,12 +87,12 @@ export default {
     },
     // 取得指定角色的菜单列表
     *fetchMenus({ payload, callback }, { call, put }) {
-      const allMenus = yield call(queryCurrentMenus);
+      const allMenus = yield call(menuResource);
       const menus = formatter(controlMenu(allMenus.result));
       const checkMenus = yield call(queryCheckedMenus, payload);
       const checked = [];
       for (let i = 0; i < checkMenus.result.length; i++) {
-        if (checkMenus.result[i].leaf) {
+        if (checkMenus.result[i].resourceType.code === '0') {
           checked.push(checkMenus.result[i]);
         }
       }

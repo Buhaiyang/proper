@@ -18,7 +18,7 @@ export async function saveOrUpdateFunc(params) {
 }
 // 取得可选的父节点菜单树
 export async function queryParentTreeData() {
-  return request('/auth/menus');
+  return request('/auth/menus/parents');
 }
 // 删除
 export async function deleteFunc(params) {

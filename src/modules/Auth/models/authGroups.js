@@ -23,7 +23,7 @@ export default {
         type: 'getUserGroups',
         payload: Array.isArray(response.result) ? response.result : [],
       });
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     *fetchUserGroups({ payload, callback }, { call, put}) {
       // 查找已选中用户的用户组
@@ -64,7 +64,7 @@ export default {
           groupUsers: Array.isArray(response.result) ? response.result : [],
         }
       })
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     *update({ payload, callback }, { call }) {
       const response = yield call(updateUserGroups, payload);

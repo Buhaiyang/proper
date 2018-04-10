@@ -4,19 +4,17 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect } from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, Select } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../../components/Oopsearch';
 import OopTreeTable from '../../../../components/OopTreeTable';
-import TableForm from './TableForm'
-import styles from './index.less'
-import { controlMenu } from '../../../../utils/utils';
-import { formatTreeNode } from '../../models/authFunc';
+import TableForm from './TableForm';
+import styles from './index.less';
 import { oopToast } from './../../../../common/oopUtils';
 
 const { TreeNode } = Tree;
-// const { Option } = Select;
+const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -32,26 +30,30 @@ const formItemLayout = {
   },
 };
 
+const formatter = (data, id) => {
+  return data.map((item) => {
+    let { disabled } = item;
+    if (item.id === id) {
+      disabled = true;
+    }
+    const result = {
+      ...item,
+      disabled
+    };
+    if (item.children && item.children.length) {
+      result.children = formatter(item.children, id);
+    }
+    return result;
+  });
+}
+
 const FuncBasicInfoForm = Form.create()((props) => {
-  const {form, funcBasicInfo, parentTreeData, loading, parentNode, originTreeData} = props;
+  const {form, funcBasicInfo, parentTreeData, loading, parentNode} = props;
   const {getFieldDecorator} = form;
   const onChange = (value)=>{
     console.log(value)
   }
-  let data = parentTreeData;
-  if (funcBasicInfo.id) {
-    let index = null;
-    for (let i = 0; i < originTreeData.length; i++) {
-      if (originTreeData[i].parentId != null && originTreeData[i].id === funcBasicInfo.id) {
-        index = i;
-      }
-    }
-    if (index) {
-      originTreeData.splice(index, 1);
-    }
-    data = controlMenu(originTreeData);
-    formatTreeNode(data);
-  }
+  const data = formatter(parentTreeData, funcBasicInfo.id);
   return (
     <Spin spinning={loading}>
       <Form>
@@ -138,7 +140,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
             </div>
           )}
         </FormItem>
-        {/* <FormItem
+        <FormItem
           {...formItemLayout}
           label="菜单类型"
         >
@@ -154,7 +156,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
               <Option value="0">系统</Option>
             </Select>
           )}
-        </FormItem> */}
+        </FormItem>
         <FormItem
           {...formItemLayout}
           label="状态"
@@ -198,7 +200,7 @@ const ModalForm = connect()((props) => {
   const {
     visible, size, handleTabChange, currentTabKey, onSubmitForm, funcBasicInfo = {},
     parentTreeData, clearModalForms, isCreate, loading, resourceList, handleResourceListChange,
-    parentNode, originTreeData
+    parentNode
   } = props;
   const onCancel = () => {
     // 隐藏窗口时
@@ -230,7 +232,6 @@ const ModalForm = connect()((props) => {
         this.basic = el;
       }}
       funcBasicInfo={funcBasicInfo}
-      originTreeData={originTreeData}
       parentTreeData={parentTreeData}
       parentNode={parentNode}
       loading={loading} />
@@ -279,7 +280,7 @@ export default class Func extends PureComponent {
     this.props.dispatch({
       type: 'authFunc/fetchTreeData'
     });
-    this.onLoad()
+    this.onLoad(['-1'])
   }
   renderTreeNodes = (data)=>{
     return data.map((item) => {
@@ -483,7 +484,7 @@ export default class Func extends PureComponent {
   render() {
     const {
       loading,
-      authFunc: { treeData, funcBasicInfo, parentTreeData, resourceList, originTreeData },
+      authFunc: { treeData, funcBasicInfo, parentTreeData, resourceList },
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
@@ -493,18 +494,18 @@ export default class Func extends PureComponent {
         title: '菜单名称', dataIndex: 'name'
       },
       {title: '前端路径', dataIndex: 'route'},
-      // {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
-      //   if (record) {
-      //     const { code } = record
-      //     if (code === '0') {
-      //       return '应用';
-      //     } else if (code === '1') {
-      //       return '页面';
-      //     } else if (code === '2') {
-      //       return '功能';
-      //     }
-      //   }
-      // }},
+      {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
+        if (record) {
+          const { code } = record
+          if (code === '0') {
+            return '应用';
+          } else if (code === '1') {
+            return '页面';
+          } else if (code === '2') {
+            return '功能';
+          }
+        }
+      }},
       {
         title: '状态', dataIndex: 'enable', render: (record)=>{
           if (record) {
@@ -565,11 +566,14 @@ export default class Func extends PureComponent {
           topButtons={topButtons}
           rowButtons={rowButtons}
           treeData={treeData}
+          treeRoot={{
+            key: '-1',
+            title: '菜单'
+          }}
         />
         <ModalForm
           resourceList={resourceList}
           funcBasicInfo={funcBasicInfo}
-          originTreeData={originTreeData}
           parentTreeData={parentTreeData}
           parentNode={parentNode}
           visible={this.state.modalVisible}

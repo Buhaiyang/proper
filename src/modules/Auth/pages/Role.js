@@ -112,10 +112,10 @@ const ManagerInfoForm = Form.create()((props) => {
 
   const renderTreeNodes = (data) => {
     return data.map((item) => {
-      if (item.children) {
+      if (item.children || item.resources) {
         return (
           <TreeNode title={item.name} key={item.id} dataRef={item} disableCheckbox={!item.enable}>
-            {renderTreeNodes(item.children)}
+            {renderTreeNodes(item.children ? item.children : item.resources)}
           </TreeNode>
         );
       }

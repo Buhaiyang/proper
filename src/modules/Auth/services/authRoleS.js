@@ -55,12 +55,12 @@ export async function queryParents(params) {
 
 // 取得指定角色的菜单列表
 export async function queryCheckedMenus(params) {
-  return request(`/auth/roles/${params.roleId}/menus`);
+  return request(`/auth/roles/${params.roleId}/resources`);
 }
 
 // 菜单添加项
 export async function menusAdd(params) {
-  return request(`/auth/roles/${params.roleId}/menus`, {
+  return request(`/auth/roles/${params.roleId}/resources`, {
     method: 'POST',
     body: params
   });
@@ -68,7 +68,7 @@ export async function menusAdd(params) {
 
 // 菜单删除项
 export async function menusDelete(params) {
-  return request(`/auth/roles/${params.roleId}/menus?${stringify(params.ids)}`, {
+  return request(`/auth/roles/${params.roleId}/resources?${stringify(params.ids)}`, {
     method: 'DELETE'
   });
 }
@@ -99,4 +99,9 @@ export async function GroupDelRole(params) {
   return request(`/auth/user-groups/${params.userOrGroupId}/role/${params.roleId}`, {
     method: 'DELETE'
   });
+}
+
+// 获取菜单资源
+export async function menuResource() {
+  return request('/auth/menus/resources');
 }
