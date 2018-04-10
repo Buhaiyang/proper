@@ -4,12 +4,13 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Form, Modal, Button, Input, Spin, TreeSelect, message } from 'antd';
+import { Form, Modal, Button, Input, Spin, TreeSelect } from 'antd';
 import {inject} from '../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/Oopsearch';
 import OopTreeTable from '../../../components/OopTreeTable';
 import styles from './Organization.less';
+import { oopToast } from './../../../common/oopUtils';
 
 const { TextArea } = Input;
 const FormItem = Form.Item;
@@ -237,11 +238,11 @@ export default class Organization extends PureComponent {
     me.props.dispatch({
       type: 'hrmOrganization/createOrUpdate',
       payload: data,
-      callback(param) {
+      callback(res) {
         me.setState({
           isCreate: false
         });
-        param ? message.success('保存成功') : message.error('保存失败');
+        oopToast(res, '保存成功', '保存失败');
         me.onLoad();
         me.props.dispatch({
           type: 'hrmOrganization/fetchOrgTree'
@@ -262,8 +263,8 @@ export default class Organization extends PureComponent {
         dispatch({
           type: 'authFunc/updateResource',
           payload: data,
-          callback() {
-            message.success('更新成功')
+          callback(res) {
+            oopToast(res, '更新成功', '更新失败');
             dispatch({
               type: 'authFunc/fetchResourceList',
               payload: funcBasicInfo.id
@@ -277,8 +278,8 @@ export default class Organization extends PureComponent {
             funcId: funcBasicInfo.id,
             resources: item,
           },
-          callback() {
-            message.success('保存成功')
+          callback(res) {
+            oopToast(res, '保存成功', '保存失败');
             dispatch({
               type: 'authFunc/fetchResourceList',
               payload: funcBasicInfo.id
@@ -290,8 +291,8 @@ export default class Organization extends PureComponent {
       dispatch({
         type: 'authFunc/deleteResource',
         payload: item.id,
-        callback() {
-          message.success('删除成功')
+        callback(res) {
+          oopToast(res, '删除成功', '删除失败');
           dispatch({
             type: 'authFunc/fetchResourceList',
             payload: funcBasicInfo.id
@@ -323,9 +324,9 @@ export default class Organization extends PureComponent {
         me.props.dispatch({
           type: 'hrmOrganization/deleteOrg',
           payload: {ids: items.toString()},
-          callback() {
+          callback(res) {
             me.oopTreeTable.table.clearSelection()
-            message.success('删除成功');
+            oopToast(res, '删除成功', '删除失败');
             me.onLoad()
           }
         })
@@ -346,8 +347,8 @@ export default class Organization extends PureComponent {
     me.props.dispatch({
       type: 'hrmOrganization/deleteOrg',
       payload: {ids: record.id},
-      callback() {
-        message.success('删除成功');
+      callback(res) {
+        oopToast(res, '删除成功', '删除失败');
         me.onLoad()
       }
     })

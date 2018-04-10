@@ -11,12 +11,12 @@ export default {
       const response = yield call(queryExamContent, payload);
       yield put({
         type: 'saveExamContent',
-        payload: response,
+        payload: response.result,
       });
     },
     *submit({ callback, payload }, { call }) {
-      yield call(submitAnswer, payload);
-      if (callback) callback();
+      const response = yield call(submitAnswer, payload);
+      if (callback) callback(response);
     },
   },
   reducers: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Form, Card, Divider, Popconfirm, Icon, Tooltip, Modal, message,
+import { Form, Card, Divider, Popconfirm, Icon, Tooltip, Modal,
   Input, Select, Spin, DatePicker, Row, Col, TreeSelect } from 'antd';
 import moment from 'moment';
 import { inject } from './../../../common/inject';
@@ -8,6 +8,7 @@ import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from './../../../components/Oopsearch/index';
 import OopTable from './../../../components/OopTable/index';
 import styles from './Employee.less';
+import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -307,12 +308,11 @@ export default class Employee extends React.PureComponent {
 
   // 删除
   handleRemove = (id) => {
-    const self = this;
     this.props.dispatch({
       type: 'hrmEmployee/employeeRemove',
       payload: {ids: id},
-      callback: () => {
-        message.success(self.props.hrmEmployee.messageText);
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败');
         this.onLoad();
       }
     })
@@ -330,9 +330,9 @@ export default class Employee extends React.PureComponent {
         self.props.dispatch({
           type: 'hrmEmployee/employeeRemove',
           payload: {ids: items.toString()},
-          callback: () => {
+          callback: (res) => {
             self.oopTable.clearSelection()
-            message.success(self.props.hrmEmployee.messageText);
+            oopToast(res, '删除成功', '删除失败');
             self.onLoad()
           }
         })
@@ -352,9 +352,9 @@ export default class Employee extends React.PureComponent {
         self.props.dispatch({
           type: 'hrmEmployee/employeeAddUsers',
           payload: {ids: items.toString()},
-          callback: () => {
+          callback: (res) => {
             self.oopTable.clearSelection()
-            message.success(self.props.hrmEmployee.messageText);
+            oopToast(res, '添加成功', '添加失败');
             self.onLoad()
           }
         })
@@ -391,14 +391,13 @@ export default class Employee extends React.PureComponent {
 
   // 新建或者更新的提交
   submitForm = (fields, form) => {
-    const self = this;
     const params = fields;
     params.birthday = params.birthday ? params.birthday.format('YYYY-MM-DD') : null;
     this.props.dispatch({
       type: 'hrmEmployee/createOrUpdate',
       payload: params,
-      callback: () => {
-        message.success(self.props.hrmEmployee.messageText);
+      callback: (res) => {
+        oopToast(res, '保存成功', '保存失败');
         this.closeForm(form);
         this.onLoad();
       }

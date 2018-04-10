@@ -208,8 +208,8 @@ module.exports = {
       "enable": false
     });
   },
-  'DELETE:/auth/user-groups':{
-    type:"ok"
+  'DELETE:/auth/user-groups':(req , res)=>{
+    res.status(528).send('失败');
   },
   'DELETE:/auth/user-groups/:id':{
     type:"ok"

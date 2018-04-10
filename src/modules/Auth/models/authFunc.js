@@ -30,20 +30,20 @@ export default {
   effects: {
     *fetchTreeData({ payload = {}, callback}, { call, put }) {
       const resp = yield call(queryTreeData, payload);
-      const treeData = controlMenu(resp);
+      const treeData = controlMenu(resp.result);
       formatTreeNode(treeData)
       yield put({
         type: 'saveTreeData',
         payload: {
           treeData,
-          originTreeData: resp
+          originTreeData: resp.result
         }
       })
-      if (callback) callback(resp)
+      if (callback) callback(resp.result)
     },
     *fetchParentTreeData({ payload = {}, callback}, { call, put }) {
       const resp = yield call(queryParentTreeData, payload);
-      const treeData = controlMenu(resp);
+      const treeData = controlMenu(resp.result);
       formatTreeNode(treeData)
       yield put({
         type: 'saveParentTreeData',
@@ -55,19 +55,19 @@ export default {
       const resp = yield call(saveOrUpdateFunc, payload);
       yield put({
         type: 'saveFuncBasicInfo',
-        payload: resp || {}
+        payload: resp.result || {}
       })
       if (callback) callback(resp)
     },
     *deleteFunc({payload, callback}, {call}) {
-      yield call(deleteFunc, payload);
-      if (callback) callback()
+      const resp = yield call(deleteFunc, payload);
+      if (callback) callback(resp)
     },
     *fetchById({ payload, callback }, { call, put }) {
       const resp = yield call(queryFuncById, payload);
       yield put({
         type: 'saveFuncBasicInfo',
-        payload: resp
+        payload: resp.result
       })
       if (callback) callback()
     },
@@ -75,9 +75,9 @@ export default {
       const resp = yield call(queryResourceList, payload);
       yield put({
         type: 'saveResourceList',
-        payload: resp
+        payload: resp.result
       })
-      if (callback) callback(resp)
+      if (callback) callback(resp.result)
     },
     *saveResource({payload, callback}, {call}) {
       const resp = yield call(saveResource, payload);

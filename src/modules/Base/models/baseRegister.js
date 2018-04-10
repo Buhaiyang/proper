@@ -12,7 +12,7 @@ export default {
       const response = yield call(fakeRegister);
       yield put({
         type: 'registerHandle',
-        payload: response,
+        payload: response.result,
       });
     },
   },

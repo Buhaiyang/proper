@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
-  Form, message, Tabs, Input, Radio, Select, Tree } from 'antd';
+  Form, Tabs, Input, Radio, Select, Tree } from 'antd';
 import { connect } from 'dva';
 // import styles from './Role.less';
 import { inject } from './../../../common/inject';
@@ -8,6 +8,7 @@ import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/Oopsearch';
 import DescriptionList from '../../../components/DescriptionList';
 import OopTable from '../../../components/OopTable';
+import { oopToast } from './../../../common/oopUtils';
 
 const { Description } = DescriptionList;
 const { TabPane } = Tabs;
@@ -417,8 +418,8 @@ export default class Role extends PureComponent {
     this.props.dispatch({
       type: 'authRole/removeRoles',
       payload: { ids: idsArray.toString() },
-      callback: () => {
-        message.success(this.props.authRole.messageText);
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败');
         this.onLoad();
       }
     });
@@ -508,8 +509,8 @@ export default class Role extends PureComponent {
           roleId: id,
           ids: changeMenus
         },
-        callback: () => {
-          message.success('菜单添加成功');
+        callback: (res) => {
+          oopToast(res, '菜单添加成功', '菜单添加失败');
         }
       });
     }
@@ -525,8 +526,8 @@ export default class Role extends PureComponent {
           roleId: id,
           ids: {ids: changeMenus.toString()}
         },
-        callback: () => {
-          message.success('菜单删除成功');
+        callback: (res) => {
+          oopToast(res, '菜单删除成功', '菜单删除失败');
         }
       });
     }
@@ -597,7 +598,8 @@ export default class Role extends PureComponent {
       this.props.dispatch({
         type: 'authRole/createOrUpdate',
         payload: fields,
-        callback: () => {
+        callback: (res) => {
+          oopToast(res, '保存成功', '保存失败');
           this.getAllRoles();
           this.onLoad();
           self.setState({
@@ -610,7 +612,6 @@ export default class Role extends PureComponent {
 
   // 添加删除公用函数
   addAndDel(roleId, newKeys, oldKeys, typeAdd, typeDel, stateName) {
-    const self = this;
     this.setState({
       [stateName]: newKeys
     });
@@ -623,12 +624,8 @@ export default class Role extends PureComponent {
               userOrGroupId: newKeys[i],
               roleId
             },
-            callback: () => {
-              if (self.props.authRole.messageText instanceof String && self.props.authRole.messageText !== '') {
-                message.success(self.props.authRole.messageText);
-              } else {
-                message.success('添加成功');
-              }
+            callback: (res) => {
+              oopToast(res, '添加成功', '添加失败');
             }
           });
         }
@@ -643,12 +640,8 @@ export default class Role extends PureComponent {
               userOrGroupId: oldKeys[i],
               roleId
             },
-            callback: () => {
-              if (self.props.authRole.messageText instanceof String && self.props.authRole.messageText !== '') {
-                message.success(self.props.authRole.messageText);
-              } else {
-                message.success('删除成功');
-              }
+            callback: (res) => {
+              oopToast(res, '删除成功', '删除失败');
             }
           });
         }

@@ -72,11 +72,19 @@ module.exports = {
       },
       {
         questionId: "7",
+        questionName: "请简介一下其中的一篇（课内学过的除外）的主要内容 ：___________________________________.",
+        type: "FILL_IN",
+        answer: null
+      },
+      {
+        questionId: "8",
         questionName: "什么是跨域？跨域请求资源的方法有哪些？",
         type: "SUBJECTIVE_ITEM",
         answer: null
       }
     ]
   },
-  "POST:/questionnaire/:id": { status: 'ok' },
+  "POST:/questionnaire/:id": (req , res)=>{
+    res.status(200).send('问卷提交成功');
+  },
 }

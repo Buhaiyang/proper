@@ -5,65 +5,46 @@ export default {
   namespace: 'hrmEmployee',
 
   state: {
-    messageText: '',
     employeeInfo: {},
     organization: []
   },
 
   effects: {
-    *employeeRemove({ payload, callback }, { call, put }) {
+    *employeeRemove({ payload, callback }, { call }) {
       const response = yield call(employeeDelete, payload);
-      yield put({
-        type: 'saveMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
-    *employeeAddUsers({ payload, callback }, { call, put }) {
+    *employeeAddUsers({ payload, callback }, { call }) {
       const response = yield call(employeeAddUsers, payload);
-      yield put({
-        type: 'saveMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 获得某个人员的信息
     *employeeInfo({ payload, callback }, { call, put }) {
       const response = yield call(queryEmployeeInfo, payload);
       yield put({
         type: 'saveEmployeeInfo',
-        payload: response,
+        payload: response.result,
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 获得所有部门
     *fetchOrganization({ payload, callback }, { call, put }) {
       const response = yield call(queryOrganization, payload);
-      const menus = formatter(controlMenu(response));
+      const menus = formatter(controlMenu(response.result));
       yield put({
         type: 'saveOrganization',
         payload: menus,
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 新建或者更新
-    *createOrUpdate({ payload, callback }, { call, put }) {
+    *createOrUpdate({ payload, callback }, { call }) {
       const response = yield call(createOrUpdate, payload);
-      yield put({
-        type: 'saveMessages',
-        payload: response,
-      });
       if (callback) callback(response);
     },
   },
 
   reducers: {
-    saveMessages(state, action) {
-      return {
-        ...state,
-        messageText: action.payload
-      };
-    },
     saveEmployeeInfo(state, action) {
       return {
         ...state,

@@ -14,7 +14,7 @@ export default {
     // 获得所有部门(左侧树)
     *fetchOrgTree({ payload, callback }, { call, put }) {
       const response = yield call(queryOrganization, payload);
-      const menus = formatter(controlMenu(response));
+      const menus = formatter(controlMenu(response.result));
       yield put({
         type: 'saveTreeData',
         payload: menus,
@@ -34,13 +34,13 @@ export default {
     // 查询上级部门(所有部门)
     *fetchParentTreeData({ payload, callback }, { call, put }) {
       const response = yield call(queryOrganization, payload);
-      response.forEach((item)=> {
+      response.result.forEach((item)=> {
         const data = item
         data.title = data.name
         data.key = data.id
         data.value = data.id
       })
-      const menus = formatter(controlMenu(response));
+      const menus = formatter(controlMenu(response.result));
       yield put({
         type: 'saveParentTreeData',
         payload: menus
@@ -52,9 +52,9 @@ export default {
       const response = yield call(queryOrgById, payload);
       yield put({
         type: 'saveOrgInfo',
-        payload: response
+        payload: response.result
       })
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
   },
 

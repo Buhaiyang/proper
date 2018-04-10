@@ -5,6 +5,7 @@ import styles from './index.less';
 import { inject } from './../../../common/inject';
 import SelectOne from './../SelectOne/index';
 import SelectMore from './../selectMore/index';
+import { oopToast } from './../../../common/oopUtils';
 
 const { TextArea } = Input;
 
@@ -89,8 +90,8 @@ export default class Exam extends React.PureComponent {
               number: window.localStorage.getItem('questionnaireNo'),
               data: self.state.answer
             },
-            callback: () => {
-              message.success('提交成功');
+            callback: (res) => {
+              oopToast(res, '提交成功');
               self.setState({
                 btnDisabled: true
               })
@@ -99,7 +100,7 @@ export default class Exam extends React.PureComponent {
         }
       });
     } else {
-      message.success('至少回答一个题目');
+      message.warning('至少回答一个题目');
     }
   }
 

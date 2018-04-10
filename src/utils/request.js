@@ -21,8 +21,9 @@ const codeMessage = {
   503: '服务不可用，服务器暂时过载或维护',
   504: '网关超时',
 };
+
 function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
+  if ((response.status >= 200 && response.status < 300) || response.status === 528) {
     return response;
   }
   const errortext = codeMessage[response.status] || response.statusText;
@@ -85,16 +86,28 @@ export default function request(url, options) {
   return fetch(newUrl, newOptions)
     .then(checkStatus)
     .then((response) => {
-      if (newOptions.method === 'DELETE' || response.status === 204) {
-        return response.text();
+      let codeStyle = null;
+      let thePromise = null;
+      if (response.status >= 200 && response.status < 300) {
+        codeStyle = 'ok';
+      } else {
+        codeStyle = 'err';
       }
       if (response.headers.get('content-type').indexOf('text/') !== -1) {
-        return response.text();
+        thePromise = response.text();
       } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
-        return response.json();
+        thePromise = response.json();
       } else {
-        return response;
+        thePromise = response;
       }
+      return new Promise((resolve)=>{
+        thePromise.then((res)=>{
+          resolve({
+            status: codeStyle,
+            result: res
+          });
+        })
+      });
     })
     .catch((e) => {
       const { dispatch } = store;

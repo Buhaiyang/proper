@@ -1,12 +1,13 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Spin, message} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Spin} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/Oopsearch';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';
 import styles from './User.less';
+import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -333,8 +334,8 @@ export default class User extends React.PureComponent {
     me.props.dispatch({
       type: 'authUser/deleteUsers',
       payload: {ids: record.id},
-      callback() {
-        message.success('删除成功');
+      callback(res) {
+        oopToast(res, '删除成功', '删除失败');
         me.onLoad()
       }
     })
@@ -388,11 +389,11 @@ export default class User extends React.PureComponent {
       this.props.dispatch({
         type: 'authUser/saveOrUpdateUser',
         payload: data,
-        callback(param) {
+        callback(res) {
           me.setState({
             isCreate: false
           });
-          param ? message.success('保存成功') : message.error('保存失败');
+          oopToast(res, '保存成功', '保存失败');
           me.onLoad();
         }
       });
@@ -426,9 +427,9 @@ export default class User extends React.PureComponent {
         me.props.dispatch({
           type: 'authUser/deleteUsers',
           payload: {ids: items.toString()},
-          callback() {
+          callback(res) {
             me.oopTable.clearSelection()
-            message.success('删除成功');
+            oopToast(res, '删除成功', '删除失败');
             me.onLoad()
           }
         })

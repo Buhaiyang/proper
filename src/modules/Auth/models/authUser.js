@@ -21,14 +21,14 @@ export default {
       const resp = yield call(queryUsers, payload);
       yield put({
         type: 'saveList',
-        payload: {list: resp.data, extraParams: payload.extraParams}
+        payload: {list: resp.result.data, extraParams: payload.extraParams}
       })
     },
     *fetchById({ payload, callback }, { call, put }) {
       const resp = yield call(queryUsersById, payload);
       yield put({
         type: 'saveUserBasicInfo',
-        payload: resp
+        payload: resp.result
       })
       if (callback) callback()
     },
@@ -39,8 +39,8 @@ export default {
       yield put({
         type: 'saveUserRoles',
         payload: {
-          userRoles: resp,
-          userRolesAll: resp2
+          userRoles: resp.result,
+          userRolesAll: resp2.result
         }
       })
     },
@@ -51,8 +51,8 @@ export default {
       yield put({
         type: 'saveUserGroups',
         payload: {
-          userGroups: resp,
-          userGroupsAll: resp2
+          userGroups: resp.result,
+          userGroupsAll: resp2.result
         }
       })
     },
@@ -64,42 +64,42 @@ export default {
       yield put({
         type: 'saveAll',
         payload: {
-          userBasicInfo,
-          userGroups,
-          userRoles,
+          userBasicInfo: userBasicInfo.result,
+          userGroups: userGroups.result,
+          userRoles: userRoles.result,
         }
       })
       if (callback) callback()
     },
     *deleteUsers({payload, callback}, {call}) {
-      yield call(deleteUsers, payload);
-      if (callback) callback()
+      const resp = yield call(deleteUsers, payload);
+      if (callback) callback(resp)
     },
     *saveOrUpdateUser({payload, callback}, {call, put}) {
       const resp = yield call(saveOrUpdateUser, payload);
       yield put({
         type: 'saveUserBasicInfo',
-        payload: resp || {}
+        payload: resp.result || {}
       })
       if (callback) callback(resp)
     },
     // 用户添加角色
     *userAddRole({ payload, callback }, { call }) {
-      yield call(userAddRole, payload);
-      if (callback) callback();
+      const resp = yield call(userAddRole, payload);
+      if (callback) callback(resp);
     },
     *userDelRole({ payload, callback }, { call }) {
-      yield call(userDelRole, payload);
-      if (callback) callback();
+      const resp = yield call(userDelRole, payload);
+      if (callback) callback(resp);
     },
     // 用户组添加用户
     *userAddGroup({ payload, callback }, { call }) {
-      yield call(userAddGroup, payload);
-      if (callback) callback();
+      const resp = yield call(userAddGroup, payload);
+      if (callback) callback(resp);
     },
     *userDelGroup({ payload, callback }, { call }) {
-      yield call(userDelGroup, payload);
-      if (callback) callback();
+      const resp = yield call(userDelGroup, payload);
+      if (callback) callback(resp);
     },
   },
 

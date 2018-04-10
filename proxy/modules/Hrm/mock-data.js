@@ -1,6 +1,7 @@
 module.exports = {
   'DELETE:/hr/employee':(req , res)=>{
-    res.send('删除成功')
+    // res.send('删除成功')
+    res.status(528).send('无法删除');
   },
   'POST:/hr/employee/user':(req , res)=>{
     res.send('人员添加到用户成功')

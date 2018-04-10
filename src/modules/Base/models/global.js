@@ -36,11 +36,11 @@ export default {
       const data = yield call(queryNotices);
       yield put({
         type: 'saveNotices',
-        payload: data,
+        payload: data.result,
       });
       yield put({
         type: 'user/changeNotifyCount',
-        payload: data.length,
+        payload: data.result.length,
       });
     },
     *clearNotices({ payload }, { put, select }) {
@@ -55,27 +55,27 @@ export default {
       });
     },
     *oopSearchResult({ payload }, { put, call }) {
-      const res = yield call(searchResult, payload);
+      const data = yield call(searchResult, payload);
       // TODO 不这样写  列表不出数据
       // begin
       // if (Array.isArray(res)) {
       //   yield put({
       //     type: 'saveOopSearchGrid',
-      //     payload: {data: res},
+      //     payload: {data: res.result},
       //   });
       //   return
       // }
       // end
       yield put({
         type: 'saveOopSearchGrid',
-        payload: res,
+        payload: data.result,
       });
     },
     *oopSearchSuggest({ payload }, { put, call }) {
-      const res = yield call(searchSuggest, payload);
+      const data = yield call(searchSuggest, payload);
       yield put({
         type: 'saveSearchOptions',
-        payload: {res, matchStr: payload},
+        payload: {res: data.result, matchStr: payload},
       });
     },
     *showHistory(_, {put}) {

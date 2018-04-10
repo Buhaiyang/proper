@@ -6,7 +6,6 @@ export default {
 
   state: {
     data: {},
-    messageData: null,
     newId: null,
     changeList: [],
     deployData: {}
@@ -17,23 +16,19 @@ export default {
       const response = yield call(queryWorkflowList, payload);
       yield put({
         type: 'getList',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
+    *remove({ payload, callback }, { call }) {
       const response = yield call(removeWorkflowList, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     *create({ payload, callback }, { call, put }) {
       const response = yield call(createWorkflow, payload);
       yield put({
         type: 'getCreateId',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback();
     },
@@ -55,9 +50,9 @@ export default {
       const response = yield call(repositoryWorkflow, payload);
       yield put({
         type: 'getDepoly',
-        payload: response,
+        payload: response.result,
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
   },
 
@@ -73,12 +68,6 @@ export default {
       return {
         ...state,
         data: lists
-      };
-    },
-    getMessages(state, action) {
-      return {
-        ...state,
-        messageData: action.payload
       };
     },
     getCreateId(state, action) {

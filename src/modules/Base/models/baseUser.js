@@ -15,19 +15,19 @@ export default {
       const response = yield call(queryUsers);
       yield put({
         type: 'save',
-        payload: response,
+        payload: response.result,
       });
     },
     *fetchCurrent(_, { call, put }) {
       const response = yield call(queryCurrent);
       yield put({
         type: 'saveCurrentUser',
-        payload: response,
+        payload: response.result,
       });
     },
     *fetchMenus(_, { call, put }) {
       const response = yield call(queryCurrentMenus);
-      const menus = formatter(controlMenu(response));
+      const menus = formatter(controlMenu(response.result));
       yield put({
         type: 'saveMenus',
         payload: menus

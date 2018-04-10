@@ -11,7 +11,6 @@ export default {
 
   state: {
     roleList: [],
-    messageText: '',
     roleInfo: {},
     roleUsers: [],
     allUsers: [],
@@ -28,48 +27,41 @@ export default {
       const response = yield call(queryRoles, payload);
       yield put({
         type: 'saveRoleList',
-        payload: Array.isArray(response) ? response : [],
+        payload: Array.isArray(response.result) ? response.result : [],
       });
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     // 取得指定角色ID详情信息
     *fetchById({ payload, callback }, { call, put }) {
       const response = yield call(queryRole, payload);
       yield put({
         type: 'saveRoleInfo',
-        payload: response,
+        payload: response.result,
       });
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     // 删除选中的角色信息
-    *removeRoles({ payload, callback }, { call, put }) {
-      let response = yield call(removeRoles, payload);
-      if (response === '') {
-        response = '删除成功';
-      }
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+    *removeRoles({ payload, callback }, { call }) {
+      const response = yield call(removeRoles, payload);
+      if (callback) callback(response);
     },
     // 取得指定角色ID的用户列表
     *fetchRoleUsersById({ payload, callback }, { call, put }) {
       const response = yield call(queryRoleUsers, payload);
       yield put({
         type: 'saveRoleUsers',
-        payload: response,
+        payload: response.result,
       });
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     // 取得指定角色ID的用户组列表
     *fetchRoleGroupsById({ payload, callback }, { call, put }) {
       const response = yield call(queryRoleGroups, payload);
       yield put({
         type: 'saveRoleGroups',
-        payload: response,
+        payload: response.result,
       });
-      if (callback) callback(response);
+      if (callback) callback(response.result);
     },
     // 更新角色列表的状态信息
     *fetchUpdateStatus({ payload, callback }, { call }) {
@@ -81,7 +73,7 @@ export default {
       const response = yield call(createOrUpdate, payload);
       yield put({
         type: 'saveRoleInfo',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback(response);
     },
@@ -90,19 +82,19 @@ export default {
       const response = yield call(queryParents, payload);
       yield put({
         type: 'saveRoleParents',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback(response);
     },
     // 取得指定角色的菜单列表
     *fetchMenus({ payload, callback }, { call, put }) {
       const allMenus = yield call(queryCurrentMenus);
-      const menus = formatter(controlMenu(allMenus));
+      const menus = formatter(controlMenu(allMenus.result));
       const checkMenus = yield call(queryCheckedMenus, payload);
       const checked = [];
-      for (let i = 0; i < checkMenus.length; i++) {
-        if (checkMenus[i].leaf) {
-          checked.push(checkMenus[i]);
+      for (let i = 0; i < checkMenus.result.length; i++) {
+        if (checkMenus.result[i].leaf) {
+          checked.push(checkMenus.result[i]);
         }
       }
       yield put({
@@ -113,20 +105,20 @@ export default {
     },
     // 菜单添加项
     *menusAdd({ payload, callback }, { call }) {
-      yield call(menusAdd, payload);
-      if (callback) callback();
+      const response = yield call(menusAdd, payload);
+      if (callback) callback(response);
     },
     // 菜单删除项
     *menusDelete({ payload, callback }, { call }) {
-      yield call(menusDelete, payload);
-      if (callback) callback();
+      const response = yield call(menusDelete, payload);
+      if (callback) callback(response);
     },
     // 取得所有用户
     *fetchAllUsers({ payload, callback }, { call, put }) {
       const response = yield call(queryUsers, payload);
       yield put({
         type: 'saveAllUsers',
-        payload: response.data,
+        payload: response.result.data,
       });
       if (callback) callback();
     },
@@ -135,45 +127,29 @@ export default {
       const response = yield call(queryGroups, payload);
       yield put({
         type: 'saveAllGroups',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback();
     },
     // 角色添加用户
-    *roleAddUsers({ payload, callback }, { call, put }) {
+    *roleAddUsers({ payload, callback }, { call }) {
       const response = yield call(userAddRole, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 角色删除用户
-    *roleDelUsers({ payload, callback }, { call, put }) {
+    *roleDelUsers({ payload, callback }, { call }) {
       const response = yield call(userDelRole, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 角色添加用户组
-    *roleAddGroups({ payload, callback }, { call, put }) {
+    *roleAddGroups({ payload, callback }, { call }) {
       const response = yield call(GroupAddRole, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 角色删除用户组
-    *userDelGroups({ payload, callback }, { call, put }) {
+    *userDelGroups({ payload, callback }, { call }) {
       const response = yield call(GroupDelRole, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
   },
 
@@ -188,12 +164,6 @@ export default {
       return {
         ...state,
         roleInfo: action.payload
-      };
-    },
-    getMessages(state, action) {
-      return {
-        ...state,
-        messageText: action.payload
       };
     },
     saveRoleUsers(state, action) {

@@ -1,12 +1,13 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Spin, Transfer,
-  Form, Modal, Input, message, Tabs, Radio, Badge } from 'antd';
+  Form, Modal, Input, Tabs, Radio, Badge } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/Oopsearch';
 import OopTable from '../../../components/OopTable';
 import DescriptionList from '../../../components/DescriptionList';
+import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
@@ -263,8 +264,8 @@ export default class Group extends PureComponent {
         enable: checked,
         ids: [record.id]
       },
-      callback: () => {
-        checked ? message.success('已启用') : message.error('已禁用')
+      callback: (res) => {
+        oopToast(res, '已启用', '已禁用');
         this.refresh();
       }
     });
@@ -284,8 +285,8 @@ export default class Group extends PureComponent {
           payload: {
             ids: selectedRowKeys.toString()
           },
-          callback: (msg) => {
-            msg ? message.error(msg) : message.success('删除成功');
+          callback: (res) => {
+            oopToast(res, '删除成功', '删除失败');
             me.oopTable.clearSelection()
             me.refresh();
           }
@@ -302,8 +303,8 @@ export default class Group extends PureComponent {
       payload: {
         ids: row.id
       },
-      callback: (msg) => {
-        msg ? message.error(msg) : message.success('删除成功');
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败');
         me.oopTable.clearSelection()
         me.refresh();
       }
@@ -343,8 +344,8 @@ export default class Group extends PureComponent {
       this.props.dispatch({
         type: 'authGroups/createOrUpdate',
         payload: fields,
-        callback: () => {
-          message.success('保存成功');
+        callback: (res) => {
+          oopToast(res, '保存成功', '保存失败');
           this.refresh();
           self.setState({
             isCreate: false

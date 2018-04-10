@@ -8,7 +8,6 @@ export default {
 
   state: {
     groupsData: [],
-    groupsMessageData: '',
     groupsBasicInfo: {},
     groupUsers: [],
     allUsers: [],
@@ -22,7 +21,7 @@ export default {
       const response = yield call(queryGroups, payload);
       yield put({
         type: 'getUserGroups',
-        payload: Array.isArray(response) ? response : [],
+        payload: Array.isArray(response.result) ? response.result : [],
       });
       if (callback) callback(response);
     },
@@ -32,7 +31,7 @@ export default {
       yield put({
         type: 'saveUserGroups',
         payload: {
-          groupUsers: Array.isArray(response) ? response : [],
+          groupUsers: Array.isArray(response.result) ? response.result : [],
         }
       })
       if (callback) callback();
@@ -41,7 +40,7 @@ export default {
       const response = yield call(queryUserGroupsById, payload);
       yield put({
         type: 'getGroupsBasicInfo',
-        payload: response,
+        payload: response.result,
       });
       if (callback) callback();
     },
@@ -51,7 +50,7 @@ export default {
       yield put({
         type: 'saveGroupUserAll',
         payload: {
-          allUsers: res.data
+          allUsers: res.result.data
         }
       })
       if (callback) callback();
@@ -62,62 +61,40 @@ export default {
       yield put({
         type: 'saveGroupUsers',
         payload: {
-          groupUsers: Array.isArray(response) ? response : [],
+          groupUsers: Array.isArray(response.result) ? response.result : [],
         }
       })
       if (callback) callback(response);
     },
-    *update({ payload, callback }, { call, put }) {
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
+    *update({ payload, callback }, { call }) {
       const response = yield call(updateUserGroups, payload);
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+      if (callback) callback(response);
     },
-    *removeAll({ payload, callback }, { call, put }) {
-      let response = yield call(removeAllUserGroups, payload);
-      if (response === '') {
-        response = '删除成功';
-      }
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+    *removeAll({ payload, callback }, { call }) {
+      const response = yield call(removeAllUserGroups, payload);
+      if (callback) callback(response);
     },
-    *remove({ payload, callback }, { call, put }) {
-      let response = yield call(removeUserGroups, payload);
-      if (response === '') {
-        response = '删除成功';
-      }
-      yield put({
-        type: 'getMessages',
-        payload: response,
-      });
-      if (callback) callback();
+    *remove({ payload, callback }, { call }) {
+      const response = yield call(removeUserGroups, payload);
+      if (callback) callback(response);
     },
     *createOrUpdate({ payload, callback }, { call, put }) {
       const response = yield call(createOrUpdateUserGroups, payload);
       yield put({
         type: 'getGroupsBasicInfo',
-        payload: response || {},
+        payload: response.result || {},
       });
       if (callback) callback(response);
     },
     // 用户组添加用户
     *groupAddUsers({ payload, callback }, { call }) {
-      yield call(groupAddUsers, payload);
-      if (callback) callback();
+      const response = yield call(groupAddUsers, payload);
+      if (callback) callback(response);
     },
     // 用户组删除用户
     *groupDeleteUsers({ payload, callback }, { call }) {
-      yield call(groupDeleteUsers, payload);
-      if (callback) callback();
+      const response = yield call(groupDeleteUsers, payload);
+      if (callback) callback(response);
     },
   },
 
@@ -133,12 +110,6 @@ export default {
         ...state,
         groupsBasicInfo: action.payload
       }
-    },
-    getMessages(state, action) {
-      return {
-        ...state,
-        groupsMessageData: action.payload
-      };
     },
     saveGroupUsers(state, { payload }) {
       return {

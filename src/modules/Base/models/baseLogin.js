@@ -17,7 +17,7 @@ export default {
       const response = yield call(login, payload);
       // Login successfully
       if (response) {
-        window.localStorage.setItem('proper-auth-login-token', response);
+        window.localStorage.setItem('proper-auth-login-token', response.result);
         // yield put(routerRedux.push('/main'));
         window.location.href = `${window.location.origin}${window.location.pathname}`
         yield put({
