@@ -164,10 +164,10 @@ function getFlatMenuData(menus) {
   let keys = {};
   menus.forEach((item) => {
     if (item.children) {
-      keys[item.path] = { ...item };
+      keys[item.route] = { ...item };
       keys = { ...keys, ...getFlatMenuData(item.children) };
     } else {
-      keys[item.path] = { ...item };
+      keys[item.route] = { ...item };
     }
   });
   return keys;
@@ -200,18 +200,18 @@ function firstUpperCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function formatter(data, parentPath = '') {
+export function formatter(data) {
   return data.map((item) => {
-    let { path } = item;
-    if (!isUrl(path)) {
-      path = parentPath + item.path;
-    }
+    const { path } = item;
+    // if (!isUrl(path)) {
+    //   path = item.path;
+    // }
     const result = {
       ...item,
       path
     };
     if (item.children) {
-      result.children = formatter(item.children, `${parentPath}${item.path}/`);
+      result.children = formatter(item.children);
     }
     return result;
   });
