@@ -21,13 +21,22 @@ export const dynamicWrapper = (component) => {
     app: getApp(),
     models: () => [],
     component: () => {
-      return component().then((raw) => {
-        const Component = raw.default || raw;
-        return props => createElement(Component, {
-          ...props,
-          routerData: getRouterData(),
+      if (component().then) {
+        return component().then((raw) => {
+          const Component = raw.default || raw;
+          return props => createElement(Component, {
+            ...props,
+            routerData: getRouterData(),
+          });
         });
-      });
+      } else {
+        return (props) => {
+          return createElement(component().default, {
+            ...props,
+            routerData: getRouterData(),
+          });
+        };
+      }
     },
   });
 };

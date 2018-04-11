@@ -62,7 +62,7 @@ export default class OopTable extends PureComponent {
                     (
                       <Tooltip placement="bottom" title={item.text}>
                         <a>
-                          <Icon type={item.icon} />
+                          <Icon type={item.icon} style={item.style} />
                         </a>
                       </Tooltip>) : <a>{item.text}</a>
                   }
@@ -71,7 +71,7 @@ export default class OopTable extends PureComponent {
                 item.icon ? (
                   <Tooltip placement="bottom" title={item.text}>
                     <a onClick={() => item.onClick(record)}>
-                      <Icon type={item.icon} />
+                      <Icon type={item.icon} style={item.style} />
                     </a>
                   </Tooltip>) : <a onClick={() => item.onClick(record)}>{item.text}</a>
               )
