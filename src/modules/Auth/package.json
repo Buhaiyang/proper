@@ -1,28 +1,4 @@
 {
-  "_from": "@pea/module-auth@^0.0.1",
-  "_id": "@pea/module-auth@0.0.1",
-  "_inBundle": false,
-  "_integrity": "sha512-Hb8Lrb945jG9nU3d8xIHTGYUm+Ext/8lqUV7KqwB2pQKpYSNOGtebUrjD1dP6UnzMKFzKwPUjTSddUrWeMRj4w==",
-  "_location": "/@pea/module-auth",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "@pea/module-auth@^0.0.1",
-    "name": "@pea/module-auth",
-    "escapedName": "@pea%2fmodule-auth",
-    "scope": "@pea",
-    "rawSpec": "^0.0.1",
-    "saveSpec": null,
-    "fetchSpec": "^0.0.1"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "http://nexus.propersoft.cn:8081/repository/npm-internal/@pea/module-auth/-/module-auth-0.0.1.tgz",
-  "_shasum": "f5d389696a4efa340ef98a5094e58dface621082",
-  "_spec": "@pea/module-auth@^0.0.1",
-  "_where": "D:\\Documents\\GitHub\\new\\proper-enterprise-app",
   "author": "",
   "bundleDependencies": false,
   "deprecated": false,
@@ -33,5 +9,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "0.0.1"
+  "version": "0.4.0"
 }
