@@ -8,9 +8,9 @@ module.exports = {
   "POST:/auth/login": (req, res)=>{
     const { pwd, username } = req.body;
     if(pwd === '123456' && username === 'admin'){
-      res.send('husrhtluihetioyhoihl');
+      res.status(200).send('husrhtluihetioyhoihl');
     }else {
-      res.send('');
+      res.status(528).send('失败');
     }
   },
   "GET:/auth/menus":[
@@ -255,10 +255,16 @@ module.exports = {
     {"id": "9901003","icon": "icon","name": "角色管理","route": "","enable": true,"root": false,"leaf": true,"parentId": "99010","menuType": {"code": "1"}},
   ],
   'POST:/auth/roles/:id/menus':(req , res)=>{
-    res.send({msg: '添加成功'})
+    res.send({msg: '菜单添加成功'})
   },
   'DELETE:/auth/roles/:id/menus':(req , res)=>{
-    res.send({msg: '删除成功'})
+    res.send({msg: '菜单删除成功'})
+  },
+  'POST:/auth/roles/:id/resources':(req , res)=>{
+    res.send({msg: '资源添加成功'})
+  },
+  'DELETE:/auth/roles/:id/resources':(req , res)=>{
+    res.send({msg: '资源删除成功'})
   },
   'GET:/auth/roles/parents':[
     {"id": "1", "name": "普通管理员", "description": "普通权限管理员", "enable": true, "parentId": "1", "parentName": "父节点1"},

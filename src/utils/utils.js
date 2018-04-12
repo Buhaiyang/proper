@@ -291,7 +291,7 @@ export function controlMenu(oldMenu, newMenu = []) {
     for (let i = 0; i < oldMenu.length; i++) {
       const item = oldMenu[i];
       item.path = oldMenu[i].route;
-      if (oldMenu[i].parentId == null) {
+      if (oldMenu[i].parentId == null || oldMenu[i].parentId === '') {
         newMenu.push(oldMenu[i]);
       }
     }

@@ -108,7 +108,10 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const ManagerInfoForm = Form.create()((props) => {
-  const { loading, roleMenus, checkedMenuKeys, handleMenuKeys, roleInfo, labelText } = props;
+  const { loading, roleMenus, checkedMenuKeys, checkedResourceKeys,
+    handleMenuKeys, roleInfo, labelText } = props;
+
+  const checkedAllKeys = [...checkedMenuKeys, ...checkedResourceKeys];
 
   const renderTreeNodes = (data) => {
     return data.map((item) => {
@@ -125,8 +128,8 @@ const ManagerInfoForm = Form.create()((props) => {
     });
   }
 
-  const onCheck = (checkedKeys, id) => {
-    handleMenuKeys(checkedKeys, id);
+  const onCheck = (checkedKeys, info) => {
+    handleMenuKeys(checkedKeys, info, roleInfo.id);
   }
 
   return (
@@ -139,8 +142,8 @@ const ManagerInfoForm = Form.create()((props) => {
           <Tree
             checkable
             showLine
-            checkedKeys={checkedMenuKeys}
-            onCheck={value => onCheck(value, roleInfo.id)}
+            checkedKeys={checkedAllKeys}
+            onCheck={onCheck}
           >
             {
               renderTreeNodes(roleMenus)
@@ -222,7 +225,7 @@ const GroupInfoForm = Form.create()((props) => {
 
 const CreateForm = connect()((props) => {
   const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleList, roleMenus, checkedMenuKeys,
+    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys,
     handleTabChange, handleMenuKeys, allUsers, roleUsers, allGroups, roleGroups,
     handleUserChange, handleGroupChange } = props;
 
@@ -282,6 +285,7 @@ const CreateForm = connect()((props) => {
         ref = {(el) => { this.manager = el; }}
         roleInfo = {roleInfo}
         checkedMenuKeys = {checkedMenuKeys}
+        checkedResourceKeys={checkedResourceKeys}
         handleMenuKeys = {handleMenuKeys}
         roleMenus = {roleMenus}
         loading = {loading}
@@ -355,6 +359,8 @@ export default class Role extends PureComponent {
     isCreate: !this.props.authRole.roleInfo.id,
     // 菜单被选择的项
     checkedMenuKeys: [],
+    // 资源被选择的项
+    checkedResourceKeys: [],
     // 当前角色保存的用户
     userKey: [],
     // 当前角色保存的用户组
@@ -491,43 +497,61 @@ export default class Role extends PureComponent {
   }
 
   // 控制菜单选择的渲染
-  handleMenuKeys = (checkedKeys, id) => {
+  handleMenuKeys = (checkedKeys, info, id) => {
+    const checkedMenus = [];
+    const checkedResource = [];
+    for (let i = 0; i < info.checkedNodes.length; i++) {
+      if (info.checkedNodes[i].props.dataRef.resourceType) {
+        checkedResource.push(info.checkedNodes[i].props.dataRef.id);
+      }
+      if (info.checkedNodes[i].props.dataRef.menuType) {
+        checkedMenus.push(info.checkedNodes[i].props.dataRef.id);
+      }
+    }
     const oldMenus = this.state.checkedMenuKeys;
-    const changeMenus = [];
+    const oldResource = this.state.checkedResourceKeys;
     this.setState({
-      checkedMenuKeys: checkedKeys
+      checkedMenuKeys: checkedMenus,
+      checkedResourceKeys: checkedResource,
     })
-    if (oldMenus.length < checkedKeys.length) {
+    this.handleMenuKeysRequest(oldMenus, checkedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
+    this.handleMenuKeysRequest(oldResource, checkedResource, id, 'authRole/resourcesAdd', 'authRole/resourcesDelete', '资源');
+  }
+
+  // 控制菜单选择的请求
+  handleMenuKeysRequest = (oldItems, checkedKeys, id, addType, delType, typeText) => {
+    const changeItems = [];
+    if (oldItems.length < checkedKeys.length) {
       for (let i = 0; i < checkedKeys.length; i++) {
-        if (oldMenus.indexOf(checkedKeys[i]) === -1) {
-          changeMenus.push(checkedKeys[i]);
+        if (oldItems.indexOf(checkedKeys[i]) === -1) {
+          changeItems.push(checkedKeys[i]);
         }
       }
       this.props.dispatch({
-        type: 'authRole/menusAdd',
+        type: addType,
         payload: {
           roleId: id,
-          ids: changeMenus
+          ids: changeItems
         },
         callback: (res) => {
-          oopToast(res, '菜单添加成功', '菜单添加失败');
+          oopToast(res, `${typeText}添加成功`, `${typeText}添加失败`);
         }
       });
     }
-    if (oldMenus.length > checkedKeys.length) {
-      for (let i = 0; i < oldMenus.length; i++) {
-        if (checkedKeys.indexOf(oldMenus[i]) === -1) {
-          changeMenus.push(oldMenus[i]);
+    if (oldItems.length > checkedKeys.length) {
+      for (let i = 0; i < oldItems.length; i++) {
+        if (checkedKeys.indexOf(oldItems[i]) === -1) {
+          changeItems.push(oldItems[i]);
         }
       }
       this.props.dispatch({
-        type: 'authRole/menusDelete',
+        type: delType,
         payload: {
           roleId: id,
-          ids: {ids: changeMenus.toString()}
+          ids: {ids: changeItems.toString()}
         },
         callback: (res) => {
-          oopToast(res, '菜单删除成功', '菜单删除失败');
+          oopToast(res, `${typeText}删除成功`, `${typeText}删除失败`);
         }
       });
     }
@@ -666,7 +690,7 @@ export default class Role extends PureComponent {
         roleMenus, allUsers, allGroups } } = this.props;
 
     const { viewVisible, formVisible, currentTabKey, isCreate,
-      checkedMenuKeys } = this.state;
+      checkedMenuKeys, checkedResourceKeys } = this.state;
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -749,6 +773,7 @@ export default class Role extends PureComponent {
           roleList={roleList}
           roleMenus={roleMenus}
           checkedMenuKeys={checkedMenuKeys}
+          checkedResourceKeys={checkedResourceKeys}
           handleMenuKeys={this.handleMenuKeys}
           handleTabChange={this.handleTabChange}
           allUsers={allUsers}
@@ -781,6 +806,7 @@ export default class Role extends PureComponent {
               <ManagerInfoForm
                 roleInfo = {roleInfo}
                 checkedMenuKeys = {checkedMenuKeys}
+                checkedResourceKeys={checkedResourceKeys}
                 handleMenuKeys = {this.handleMenuKeysView}
                 roleMenus = {roleMenus}
                 loading = {loading}

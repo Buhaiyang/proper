@@ -62,7 +62,8 @@ export default class BasicLayout extends React.PureComponent {
   }
   state = {
     isMobile,
-    marginLeft: '256px'
+    marginLeft: '256px',
+    showMenusLoading: true,
   };
 
   getChildContext() {
@@ -88,7 +89,12 @@ export default class BasicLayout extends React.PureComponent {
     // 从后台数据库加载菜单并且 按照菜单格式组装路由
     this.props.dispatch({
       type: 'baseUser/fetchMenus',
-      payload: this.props.app
+      payload: this.props.app,
+      callback: () => {
+        this.setState({
+          showMenusLoading: false
+        })
+      }
     });
     this.props.dispatch({
       type: 'baseUser/fetchCurrent',
@@ -180,6 +186,7 @@ export default class BasicLayout extends React.PureComponent {
     const {
       currentUser, collapsed, fetchingNotices, notices, routerData, match, location, menus
     } = this.props;
+    const { showMenusLoading } = this.state;
     // console.log('routerData',routerData);
     const bashRedirect = this.getBashRedirect();
     redirectData = this.getRedirect(menus);
@@ -194,6 +201,7 @@ export default class BasicLayout extends React.PureComponent {
             // If you do not have the Authorized parameter
             // you will be forced to jump to the 403 interface without permission
             menuData={menus}
+            showMenusLoading={showMenusLoading}
             collapsed={collapsed}
             location={location}
             isMobile={this.state.isMobile}

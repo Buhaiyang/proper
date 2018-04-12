@@ -275,6 +275,7 @@ export default class Func extends PureComponent {
     currentTabKey: 'basic',
     isCreate: true,
     parentNode: null,
+    parentId: null,
   }
   componentDidMount() {
     this.props.dispatch({
@@ -297,7 +298,8 @@ export default class Func extends PureComponent {
   handleOnSelect = (treeNode)=>{
     this.onLoad({
       parentId: treeNode[0]
-    })
+    });
+    this.state.parentId = treeNode[0].toString();
     this.oopTreeTable.table.clearSelection()
   }
   setModalVisible = (flag) => {
@@ -324,10 +326,11 @@ export default class Func extends PureComponent {
       payload: data,
       callback(res) {
         me.setState({
-          isCreate: false
+          isCreate: false,
+          parentId: data.parentId
         });
         oopToast(res, '保存成功', '保存失败');
-        me.onLoad();
+        me.onLoad([me.state.parentId]);
         me.props.dispatch({
           type: 'authFunc/fetchTreeData'
         });
@@ -434,7 +437,7 @@ export default class Func extends PureComponent {
           callback(res) {
             me.oopTreeTable.table.clearSelection()
             oopToast(res, '删除成功', '删除失败');
-            me.onLoad()
+            me.onLoad([me.state.parentId])
           }
         })
       }
@@ -456,7 +459,7 @@ export default class Func extends PureComponent {
       payload: {ids: record.id},
       callback(res) {
         oopToast(res, '删除成功', '删除失败');
-        me.onLoad()
+        me.onLoad([me.state.parentId])
       }
     })
   }

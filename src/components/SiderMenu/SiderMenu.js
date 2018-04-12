@@ -234,7 +234,7 @@ export default class SiderMenu extends PureComponent {
           style={{ padding: '16px 0', width: '100%', height: 'calc(100vh - 64px)', overflowY: 'auto'}} >
           {this.getNavMenuItems(this.props.menuData)}
         </Menu>
-        {this.props.menuData.length === 0 && (
+        {this.props.showMenusLoading && (
           <div className={styles.menuLoading}>
             <Spin size="large" />
           </div>

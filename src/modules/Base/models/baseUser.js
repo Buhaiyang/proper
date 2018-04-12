@@ -25,7 +25,7 @@ export default {
         payload: response.result,
       });
     },
-    *fetchMenus(_, { call, put }) {
+    *fetchMenus({ callback }, { call, put }) {
       const response = yield call(queryCurrentMenus);
       const menus = formatter(controlMenu(response.result));
       yield put({
@@ -36,6 +36,7 @@ export default {
         type: 'saveRouters',
         payload: getRouterDataFromMenuData(menus, dynamicWrapper),
       });
+      if (callback) callback();
     }
   },
   reducers: {

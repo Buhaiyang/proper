@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Alert, Modal, Form, Input, message } from 'antd';
-// TODO import { Link } from 'dva/router';
-// TODO import { Checkbox, Alert, Icon, Modal, Form, Input, message } from 'antd';
+import { Link } from 'dva/router';
+import { Checkbox, Alert, Icon, Modal, Form, Input, message } from 'antd';
 import Login from '../../../components/Login';
 import styles from './Login.less';
 import {inject} from '../../../common/inject';
 
-// TODO const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
-const { Tab, UserName, Password, Submit } = Login;
+const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 const FormItem = Form.Item;
 const AddressForm = Form.create()((props)=>{
   const { form, address } = props;
@@ -39,7 +37,7 @@ const AddressForm = Form.create()((props)=>{
 export default class LoginPage extends Component {
   state = {
     type: 'account',
-    // TODO autoLogin: true,
+    autoLogin: true,
   }
 
   onTabChange = (type) => {
@@ -57,12 +55,11 @@ export default class LoginPage extends Component {
     }
   }
 
-  // TODO
-  // changeAutoLogin = (e) => {
-  //   this.setState({
-  //     autoLogin: e.target.checked,
-  //   });
-  // }
+  changeAutoLogin = (e) => {
+    this.setState({
+      autoLogin: e.target.checked,
+    });
+  }
 
   renderMessage = (content) => {
     return (
@@ -102,12 +99,12 @@ export default class LoginPage extends Component {
         >
           <Tab key="account" tab="账户密码登录">
             {
-              baseLogin.showError && this.renderMessage('账户或密码错误(admin/123456)')
+              baseLogin.showError && this.renderMessage('账户或密码错误')
             }
-            <UserName name="username" placeholder="admin" />
-            <Password name="pwd" placeholder="123456" />
+            <UserName name="username" placeholder="请输入账户名" />
+            <Password name="pwd" placeholder="请输入密码" />
           </Tab>
-          {/* TODO <Tab key="mobile" tab="手机号登录">
+          <Tab key="mobile" tab="手机号登录">
             {
               baseLogin.status === 'error' &&
               baseLogin.type === 'mobile' &&
@@ -116,19 +113,19 @@ export default class LoginPage extends Component {
             }
             <Mobile name="mobile" />
             <Captcha name="captcha" />
-          </Tab> */}
-          {/* TODO <div>
+          </Tab>
+          <div>
             <Checkbox checked={this.state.autoLogin} onChange={this.changeAutoLogin}>自动登录</Checkbox>
             <a style={{ float: 'right' }} href="">忘记密码</a>
-          </div> */}
+          </div>
           <Submit loading={submitting}>登录</Submit>
-          {/* TODO <div className={styles.other}>
+          <div className={styles.other}>
             其他登录方式
             <Icon className={styles.icon} type="alipay-circle" />
             <Icon className={styles.icon} type="taobao-circle" />
             <Icon className={styles.icon} type="weibo-circle" />
             <Link className={styles.register} to="/base/register">注册账户</Link>
-          </div> */}
+          </div>
         </Login>
         <Modal
           visible={ baseLogin.modalVisible }

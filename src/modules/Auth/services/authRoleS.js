@@ -60,7 +60,7 @@ export async function queryCheckedMenus(params) {
 
 // 菜单添加项
 export async function menusAdd(params) {
-  return request(`/auth/roles/${params.roleId}/resources`, {
+  return request(`/auth/roles/${params.roleId}/menus`, {
     method: 'POST',
     body: params
   });
@@ -68,6 +68,21 @@ export async function menusAdd(params) {
 
 // 菜单删除项
 export async function menusDelete(params) {
+  return request(`/auth/roles/${params.roleId}/menus?${stringify(params.ids)}`, {
+    method: 'DELETE'
+  });
+}
+
+// 资源添加项
+export async function resourcesAdd(params) {
+  return request(`/auth/roles/${params.roleId}/resources`, {
+    method: 'POST',
+    body: params
+  });
+}
+
+// 资源删除项
+export async function resourcesDelete(params) {
   return request(`/auth/roles/${params.roleId}/resources?${stringify(params.ids)}`, {
     method: 'DELETE'
   });

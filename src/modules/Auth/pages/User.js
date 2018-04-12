@@ -608,7 +608,6 @@ export default class User extends React.PureComponent {
           <Spin spinning={loading}>
             <DescriptionList size={size} col="2" title="基本信息">
               <Description term="用户名">{userBasicInfo.username}</Description>
-              <Description term="密码">{userBasicInfo.password}</Description>
               <Description term="显示名">{userBasicInfo.name}</Description>
               <Description term="电子邮箱">{userBasicInfo.email}</Description>
               <Description term="手机号码">{userBasicInfo.phone}</Description>

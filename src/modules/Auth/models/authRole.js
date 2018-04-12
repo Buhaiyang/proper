@@ -2,7 +2,8 @@ import { queryGroups } from '../services/authGroupsS';
 import { queryUsers } from '../services/authUserS';
 import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups, fetchUpdateStatus,
   createOrUpdate, queryParents, queryCheckedMenus, menusAdd, menusDelete,
-  userAddRole, userDelRole, GroupAddRole, GroupDelRole, menuResource } from '../services/authRoleS';
+  userAddRole, userDelRole, GroupAddRole, GroupDelRole, menuResource,
+  resourcesAdd, resourcesDelete } from '../services/authRoleS';
 import { formatter, controlMenu } from '../../../utils/utils';
 
 export default {
@@ -110,6 +111,16 @@ export default {
     // 菜单删除项
     *menusDelete({ payload, callback }, { call }) {
       const response = yield call(menusDelete, payload);
+      if (callback) callback(response);
+    },
+    // 资源添加项
+    *resourcesAdd({ payload, callback }, { call }) {
+      const response = yield call(resourcesAdd, payload);
+      if (callback) callback(response);
+    },
+    // 资源删除项
+    *resourcesDelete({ payload, callback }, { call }) {
+      const response = yield call(resourcesDelete, payload);
       if (callback) callback(response);
     },
     // 取得所有用户

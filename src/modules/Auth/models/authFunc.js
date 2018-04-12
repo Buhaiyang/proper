@@ -50,9 +50,13 @@ export default {
     },
     *saveOrUpdateFunc({payload, callback}, {call, put}) {
       const resp = yield call(saveOrUpdateFunc, payload);
+      let response = {};
+      if (resp) {
+        response = resp.result;
+      }
       yield put({
         type: 'saveFuncBasicInfo',
-        payload: resp.result || {}
+        payload: response
       })
       if (callback) callback(resp)
     },

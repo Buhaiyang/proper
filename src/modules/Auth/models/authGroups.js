@@ -80,9 +80,13 @@ export default {
     },
     *createOrUpdate({ payload, callback }, { call, put }) {
       const response = yield call(createOrUpdateUserGroups, payload);
+      let resp = {};
+      if (response) {
+        resp = resp.result;
+      }
       yield put({
         type: 'getGroupsBasicInfo',
-        payload: response.result || {},
+        payload: resp,
       });
       if (callback) callback(response);
     },

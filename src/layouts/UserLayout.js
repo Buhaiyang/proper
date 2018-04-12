@@ -45,8 +45,7 @@ class UserLayout extends React.PureComponent {
               <div className={styles.header}>
                 <Link to="/">
                   <img alt="logo" className={styles.logo} src={logo} />
-                  {/* TODO <span className={styles.title}>Proper Enterprise App</span> */}
-                  <span className={styles.title}>普日协同办公</span>
+                  <span className={styles.title}>Proper Enterprise App</span>
                 </Link>
               </div>
               <div className={styles.desc}>Proper Enterprise App 是一体化管理平台</div>
