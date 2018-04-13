@@ -1,6 +1,8 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Table, Button, Input, message, Popconfirm, Divider } from 'antd';
+import { Table, Button, Input, message, Popconfirm, Divider, Select } from 'antd';
 import styles from './TableForm.less';
+
+const { Option } = Select;
 
 export default class TableForm extends PureComponent {
   state = {
@@ -64,7 +66,11 @@ export default class TableForm extends PureComponent {
   handleFieldChange(e, fieldName, key) {
     const target = this.getRowByKey(key, this.props.value);
     if (target) {
-      target[fieldName] = e.target.value;
+      if (e.target == null) {
+        target[fieldName] = e;
+      } else {
+        target[fieldName] = e.target.value;
+      }
       this.forceUpdate()
     }
   }
@@ -127,6 +133,22 @@ export default class TableForm extends PureComponent {
           return text;
         }
       },
+      {title: '标识', dataIndex: 'identifier', width: 100, render: (text, record) => {
+        if (record.editable) {
+          return (
+            <Input
+              style={{width: '100px'}}
+              size="small"
+              value={text}
+              onChange={e => this.handleFieldChange(e, 'identifier', record.id)}
+              onKeyPress={e => this.handleKeyPress(e, record.id)}
+              placeholder="标识"
+            />
+          );
+        }
+        return text;
+      }
+      },
       {title: '请求方法', dataIndex: 'method', width: 100, render: (text, record) => {
         if (record.editable) {
           return (
@@ -136,7 +158,7 @@ export default class TableForm extends PureComponent {
               value={text}
               onChange={e => this.handleFieldChange(e, 'method', record.id)}
               onKeyPress={e => this.handleKeyPress(e, record.id)}
-              placeholder="标识"
+              placeholder="请求方法"
             />
           );
         }
@@ -160,12 +182,22 @@ export default class TableForm extends PureComponent {
       }
       },
       {
-        title: '状态', dataIndex: 'enable', width: 80, render: (record)=>{
-          if (record) {
-            return '已启用';
-          } else {
-            return '已禁用';
+        title: '状态', dataIndex: 'enable', width: 100, render: (text, record)=>{
+          const statusText = text ? '启用' : '停用';
+          if (record.editable) {
+            return (
+              <Select
+                defaultValue={statusText}
+                style={{ width: 90 }}
+                onChange={e => this.handleFieldChange(e, 'enable', record.id)}
+                onKeyPress={e => this.handleKeyPress(e, record.id)}
+                size="small">
+                <Option value="true">启用</Option>
+                <Option value="false">停用</Option>
+              </Select>
+            );
           }
+          return statusText;
         }
       },
       {

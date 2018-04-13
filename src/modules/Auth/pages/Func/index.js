@@ -253,7 +253,7 @@ const ModalForm = connect()((props) => {
       {currentTabKey === 'basic' && <Button type="primary" onClick={onOk} loading={loading}>保存</Button>}
     </Fragment>);
   return (
-    <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer} width={660} >
+    <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer} width={800} >
       <Tabs size={size} animated={false} onChange={onTabChange} activeKey={currentTabKey}>
         {tabList.map(item =>
           <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
@@ -353,11 +353,20 @@ export default class Func extends PureComponent {
     const {dispatch, authFunc: {funcBasicInfo} } = this.props
     if (type === 'post') {
       if (item.id) {
+        let enableBool = item.enable;
+        if (item.enable === 'true') {
+          enableBool = true;
+        }
+        if (item.enable === 'false') {
+          enableBool = false;
+        }
         const data = {
           id: item.id,
           name: item.name,
           url: item.url,
           method: item.method,
+          identifier: item.identifier,
+          enable: enableBool,
         }
         dispatch({
           type: 'authFunc/updateResource',
