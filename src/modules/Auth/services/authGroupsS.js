@@ -58,8 +58,7 @@ export async function groupAddUsers(params) {
 }
 
 export async function groupDeleteUsers(params) {
-  return request(`/auth/user-groups/${params.id}/users`, {
+  return request(`/auth/user-groups/${params.id}/users?${stringify(params)}`, {
     method: 'DELETE',
-    body: params,
   });
 }

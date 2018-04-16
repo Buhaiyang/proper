@@ -82,7 +82,7 @@ export default {
       const response = yield call(createOrUpdateUserGroups, payload);
       let resp = {};
       if (response) {
-        resp = resp.result;
+        resp = response.result;
       }
       yield put({
         type: 'getGroupsBasicInfo',

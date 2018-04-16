@@ -93,10 +93,12 @@ export default function request(url, options) {
       } else {
         codeStyle = 'err';
       }
-      if (response.headers.get('content-type').indexOf('text/') !== -1) {
-        thePromise = response.text();
-      } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
-        thePromise = response.json();
+      if (response.headers) {
+        if (response.headers.get('content-type').indexOf('text/') !== -1) {
+          thePromise = response.text();
+        } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
+          thePromise = response.json();
+        }
       } else {
         thePromise = response;
       }
