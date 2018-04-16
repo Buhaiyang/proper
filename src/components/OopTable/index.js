@@ -49,10 +49,11 @@ export default class OopTable extends PureComponent {
     const cols = [...columns]
     rowButtons.length && cols.push({
       title: '操作',
-      width: 150,
+      width: 100,
       render: (text, record)=>{
-        const renderButtons = ((item, index)=> (
-          <Fragment key={item.name}>
+        const actions = [];
+        const renderButtons = ((item)=> {
+          actions.push(<Fragment key={item.name}>
             {
               item.confirm ? (
                 <Popconfirm
@@ -76,12 +77,14 @@ export default class OopTable extends PureComponent {
                   </Tooltip>) : <a onClick={() => item.onClick(record)}>{item.text}</a>
               )
             }
-            {(rowButtons.length - 1 !== index) && <Divider type="vertical" />}
-          </Fragment>
+          </Fragment>)
+          actions.push(<Divider key={`divider-${item.name}`} type="vertical" />)
+        })
+        rowButtons.map(item=> (
+          item.display ? (item.display(record) ? renderButtons(item) : '') : renderButtons(item)
         ))
-        return rowButtons.map((item, index)=> (
-          item.display ? (item.display(record) ? renderButtons(item, index) : '') : renderButtons(item, index)
-        ))
+        actions.pop()
+        return actions;
       }
     })
     return cols

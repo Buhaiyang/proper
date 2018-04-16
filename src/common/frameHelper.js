@@ -1,24 +1,12 @@
 import { createElement } from 'react';
 import dynamic from 'dva/dynamic';
+import app from '../index';
 
-let _app = null;
-/**
- * 初始化系统的全局变量包括
- * app routerData 等
- */
-
-export const initGlobalVars = (app)=> {
-  if (_app === null && app) {
-    _app = app
-  }
-}
-
-export const getApp = ()=> _app;
 
 // wrapper of dynamic
 export const dynamicWrapper = (component) => {
   return dynamic({
-    app: getApp(),
+    app,
     models: () => [],
     component: () => {
       if (component().then) {

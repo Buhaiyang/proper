@@ -6,39 +6,47 @@ import OopTable from '../OopTable';
 const { TreeNode } = Tree
 const { Search } = Input
 const dataList = []
-const getParentKey = (key, tree) => {
+const getParentKey = (key, tree, props) => {
   let parentKey;
+  const id = props.treeKey || 'key'
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
     if (node.children) {
-      if (node.children.some(item => item.key === key)) {
-        parentKey = node.key;
-      } else if (getParentKey(key, node.children)) {
-        parentKey = getParentKey(key, node.children);
+      if (node.children.some(item => item[id] === key)) {
+        parentKey = node[id];
+      } else if (getParentKey(key, node.children, props)) {
+        parentKey = getParentKey(key, node.children, props);
       }
     }
   }
   return parentKey;
 };
-const generateList = (data) => {
+const generateList = (data, props) => {
+  const key = props.treeKey || 'key';
+  const title = props.treeTitle || 'title';
+  const parentId = props.treeParentKey || 'parentId';
   for (let i = 0; i < data.length; i++) {
     const node = data[i];
-    const { key, title } = node;
-    dataList.push({ key, title });
+    dataList.push({ key: node[key], title: node[title], parentId: node[parentId]});
     if (node.children) {
-      generateList(node.children, node.key);
+      generateList(node.children, props);
     }
   }
 };
 export default class OopTreeTable extends PureComponent {
   state = {
-    // currentTreeNode: null,
+    currentTreeNode: null,
     expandedKeys: [],
     searchValue: '',
-    autoExpandParent: false
+    autoExpandParent: true
   }
   handleOnSelect = (treeNode)=>{
-    this.onLoad(treeNode);
+    this.setState({
+      currentTreeNode: treeNode
+    }, ()=>{
+      this.onLoad();
+      this.table.clearSelection()
+    })
   }
   renderTreeNodes = (data, treeTitle, treeKey, treeRoot, searchValue)=> {
     const treeNodes = data.map((node) => {
@@ -74,10 +82,13 @@ export default class OopTreeTable extends PureComponent {
   handleOnChange = (e)=>{
     const me = this
     const { value } = e.target;
-    generateList(this.props.treeData)
+    generateList(this.props.treeData, this.props)
     const expandedKeys = dataList.map((item) => {
+      if (item.parentId === null) {
+        return item.key
+      }
       if (item.title.indexOf(value) > -1) {
-        return getParentKey(item.key, me.props.treeData);
+        return getParentKey(item.key, me.props.treeData, this.props);
       }
       return null;
     }).filter((item, i, self) => item && self.indexOf(item) === i);
@@ -88,13 +99,20 @@ export default class OopTreeTable extends PureComponent {
     });
   }
   onLoad = (param)=>{
-    this.props.onLoad(param)
+    const p = {
+      ...param,
+      currentTreeNode: this.state.currentTreeNode
+    }
+    this.props.onLoad(p)
   }
   onExpand = (expandedKeys) => {
     this.setState({
       expandedKeys,
       autoExpandParent: false,
     });
+  }
+  getCurrentTreeNode = ()=>{
+    return {currentTreeNode: this.state.currentTreeNode}
   }
   render() {
     const { searchValue, expandedKeys, autoExpandParent } = this.state;

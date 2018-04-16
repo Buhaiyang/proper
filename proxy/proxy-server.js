@@ -1,8 +1,9 @@
 const jsonServer = require('json-server')
 const getMockData = require('../proxy/readFile.js');
 const prefix = '/pep'
+const port = '8080';
+let count = 0;
 getMockData((mockData)=> {
-  console.log(mockData)
   start(mockData)
 });
 const start = (mockData)=>{
@@ -33,6 +34,7 @@ const start = (mockData)=>{
         method = 'get';
       }
       console.log(`register route : ${method.toUpperCase()} /api${route}`)
+      count ++;
       server[method](`${prefix}${route}`, (req, res) => {
         const realUrl = `${req.method}:${req.url.replace(prefix,'')}`;
         // 直接用真实的url获取数据 如果没有用注册的url获取数据
@@ -64,8 +66,8 @@ const start = (mockData)=>{
 // server.use(router)
 // server.use('/api', router)
 
-  server.listen(8080, () => {
-    console.log('JSON Server is running')
+  server.listen(port, () => {
+    console.log(`the server is running at ${port}, total: ${count}`)
   })
 
 }

@@ -1,7 +1,7 @@
-import {getApp} from './frameHelper';
+import app from '../index';
+
 // 在加载Router页面 connect属性之前 注入当前Router页面需要的model
 export const inject = (url)=> {
-  const app = getApp();
   const registeredModels = app._models;
   let arrParam = [];
   if (Array.isArray(url)) {

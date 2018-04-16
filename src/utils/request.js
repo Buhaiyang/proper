@@ -1,7 +1,7 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
 import { routerRedux } from 'dva/router';
-import store from '../index';
+import app from '../index';
 import { prefix, devMode } from '../config';
 
 const codeMessage = {
@@ -112,7 +112,7 @@ export default function request(url, options) {
       });
     })
     .catch((e) => {
-      const { dispatch } = store;
+      const { dispatch } = app._store;
       const status = e.name;
       if (status === 401) {
         dispatch(routerRedux.push('/base/login'));

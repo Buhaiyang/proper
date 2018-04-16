@@ -56,19 +56,13 @@ export default {
     },
     *oopSearchResult({ payload }, { put, call }) {
       const data = yield call(searchResult, payload);
-      // TODO 不这样写  列表不出数据
-      // begin
-      // if (Array.isArray(res)) {
-      //   yield put({
-      //     type: 'saveOopSearchGrid',
-      //     payload: {data: res.result},
-      //   });
-      //   return
-      // }
-      // end
       yield put({
         type: 'saveOopSearchGrid',
         payload: data.result,
+        pagination: {
+          current: payload.pageNo,
+          pageSize: payload.pageSize
+        }
       });
     },
     *oopSearchSuggest({ payload }, { put, call }) {
@@ -169,13 +163,13 @@ export default {
         notices: state.notices.filter(item => item.type !== payload),
       };
     },
-    saveOopSearchGrid(state, { payload }) {
+    saveOopSearchGrid(state, { payload, pagination }) {
       return {
         ...state,
         oopSearchGrid: {
           list: payload.data,
           pagination: {
-            ...state.oopSearchGrid.pagination,
+            ...pagination,
             total: payload.count
           }
         }

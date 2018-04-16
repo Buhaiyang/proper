@@ -2032,125 +2032,6 @@ const authRole = {
   },
 ]};
 
-const hrmEmployee = {
-  "count":11,
-  "data": [
-    {"id":"1","name":"何鑫","sex":"0","number":"01","email":"1015182620@qq.com","phone":"15904015593","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"2","name":"王浩鹏","sex":"0","number":"02","email":"276595311@qq.com","phone":"15912345678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"3","name":"王贺","sex":"0","number":"03","email":"1234567@qq.com","phone":"15914565478","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"4","name":"王怡","sex":"1","number":"04","email":"13457990@qq.com","phone":"15912222678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"5","name":"王维","sex":"0","number":"05","email":"3456457756@qq.com","phone":"15912333378","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"6","name":"张建林","sex":"0","number":"06","email":"23546546@qq.com","phone":"15911115678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"7","name":"刘德峰","sex":"0","number":"07","email":"4576867@qq.com","phone":"15912347778","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"8","name":"孙帅","sex":"0","number":"08","email":"344645547@qq.com","phone":"15912345999","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"9","name":"徐洋","sex":"0","number":"09","email":"5686785567@qq.com","phone":"15912654678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"10","name":"刘成尧","sex":"0","number":"10","email":"7567545646@qq.com","phone":"15974545678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"},
-    {"id":"11","name":"王丽莎","sex":"0","number":"11","email":"35346546754@qq.com","phone":"15923345678","birthday":"1982-02-03","idcard": "100010190003140649","phone1": "15123457806","telephone": "024-31353260", "telephone1": "024-67893234", "fax": "024-12345678","organization": "沈阳普日软件", "organizationId": "1", "description": "沈阳普日软件"}
-  ]
-}
-
-const hrmOrganization = {
-  "count":8,
-  "data": [
-    {
-      "parentId": null,
-      "parentName": null,
-      "id": "1",
-      "name": "普日软件",
-      "alias": "cpyf",
-      "number": "001",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是沈阳普日软件公司"
-    },
-    {
-      "parentId": "1",
-      "parentName": "普日软件",
-      "id": "101",
-      "name": "产品研发",
-      "alias": "cpyf",
-      "number": "001",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是产品研发部门"
-    },
-    {
-      "parentId": "101",
-      "parentName": "产品研发",
-      "id": "10101",
-      "name": "前端开发",
-      "alias": "qdkf",
-      "number": "001",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是产品研发部门的前端开发部门"
-    },
-    {
-      "parentId": "101",
-      "parentName": "产品研发",
-      "id": "10102",
-      "name": "java开发",
-      "alias": "qdkf",
-      "number": "002",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是产品研发部门的java开发部门"
-    },
-    {
-      "parentId": "1",
-      "parentName": "普日软件",
-      "id": "201",
-      "name": "测试项目组",
-      "alias": "cs",
-      "number": "002",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是测试项目组"
-    },
-    {
-      "parentId": "1",
-      "parentName": "普日软件",
-      "id": "301",
-      "name": "开发项目组",
-      "alias": "kf",
-      "number": "003",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是开发项目组"
-    },
-    {
-      "parentId": "301",
-      "parentName": "普日软件",
-      "id": "30101",
-      "name": "开发项目组1",
-      "alias": "kf1",
-      "number": "001",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是开发项目组1"
-    },
-    {
-      "parentId": "301",
-      "parentName": "普日软件",
-      "id": "30102",
-      "name": "开发项目组2",
-      "alias": "kf2",
-      "number": "001",
-      "address": "沈阳铁西区兴隆大都会21层",
-      "phone": "13412578901",
-      "fax": "024-31353260",
-      "description": "这是开发项目组2"
-    },
-  ]
-}
-
 const authMenu = {
   "count":7,
   "data":[
@@ -2175,12 +2056,8 @@ function queryList(type) {
     list = authGroup;
   } else if (type === 'authroles') {
     list = authRole;
-  }  else if (type === 'hrmemployee') {
-    list = hrmEmployee;
   } else if (type === 'authmenus') {
     list = authMenu;
-  } else if (type === '$hrm$organization') {
-    list = hrmOrganization;
   }
   return list;
 }
