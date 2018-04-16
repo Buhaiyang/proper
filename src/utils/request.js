@@ -23,7 +23,7 @@ const codeMessage = {
 };
 
 function checkStatus(response) {
-  if ((response.status >= 200 && response.status < 300) || response.status === 528) {
+  if ((response.status >= 200 && response.status < 300) || response.headers.get('X-PEP-ERR-TYPE') === 'PEP_BIZ_ERR') {
     return response;
   }
   const errortext = codeMessage[response.status] || response.statusText;

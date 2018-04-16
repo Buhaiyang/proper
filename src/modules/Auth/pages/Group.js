@@ -287,8 +287,10 @@ export default class Group extends PureComponent {
           },
           callback: (res) => {
             oopToast(res, '删除成功', '删除失败');
-            me.oopTable.clearSelection()
-            me.refresh();
+            if (me.oopTable) {
+              me.oopTable.clearSelection();
+              me.refresh();
+            }
           }
         });
       }
@@ -305,8 +307,10 @@ export default class Group extends PureComponent {
       },
       callback: (res) => {
         oopToast(res, '删除成功', '删除失败');
-        me.oopTable.clearSelection()
-        me.refresh();
+        if (me.oopTable) {
+          me.oopTable.clearSelection();
+          me.refresh();
+        }
       }
     });
   }

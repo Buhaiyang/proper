@@ -10,7 +10,8 @@ module.exports = {
     if(pwd === '123456' && username === 'admin'){
       res.status(200).send('husrhtluihetioyhoihl');
     }else {
-      res.status(528).send('失败');
+      res.setHeader('X-PEP-ERR-TYPE', 'PEP_BIZ_ERR');
+      res.status(500).send('失败');
     }
   },
   "GET:/auth/menus":[
@@ -206,10 +207,12 @@ module.exports = {
     });
   },
   'DELETE:/auth/user-groups':(req , res)=>{
-    res.status(528).send('失败');
+    res.setHeader('X-PEP-ERR-TYPE', 'PEP_BIZ_ERR');
+    res.status(500).send('失败');
   },
-  'DELETE:/auth/user-groups/:id':{
-    type:"ok"
+  'DELETE:/auth/user-groups/:id':(req , res)=>{
+    res.setHeader('X-PEP-ERR-TYPE', 'PEP_SYS_ERR');
+    res.status(500).send('系统异常!');
   },
   'PUT:/auth/user-groups/:id':(req , res)=>{
     res.send({
