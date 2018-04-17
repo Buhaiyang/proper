@@ -31,7 +31,7 @@ function checkStatus(response) {
     notification.error({
       // message: `请求错误 ${response.status}: ${response.url}`,
       message: `请求错误 ${response.status}`,
-      description: msg,
+      description: msg || errortext,
     });
   });
   const error = new Error(errortext);
@@ -115,6 +115,7 @@ export default function request(url, options) {
       const { dispatch } = app._store;
       const status = e.name;
       if (status === 401) {
+        window.localStorage.removeItem('proper-auth-login-token');
         dispatch(routerRedux.push('/base/login'));
         return;
       }

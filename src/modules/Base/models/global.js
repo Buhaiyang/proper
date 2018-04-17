@@ -1,4 +1,4 @@
-import { queryNotices, searchSuggest, searchResult } from '../services/baseS';
+import { searchSuggest, searchResult } from '../services/baseS';
 
 const getWindowSize = ()=>{
   const w = window.innerWidth;
@@ -22,46 +22,24 @@ export default {
     oopSearchGrid: {
       list: [],
       pagination: {
+        pageNo: 1,
+        pageSize: 10,
         showSizeChanger: true,
         showQuickJumper: true,
-        total: 0
+        count: 0
       }
     },
-    notices: [],
     size: getWindowSize()
   },
 
   effects: {
-    *fetchNotices(_, { call, put }) {
-      const data = yield call(queryNotices);
-      yield put({
-        type: 'saveNotices',
-        payload: data.result,
-      });
-      yield put({
-        type: 'user/changeNotifyCount',
-        payload: data.result.length,
-      });
-    },
-    *clearNotices({ payload }, { put, select }) {
-      yield put({
-        type: 'saveClearedNotices',
-        payload,
-      });
-      const count = yield select(state => state.global.notices.length);
-      yield put({
-        type: 'baseUser/changeNotifyCount',
-        payload: count,
-      });
-    },
     *oopSearchResult({ payload }, { put, call }) {
       const data = yield call(searchResult, payload);
       yield put({
         type: 'saveOopSearchGrid',
         payload: data.result,
         pagination: {
-          current: payload.pageNo,
-          pageSize: payload.pageSize
+          ...payload
         }
       });
     },
@@ -145,32 +123,15 @@ export default {
         ],
       }
     },
-    changeLayoutCollapsed(state, { payload }) {
-      return {
-        ...state,
-        collapsed: payload,
-      };
-    },
-    saveNotices(state, { payload }) {
-      return {
-        ...state,
-        notices: payload,
-      };
-    },
-    saveClearedNotices(state, { payload }) {
-      return {
-        ...state,
-        notices: state.notices.filter(item => item.type !== payload),
-      };
-    },
     saveOopSearchGrid(state, { payload, pagination }) {
       return {
         ...state,
         oopSearchGrid: {
           list: payload.data,
           pagination: {
-            ...pagination,
-            total: payload.count
+            pageNo: pagination.pageNo,
+            pageSize: pagination.pageSize,
+            count: payload.count,
           }
         }
       }
@@ -181,9 +142,11 @@ export default {
         oopSearchGrid: {
           list: [],
           pagination: {
+            pageNo: 1,
+            pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            total: 0
+            count: 0
           }
         },
       }
