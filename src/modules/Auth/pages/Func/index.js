@@ -142,18 +142,18 @@ const FuncBasicInfoForm = Form.create()((props) => {
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="菜单类型"
+          label="菜单类别"
         >
           {getFieldDecorator('menuType', {
             initialValue: funcBasicInfo.menuCode,
             rules: [{
-              required: true, message: '菜单类型不能为空',
+              required: true, message: '菜单类别不能为空',
             }]
           })(
-            <Select placeholder="菜单类型" >
+            <Select placeholder="菜单类别" >
               <Option value="2">功能</Option>
               <Option value="1">页面</Option>
-              <Option value="0">系统</Option>
+              <Option value="0">应用</Option>
             </Select>
           )}
         </FormItem>
