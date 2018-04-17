@@ -281,7 +281,7 @@ export default class Func extends PureComponent {
     this.props.dispatch({
       type: 'authFunc/fetchTreeData'
     });
-    this.onLoad(['-1'])
+    this.onLoad({currentTreeNode: ['-1']})
   }
   renderTreeNodes = (data)=>{
     return data.map((item) => {
@@ -412,18 +412,16 @@ export default class Func extends PureComponent {
   onLoad = (param)=>{
     let p = null;
     let parentNode = null;
-    if (param && Array.isArray(param)) {
+    if (param) {
       // param为[]代表反选的时候
-      if (param.length === 0) {
+      if (!param.currentTreeNode) {
         return
       }
       // 正常树节点下查询的时候
-      if (param.length === 1) {
-        p = {
-          parentId: param[0]
-        };
-        [parentNode] = param
-      }
+      [parentNode] = param.currentTreeNode
+      p = {
+        parentId: parentNode
+      };
     }
     // 没穿参数全部查询
     this.oopSearch.load({

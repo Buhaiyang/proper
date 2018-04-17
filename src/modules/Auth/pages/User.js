@@ -439,6 +439,7 @@ export default class User extends React.PureComponent {
   // 查询方法 加载所有数据
   onLoad = (param)=> {
     const params = {
+      ...this.oopTable.getPagination(),
       ...param,
       userEnable: 'ALL'
     }

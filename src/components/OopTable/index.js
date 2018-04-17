@@ -5,6 +5,10 @@ import styles from './index.less';
 export default class OopTable extends PureComponent {
   state = {
     selectedRowKeys: [],
+    pagination: {
+      pageNo: 1,
+      pageSize: 10
+    }
   }
   rowSelectionCfg = {
     onChange: this.rowSelectionChange,
@@ -19,10 +23,14 @@ export default class OopTable extends PureComponent {
     })
   }
   onChange = (pagination, filters, sorter)=>{
-    console.log(pagination, sorter);
-    this.props.onLoad && this.props.onLoad({
-      pageNo: pagination.current,
-      pageSize: pagination.pageSize,
+    this.setState({
+      pagination: {
+        pageNo: pagination.current,
+        pageSize: pagination.pageSize,
+        sorter
+      }
+    }, ()=>{
+      this.props.onLoad(this.state.pagination)
     })
   }
   clearSelection = ()=>{
@@ -88,6 +96,9 @@ export default class OopTable extends PureComponent {
       }
     })
     return cols
+  }
+  getPagination = ()=>{
+    return this.state.pagination
   }
   render() {
     const { grid: {list, pagination },
