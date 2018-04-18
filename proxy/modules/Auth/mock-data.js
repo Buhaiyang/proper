@@ -260,6 +260,18 @@ module.exports = {
   'DELETE:/auth/roles/:id/menus':(req , res)=>{
     res.send({msg: '菜单删除成功'})
   },
+  'GET:/auth/roles/:id/resources':{
+    "id": "pep-auth-users-user-u",
+    "valid": true,
+    "name": "更新用户",
+    "url": "/auth/users/*",
+    "resourceType": {
+      "catalog": "RESOURCE_TYPE",
+      "code": "0"
+    },
+    "enable": true,
+    "identifier": "update",
+  },
   'POST:/auth/roles/:id/resources':(req , res)=>{
     res.send({msg: '资源添加成功'})
   },
@@ -406,6 +418,288 @@ module.exports = {
   'GET:/auth/menus/parents':[
     {"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
     {"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true}
+  ],
+  'GET:/auth/menus/resources':[
+    {
+      "id": "pep-auth",
+      "leaf": false,
+      "name": "权限管理",
+      "route": "auth",
+      "parent": null,
+      "parentId": null,
+      "menuCode": null,
+      "resources": [],
+      "menuType": {
+        "catalog": "MENU_TYPE",
+        "code": "0"
+      },
+      "root": true,
+      "enable": true
+    },
+    {
+      "id": "pep-auth-users",
+      "leaf": true,
+      "name": "用户管理",
+      "route": "auth/user",
+      "parentId": "pep-auth",
+      "menuCode": null,
+      "resources": [{
+        "id": "pep-auth-users-user-g",
+        "valid": true,
+        "name": "获得用户",
+        "url": "/auth/users/*",
+        "method": "GET",
+        "resourceType": {
+          "catalog": "RESOURCE_TYPE",
+          "code": "0"
+        },
+        "enable": true,
+        "menus": [{
+          "id": "pep-auth-users",
+          "name": "用户管理",
+          "route": "auth/user",
+          "sequenceNumber": 0,
+          "icon": "solution",
+          "description": null,
+          "menuType": {
+            "catalog": "MENU_TYPE",
+            "code": "1"
+          },
+          "enable": true,
+          "identifier": null,
+          "parentId": "pep-auth",
+          "menuCode": null,
+          "root": false
+        }],
+        "roles": [{
+          "id": "1cea713b-6a1c-4371-b12d-769a17e9875b",
+          "name": "产品经理",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "4b06dcc1-101d-440d-a518-aa25e85f8f49",
+          "name": "test1",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "79eca792-c002-4e84-bb42-f1fd3392b16c",
+          "name": "test3",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }],
+        "identifier": "find",
+        "resourceCode": null,
+        "dataRestrains": []
+      }, {
+        "id": "pep-auth-users-user-u",
+        "valid": true,
+        "name": "更新用户",
+        "url": "/auth/users/*",
+        "method": "PUT",
+        "resourceType": {
+          "catalog": "RESOURCE_TYPE",
+          "code": "0"
+        },
+        "enable": true,
+        "menus": [{
+          "id": "pep-auth-users",
+          "name": "用户管理",
+          "route": "auth/user",
+          "sequenceNumber": 0,
+          "icon": "solution",
+          "description": null,
+          "menuType": {
+            "catalog": "MENU_TYPE",
+            "code": "1"
+          },
+          "enable": true,
+          "identifier": null,
+          "parentId": "pep-auth",
+          "menuCode": null,
+          "root": false
+        }],
+        "roles": [{
+          "id": "1cea713b-6a1c-4371-b12d-769a17e9875b",
+          "name": "产品经理",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "4b06dcc1-101d-440d-a518-aa25e85f8f49",
+          "name": "test1",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "79eca792-c002-4e84-bb42-f1fd3392b16c",
+          "name": "test3",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }],
+        "identifier": "update",
+        "resourceCode": null,
+        "dataRestrains": []
+      }, {
+        "id": "pep-auth-users-user-d",
+        "valid": true,
+        "name": "删除用户",
+        "url": "/auth/users/*",
+        "method": "DELETE",
+        "resourceType": {
+          "catalog": "RESOURCE_TYPE",
+          "code": "0"
+        },
+        "enable": true,
+        "menus": [{
+          "id": "pep-auth-users",
+          "name": "用户管理",
+          "route": "auth/user",
+          "sequenceNumber": 0,
+          "icon": "solution",
+          "description": null,
+          "menuType": {
+            "catalog": "MENU_TYPE",
+            "code": "1"
+          },
+          "enable": true,
+          "identifier": null,
+          "parentId": "pep-auth",
+          "menuCode": null,
+          "root": false
+        }],
+        "roles": [{
+          "id": "1cea713b-6a1c-4371-b12d-769a17e9875b",
+          "name": "产品经理",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "4b06dcc1-101d-440d-a518-aa25e85f8f49",
+          "name": "test1",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }, {
+          "id": "79eca792-c002-4e84-bb42-f1fd3392b16c",
+          "name": "test3",
+          "description": null,
+          "parentId": null,
+          "enable": true,
+          "parentName": ""
+        }],
+        "identifier": "delete",
+        "resourceCode": null,
+        "dataRestrains": []
+      }],
+      "sequenceNumber": 0,
+      "icon": "solution",
+      "description": null,
+      "menuType": {
+        "catalog": "MENU_TYPE",
+        "code": "1"
+      },
+      "enable": true,
+      "root": false
+    }, 
+    {
+      "id": "pep-auth-functions",
+      "leaf": true,
+      "name": "功能管理",
+      "route": "auth/func",
+      "parentId": "pep-auth",
+      "menuCode": null,
+      "resources": [{
+        "id": "pep-auth-menus-r",
+        "valid": true,
+        "name": "检索菜单",
+        "url": "/auth/menus",
+        "method": "GET",
+        "resourceType": {
+          "catalog": "RESOURCE_TYPE",
+          "code": "0"
+        },
+        "enable": true,
+        "menus": [{
+          "id": "pep-auth-functions",
+          "name": "功能管理",
+          "route": "auth/func",
+          "sequenceNumber": 1,
+          "icon": "bars",
+          "description": null,
+          "menuType": {
+            "catalog": "MENU_TYPE",
+            "code": "1"
+          },
+          "enable": true,
+          "identifier": null,
+          "parentId": "pep-auth",
+          "menuCode": null,
+          "root": false
+        }],
+        "identifier": "find",
+        "resourceCode": null,
+        "dataRestrains": []
+      }],
+      "menuType": {
+        "catalog": "MENU_TYPE",
+        "code": "1"
+      },
+      "enable": true,
+      "root": false
+    },
+    {
+      "id": "pep-auth-roles",
+      "leaf": true,
+      "name": "角色管理",
+      "route": "auth/role",
+      "parentId": "pep-auth",
+      "menuCode": null,
+      "resources": [{
+        "id": "pep-auth-roles-r",
+        "valid": true,
+        "name": "检索角色",
+        "url": "/auth/roles",
+        "method": "GET",
+        "resourceType": {
+          "catalog": "RESOURCE_TYPE",
+          "code": "0"
+        },
+        "enable": true,
+      }],
+      "menuType": {
+        "catalog": "MENU_TYPE",
+        "code": "1"
+      },
+      "enable": true,
+      "root": false
+    },
+    {
+      "id": "pep-auth-user-groups",
+      "leaf": false,
+      "name": "用户组管理",
+      "route": "auth/group",
+      "parentId": "pep-auth",
+      "menuCode": null,
+      "resources": [],
+      "menuType": {
+        "catalog": "MENU_TYPE",
+        "code": "1"
+      },
+      "enable": true,
+      "root": false
+    }
   ],
   'DELETE:/auth/menus':{
     type:"ok"

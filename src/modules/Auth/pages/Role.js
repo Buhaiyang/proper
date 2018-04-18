@@ -115,7 +115,7 @@ const ManagerInfoForm = Form.create()((props) => {
 
   const renderTreeNodes = (data) => {
     return data.map((item) => {
-      if (item.children || item.resources) {
+      if (item.children || (item.resources && item.resources.length > 0)) {
         return (
           <TreeNode title={item.name} key={item.id} dataRef={item} disableCheckbox={!item.enable}>
             {renderTreeNodes(item.children ? item.children : item.resources)}
@@ -225,7 +225,7 @@ const GroupInfoForm = Form.create()((props) => {
 
 const CreateForm = connect()((props) => {
   const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys,
+    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys, halfCheckedMenuKeys,
     handleTabChange, handleMenuKeys, allUsers, roleUsers, allGroups, roleGroups,
     handleUserChange, handleGroupChange } = props;
 
@@ -286,6 +286,7 @@ const CreateForm = connect()((props) => {
         roleInfo = {roleInfo}
         checkedMenuKeys = {checkedMenuKeys}
         checkedResourceKeys={checkedResourceKeys}
+        halfCheckedMenuKeys={halfCheckedMenuKeys}
         handleMenuKeys = {handleMenuKeys}
         roleMenus = {roleMenus}
         loading = {loading}
@@ -361,6 +362,8 @@ export default class Role extends PureComponent {
     checkedMenuKeys: [],
     // 资源被选择的项
     checkedResourceKeys: [],
+    // 菜单被选择的项（half）
+    halfCheckedMenuKeys: [],
     // 当前角色保存的用户
     userKey: [],
     // 当前角色保存的用户组
@@ -500,6 +503,7 @@ export default class Role extends PureComponent {
   handleMenuKeys = (checkedKeys, info, id) => {
     const checkedMenus = [];
     const checkedResource = [];
+    const halfCheckedMenus = [];
     for (let i = 0; i < info.checkedNodes.length; i++) {
       if (info.checkedNodes[i].props.dataRef.resourceType) {
         checkedResource.push(info.checkedNodes[i].props.dataRef.id);
@@ -508,13 +512,19 @@ export default class Role extends PureComponent {
         checkedMenus.push(info.checkedNodes[i].props.dataRef.id);
       }
     }
+    for (let i = 0; i < info.halfCheckedKeys.length; i++) {
+      halfCheckedMenus.push(info.halfCheckedKeys[i]);
+    }
     const oldMenus = this.state.checkedMenuKeys;
+    const oldHalfMenus = this.state.halfCheckedMenuKeys;
     const oldResource = this.state.checkedResourceKeys;
     this.setState({
       checkedMenuKeys: checkedMenus,
       checkedResourceKeys: checkedResource,
+      halfCheckedMenuKeys: halfCheckedMenus,
     })
     this.handleMenuKeysRequest(oldMenus, checkedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
+    this.handleMenuKeysRequest(oldHalfMenus, halfCheckedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
     this.handleMenuKeysRequest(oldResource, checkedResource, id, 'authRole/resourcesAdd', 'authRole/resourcesDelete', '资源');
   }
 
@@ -690,7 +700,7 @@ export default class Role extends PureComponent {
         roleMenus, allUsers, allGroups } } = this.props;
 
     const { viewVisible, formVisible, currentTabKey, isCreate,
-      checkedMenuKeys, checkedResourceKeys } = this.state;
+      checkedMenuKeys, checkedResourceKeys, halfCheckedMenuKeys } = this.state;
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -774,6 +784,7 @@ export default class Role extends PureComponent {
           roleMenus={roleMenus}
           checkedMenuKeys={checkedMenuKeys}
           checkedResourceKeys={checkedResourceKeys}
+          halfCheckedMenuKeys={halfCheckedMenuKeys}
           handleMenuKeys={this.handleMenuKeys}
           handleTabChange={this.handleTabChange}
           allUsers={allUsers}
