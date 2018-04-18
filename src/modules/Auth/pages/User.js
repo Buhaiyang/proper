@@ -251,7 +251,7 @@ const ModalForm = connect()((props) => {
   }, {
     key: 'roleUser',
     tab: '角色信息',
-    disabled: isCreate || !userBasicInfo.enable,
+    disabled: isCreate,
     content: <RoleInfoForm
       ref={(el) => {
         this.roleUser = el;
@@ -263,7 +263,7 @@ const ModalForm = connect()((props) => {
   }, {
     key: 'userGroups',
     tab: '用户组信息',
-    disabled: isCreate || !userBasicInfo.enable,
+    disabled: isCreate,
     content: <UserGroupInfoForm
       ref={(el) => {
         this.userGroups = el;

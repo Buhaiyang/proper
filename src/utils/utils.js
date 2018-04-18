@@ -222,23 +222,16 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
   const menuData = getFlatMenuData(res);
   if (!routerConfig) {
     routerConfig = {};
-    for (const k in menuData) {
+    for (const k of Object.keys(menuData)) {
       const menu = menuData[k];
       if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
         const { moduleName, pathName } = exchangePath2Router(k);
-        // console.log(k, '====>', path)
-        routerConfig[`/${k}`] = {
-          component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
-        };
-        // if(menu.subRoute && menu.subRoute.length){
-        //   menu.subRoute.forEach((sr)=>{
-        //   let key = `${k}/${sr.path}`;
-        //   const path = exchangePath2Router(key);
-        //   routerConfig2[`/${key}`] = {
-        //     component:dynamicWrapper(()=>import(`../routes/${path}`))
-        //   }
-        //   })
-        // }
+        if (moduleName && pathName) {
+          // console.log(k, '====>', path)
+          routerConfig[`/${k}`] = {
+            component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
+          };
+        }
       }
     }
   }

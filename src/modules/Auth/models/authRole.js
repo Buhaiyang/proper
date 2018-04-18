@@ -3,7 +3,7 @@ import { queryUsers } from '../services/authUserS';
 import { queryRoles, queryRole, removeRoles, queryRoleUsers, queryRoleGroups, fetchUpdateStatus,
   createOrUpdate, queryParents, queryCheckedMenus, menusAdd, menusDelete,
   userAddRole, userDelRole, GroupAddRole, GroupDelRole, menuResource,
-  resourcesAdd, resourcesDelete } from '../services/authRoleS';
+  resourcesAdd, resourcesDelete, queryCheckedResources } from '../services/authRoleS';
 import { formatter, controlMenu } from '../../../utils/utils';
 
 export default {
@@ -19,6 +19,7 @@ export default {
     roleParents: [],
     roleMenus: [],
     roleMenusChecked: [],
+    roleResourcesChecked: [],
   },
 
   effects: {
@@ -86,20 +87,22 @@ export default {
       });
       if (callback) callback(response);
     },
-    // 取得指定角色的菜单列表
-    *fetchMenus({ payload, callback }, { call, put }) {
+    // 取得指定角色的菜单和资源列表
+    *fetchRoleMenusResources({ payload, callback }, { call, put }) {
       const allMenus = yield call(menuResource);
       const menus = formatter(controlMenu(allMenus.result));
       const checkMenus = yield call(queryCheckedMenus, payload);
-      const checked = [];
+      const checkResources = yield call(queryCheckedResources, payload);
+      const resourcesChecked = checkResources.result;
+      const menusChecked = [];
       for (let i = 0; i < checkMenus.result.length; i++) {
-        if (checkMenus.result[i].resourceType.code === '0') {
-          checked.push(checkMenus.result[i]);
+        if (checkMenus.result[i].leaf) {
+          menusChecked.push(checkMenus.result[i]);
         }
       }
       yield put({
         type: 'saveRoleMenus',
-        payload: {menus, checked},
+        payload: {menus, menusChecked, resourcesChecked},
       });
       if (callback) callback();
     },
@@ -198,7 +201,8 @@ export default {
       return {
         ...state,
         roleMenus: action.payload.menus,
-        roleMenusChecked: action.payload.checked
+        roleMenusChecked: action.payload.menusChecked,
+        roleResourcesChecked: action.payload.resourcesChecked
       };
     },
     saveAllUsers(state, action) {

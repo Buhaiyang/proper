@@ -167,7 +167,7 @@ const CreateForm = connect()((props) => {
     {
       key: 'user',
       tab: '用户信息',
-      disabled: isCreate || !groupsBasicInfo.enable,
+      disabled: isCreate,
       content: <UserInfoForm
         ref = {(el) => { this.user = el; }}
         groupsBasicInfo = {groupsBasicInfo}
@@ -265,7 +265,7 @@ export default class Group extends PureComponent {
         ids: [record.id]
       },
       callback: (res) => {
-        oopToast(res, '已启用', '已禁用');
+        oopToast(res, '已启用', '已停用');
         this.refresh();
       }
     });

@@ -53,9 +53,14 @@ export async function queryParents(params) {
     : request('/auth/roles/parents');
 }
 
+// 取得指定角色的资源列表
+export async function queryCheckedResources(params) {
+  return request(`/auth/roles/${params.roleId}/resources`);
+}
+
 // 取得指定角色的菜单列表
 export async function queryCheckedMenus(params) {
-  return request(`/auth/roles/${params.roleId}/resources`);
+  return request(`/auth/roles/${params.roleId}/menus`);
 }
 
 // 菜单添加项

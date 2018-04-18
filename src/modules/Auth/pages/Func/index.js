@@ -238,7 +238,7 @@ const ModalForm = connect()((props) => {
   }, {
     key: 'resource',
     tab: '资源信息',
-    disabled: isCreate || !funcBasicInfo.enable,
+    disabled: isCreate,
     content: <ResourceInfoForm
       ref={(el) => {
         this.resource = el;
@@ -414,8 +414,8 @@ export default class Func extends PureComponent {
     let parentNode = null;
     if (param) {
       // param为[]代表反选的时候
-      if (!param.currentTreeNode) {
-        return
+      if ((!param.currentTreeNode) || param.currentTreeNode.length === 0) {
+        return;
       }
       // 正常树节点下查询的时候
       [parentNode] = param.currentTreeNode
@@ -521,7 +521,7 @@ export default class Func extends PureComponent {
           if (record) {
             return '已启用';
           } else {
-            return '已禁用';
+            return '已停用';
           }
         }
       }

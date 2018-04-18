@@ -152,14 +152,18 @@ export default class TableForm extends PureComponent {
       {title: '请求方法', dataIndex: 'method', width: 100, render: (text, record) => {
         if (record.editable) {
           return (
-            <Input
-              style={{width: '100px'}}
-              size="small"
-              value={text}
+            <Select
+              placeholder="请求方法"
+              defaultValue={text}
+              style={{ width: 90 }}
               onChange={e => this.handleFieldChange(e, 'method', record.id)}
               onKeyPress={e => this.handleKeyPress(e, record.id)}
-              placeholder="请求方法"
-            />
+              size="small">
+              <Option value="GET">GET</Option>
+              <Option value="POST">POST</Option>
+              <Option value="PUT">PUT</Option>
+              <Option value="DELETE">DELETE</Option>
+            </Select>
           );
         }
         return text;

@@ -225,7 +225,7 @@ const GroupInfoForm = Form.create()((props) => {
 
 const CreateForm = connect()((props) => {
   const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys, halfCheckedMenuKeys,
+    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys,
     handleTabChange, handleMenuKeys, allUsers, roleUsers, allGroups, roleGroups,
     handleUserChange, handleGroupChange } = props;
 
@@ -286,7 +286,6 @@ const CreateForm = connect()((props) => {
         roleInfo = {roleInfo}
         checkedMenuKeys = {checkedMenuKeys}
         checkedResourceKeys={checkedResourceKeys}
-        halfCheckedMenuKeys={halfCheckedMenuKeys}
         handleMenuKeys = {handleMenuKeys}
         roleMenus = {roleMenus}
         loading = {loading}
@@ -362,8 +361,8 @@ export default class Role extends PureComponent {
     checkedMenuKeys: [],
     // 资源被选择的项
     checkedResourceKeys: [],
-    // 菜单被选择的项（half）
-    halfCheckedMenuKeys: [],
+    // 菜单被选择的项（all）
+    allCheckedMenuKeys: [],
     // 当前角色保存的用户
     userKey: [],
     // 当前角色保存的用户组
@@ -486,14 +485,15 @@ export default class Role extends PureComponent {
     })
   }
 
-  // 取得角色的菜单
+  // 取得已有角色的菜单和资源
   getMenus = (roleId) => {
     this.props.dispatch({
-      type: 'authRole/fetchMenus',
+      type: 'authRole/fetchRoleMenusResources',
       payload: { roleId },
       callback: () => {
         this.setState({
-          checkedMenuKeys: this.props.authRole.roleMenusChecked.map(item => item.id)
+          checkedMenuKeys: this.props.authRole.roleMenusChecked.map(item => item.id),
+          checkedResourceKeys: this.props.authRole.roleResourcesChecked.map(item => item.id),
         })
       }
     })
@@ -515,16 +515,26 @@ export default class Role extends PureComponent {
     for (let i = 0; i < info.halfCheckedKeys.length; i++) {
       halfCheckedMenus.push(info.halfCheckedKeys[i]);
     }
-    const oldMenus = this.state.checkedMenuKeys;
-    const oldHalfMenus = this.state.halfCheckedMenuKeys;
+    const allCheckedMenus = halfCheckedMenus;
+    for (let i = 0; i < checkedMenus.length; i++) {
+      let flag = true;
+      for (let j = 0; j < halfCheckedMenus.length; j++) {
+        if (checkedMenus[i] === halfCheckedMenus[j]) {
+          flag = false;
+        }
+      }
+      if (flag) {
+        allCheckedMenus.push(checkedMenus[i]);
+      }
+    }
+    const oldAllMenus = this.state.allCheckedMenuKeys;
     const oldResource = this.state.checkedResourceKeys;
     this.setState({
       checkedMenuKeys: checkedMenus,
       checkedResourceKeys: checkedResource,
-      halfCheckedMenuKeys: halfCheckedMenus,
+      allCheckedMenuKeys: allCheckedMenus
     })
-    this.handleMenuKeysRequest(oldMenus, checkedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
-    this.handleMenuKeysRequest(oldHalfMenus, halfCheckedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
+    this.handleMenuKeysRequest(oldAllMenus, allCheckedMenus, id, 'authRole/menusAdd', 'authRole/menusDelete', '菜单');
     this.handleMenuKeysRequest(oldResource, checkedResource, id, 'authRole/resourcesAdd', 'authRole/resourcesDelete', '资源');
   }
 
@@ -544,7 +554,9 @@ export default class Role extends PureComponent {
           ids: changeItems
         },
         callback: (res) => {
-          oopToast(res, `${typeText}添加成功`, `${typeText}添加失败`);
+          if (typeText) {
+            oopToast(res, `${typeText}添加成功`, `${typeText}添加失败`);
+          }
         }
       });
     }
@@ -700,7 +712,7 @@ export default class Role extends PureComponent {
         roleMenus, allUsers, allGroups } } = this.props;
 
     const { viewVisible, formVisible, currentTabKey, isCreate,
-      checkedMenuKeys, checkedResourceKeys, halfCheckedMenuKeys } = this.state;
+      checkedMenuKeys, checkedResourceKeys } = this.state;
 
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
@@ -784,7 +796,6 @@ export default class Role extends PureComponent {
           roleMenus={roleMenus}
           checkedMenuKeys={checkedMenuKeys}
           checkedResourceKeys={checkedResourceKeys}
-          halfCheckedMenuKeys={halfCheckedMenuKeys}
           handleMenuKeys={this.handleMenuKeys}
           handleTabChange={this.handleTabChange}
           allUsers={allUsers}
