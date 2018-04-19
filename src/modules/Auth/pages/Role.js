@@ -375,7 +375,13 @@ export default class Role extends PureComponent {
 
   // 刷新角色列表
   onLoad = (param) => {
-    this.oopSearch.load(param);
+    const { pagination } = this.props.global.oopSearchGrid
+    const params = {
+      ...pagination,
+      ...param,
+      roleEnable: 'ALL'
+    }
+    this.oopSearch.load(params);
   }
 
   // 关闭基本信息
