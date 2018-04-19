@@ -66,6 +66,10 @@ const BasicInfoForm = Form.create()((props) => {
               filterOption={(input, option) =>
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
+              <Option
+                key="role_no_select">
+                不继承任何角色
+              </Option>
               {
                 roleList ? roleList.map(item => (
                   <Option
@@ -646,10 +650,14 @@ export default class Role extends PureComponent {
   submitForm = (customForm, fields) => {
     const activeKey = this.state.currentTabKey;
     const self = this;
+    const params = fields;
+    if (fields.parentId === 'role_no_select') {
+      params.parentId = null;
+    }
     if (activeKey === 'basic') {
       this.props.dispatch({
         type: 'authRole/createOrUpdate',
-        payload: fields,
+        payload: params,
         callback: (res) => {
           oopToast(res, '保存成功', '保存失败');
           this.getAllRoles();
