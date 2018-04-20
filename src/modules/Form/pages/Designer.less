@@ -1,0 +1,96 @@
+.container {
+  position: relative;
+  .leftPage {
+    padding-right: 350px;
+  }
+  .rightPage {
+    width: 350px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    :global {
+      .ant-form-item {
+        margin-bottom: 0;
+      }
+    }
+  }
+  .addPanel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 290px;
+    display: flex;
+    background: #fff;
+  }
+  .addPanel ul {
+    list-style: none;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0;
+  }
+  .addPanel ul li {
+    width: 100px;
+    text-align: center;
+    margin: 8px;
+  }
+  .addPanel ul li button {
+    width: 100%;
+  }
+  .centerBox {
+    margin: 0 auto;
+    background-color: #fff;
+    max-width: 700px;
+    :global {
+      .ant-form-item:hover {
+        background: #d8e6df;
+      }
+      .ant-form-item {
+        cursor: pointer;
+      }
+      .ant-form-item-action {
+        position: absolute;
+        top: 8px;
+        right: 20px;
+      }
+      .ant-form-item-action i.anticon {
+        font-size: 24px;
+      }
+      .ant-form-item-action i.anticon:hover {
+        cursor: pointer;
+      }
+      i.anticon + i.anticon {
+        margin-left: 8px;
+      }
+      .rowItemWrapper {
+        position: relative;
+      }
+      .active {
+        background: #d8e6df;
+      }
+    }
+  }
+  .editPanel {
+    :global {
+      .rowItemWrapper {
+        position: relative;
+      }
+      .ant-card-body {
+        padding-right: 50px;
+      }
+      .ant-form-item-action {
+        position: absolute;
+        top: 4px;
+        right: -40px;
+      }
+      .ant-form-item-action i.anticon {
+        font-size: 16px;
+      }
+      .ant-form-item-action i.anticon:hover {
+        cursor: pointer;
+      }
+      i.anticon + i.anticon {
+        margin-left: 4px;
+      }
+    }
+  }
+}

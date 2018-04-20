@@ -151,6 +151,12 @@ export default {
         },
       }
     },
+    changeLayoutCollapsed(state, { payload }) {
+      return {
+        ...state,
+        collapsed: payload,
+      };
+    },
     resize(state) {
       return {
         ...state,
