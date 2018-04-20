@@ -329,6 +329,7 @@ const CreateForm = connect()((props) => {
       onOk={okHandle}
       onCancel={handleCancel}
       footer={customFooter[currentTabKey]}
+      destroyOnClose={true}
     >
       <Tabs
         onChange={value => onTabChange(value, roleInfo.id)}

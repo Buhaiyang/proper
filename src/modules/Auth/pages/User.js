@@ -280,7 +280,7 @@ const ModalForm = connect()((props) => {
       {currentTabKey === 'basicUser' && <Button type="primary" onClick={onOk} loading={loading}>保存</Button>}
     </Fragment>);
   return (
-    <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer}>
+    <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer} destroyOnClose={true}>
       <Tabs size={size} animated={false} onChange={onTabChange} activeKey={currentTabKey}>
         {tabList.map(item =>
           <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>

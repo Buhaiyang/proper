@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Spin, Transfer,
-  Form, Modal, Input, Tabs, Radio, Badge } from 'antd';
+  Form, Modal, Input, Tabs, Radio, Badge, InputNumber } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
@@ -8,6 +8,7 @@ import OopSearch from '../../../components/Oopsearch';
 import OopTable from '../../../components/OopTable';
 import DescriptionList from '../../../components/DescriptionList';
 import { oopToast } from './../../../common/oopUtils';
+import styles from './Group.less';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
@@ -61,7 +62,7 @@ const BasicInfoForm = Form.create()((props) => {
               { pattern: /\d+/i, message: '顺序只能为数字'}
             ],
           })(
-            <Input placeholder="请输入顺序" />
+            <InputNumber placeholder="请输入顺序" min={1} max={999} />
           )}
         </FormItem>
         <FormItem
@@ -201,6 +202,8 @@ const CreateForm = connect()((props) => {
       visible={modalVisible}
       onCancel={handleCancel}
       footer={footer}
+      className={styles.anthGroupStyles}
+      destroyOnClose={true}
     >
       <Tabs
         onChange={onTabChange}
