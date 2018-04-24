@@ -1,12 +1,13 @@
 import React from 'react';
-import { Form, Button, Card } from 'antd';
+import { Form, Button, Card, Row, Col } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import {connect} from 'dva';
 import styles from './Designer.less';
 import { formGenerator, getUuid } from '../../../common/oopUtils';
 
 // console.log(formJson)
-const CenterBox = Form.create()((props) => {
+const CenterPanel = Form.create()((props) => {
   const {form, rowItems, onRowItemClick, onRowItemIconCopy, onRowItemIconDelete,
     onFormSubmit} = props;
   const rowItemClick = (name)=>{
@@ -20,8 +21,8 @@ const CenterBox = Form.create()((props) => {
   }
   const param = {formJson: rowItems, form, rowItemClick, rowItemIconCopy, rowItemIconDelete}
   return (
-  <div className={styles.centerBox}>
-    <Card title="你的表单" bordered={false} style={{ width: 700 }}>
+  <div className={styles.centerPanel}>
+    <Card title="你的表单" bordered={false}>
     {formGenerator(param)}
       <div style={{textAlign: 'center'}}><Button type="primary" onClick={onFormSubmit}>提交</Button></div>
     </Card>
@@ -33,12 +34,14 @@ const AddPanel = connect()((props) => {
     onAddItem(item)
   }
   return (
-    <div className={styles.addPanel}><Card title="添加组件" bordered={false} style={{ width: 300 }}><ul>{
-    selections.map(item=>(<li key={item.key}><Button type="primary" ghost onClick={()=>addItem(item)}>{item.text}</Button></li>))
+    <div className={styles.addPanel}><Card title="添加组件" bordered={false}><ul>{
+    selections.map(item=>(<li key={item.key}><Button type="primary" ghost onClick={()=>addItem(item)}>{item.label}</Button></li>))
     }</ul></Card></div>);
 });
 const EditPanel = Form.create()((props) => {
-  const { form, currentRowItem, updateCenterBox, onRowItemIconCopy, onRowItemIconDelete } = props;
+  const { form,
+    currentRowItem,
+    updateCenterPanel, onRowItemIconCopy, onRowItemIconDelete, onPlusClick } = props;
   const rowItemIconCopy = (event, name)=>{
     onRowItemIconCopy(name)
   }
@@ -53,7 +56,10 @@ const EditPanel = Form.create()((props) => {
       const { children } = component;
       const onChange = (e)=>{
         const element = e.currentTarget;
-        updateCenterBox(element);
+        updateCenterPanel(element);
+      }
+      const plusClick = ()=>{
+        onPlusClick(name)
       }
       if (cName) {
         const prefix = '_edit'
@@ -101,7 +107,10 @@ const EditPanel = Form.create()((props) => {
           {
             name: `${name}${prefix}_children`,
             label: '选项',
-            component: {
+            component: children.length === 0 ? {
+              name: 'Button',
+              attrs: [{icon: 'plus'}, {onClick: plusClick}]
+            } : {
               name: 'Input',
               attrs: [{type: 'hidden'}]
             },
@@ -147,27 +156,21 @@ const componentData = [
   {label: 'C', value: 'C'},
   {label: 'D', value: 'D'}
 ]
-const generateData = ()=>{
-  const arr = [...componentData]
-  return [
-    ...arr
-  ]
-}
 export default class Designer extends React.PureComponent {
   state = {
     currentRowItem: null,
     selections: [
-      {text: '输入框', key: '1', component: {name: 'Input'}},
-      {text: '文本域', key: '2', component: {name: 'TextArea'}},
-      {text: '单选框', key: '3', component: {name: 'RadioGroup', children: generateData()}},
-      {text: '多选框', key: '4', component: {name: 'CheckboxGroup', children: generateData()}, initialValue: []},
-      {text: '选择器', key: '5', component: {name: 'Select', children: generateData()}},
-      {text: '数字输入框', key: '6', component: {name: 'InputNumber'}}
+      {label: '输入框', key: '1', component: {name: 'Input'}},
+      {label: '文本域', key: '2', component: {name: 'TextArea'}},
+      {label: '单选框', key: '3', component: {name: 'RadioGroup', children: componentData}},
+      {label: '多选框', key: '4', component: {name: 'CheckboxGroup', children: componentData}, initialValue: []},
+      {label: '选择器', key: '5', component: {name: 'Select', children: componentData}},
+      {label: '数字输入框', key: '6', component: {name: 'InputNumber'}}
     ],
     rowItems: [],
   }
   componentWillUnmount() {
-    this.renderCenterBox.cancel();
+    this.renderCenterPanel.cancel();
   }
   componentDidMount() {
     console.log(this.state.currentRowItem, this.state.rowItems)
@@ -188,7 +191,7 @@ export default class Designer extends React.PureComponent {
   }
   /**
    * 如果传了name那么是“EditPanel”中的复制
-   * 否则是“CenterBox中”的复制
+   * 否则是“CenterPanel中”的复制
    * 下面的删除一样
    * @param name
    */
@@ -208,26 +211,13 @@ export default class Designer extends React.PureComponent {
       this.forceUpdate()
     } else {
       const item = this.state.currentRowItem;
-      if (item) {
-        let copy = {
-          ...item,
-        }
-        // 如果是radio checkbox
-        if (copy.component.children) {
-          copy = {
-            ...copy,
-            component: {
-              ...item.component,
-              children: [
-                ...item.component.children
-              ]
-            }
-          }
-        }
-        copy.active = false;
-        copy.name = getUuid(5);
-        this.state.rowItems.push(copy)
+      const copy = cloneDeep(item);
+      const newItem = {
+        ...copy,
+        name: getUuid(5),
+        active: false
       }
+      this.state.rowItems.push(newItem);
     }
   }
   onRowItemIconDelete = (name)=>{
@@ -255,33 +245,25 @@ export default class Designer extends React.PureComponent {
     }
   }
   onAddItem = (item)=>{
-    const {component, text, initialValue} = item
-    let newItem = {
+    const copy = cloneDeep(item);
+    const newItem = {
+      ...copy,
       name: getUuid(5),
-      label: text,
-      initialValue,
-      component
     }
-    if (component.children) {
-      newItem = {
-        ...newItem,
-        component: {
-          ...item.component,
-          children: [
-            ...item.component.children
-          ]
-        }
-      }
-    }
-    console.log(newItem)
     this.state.rowItems.push(newItem);
     this.forceUpdate()
   }
-  onUpdateCenterBox = (element)=>{
-    this.renderCenterBox(element);
+  onPlusClick = ()=>{
+    this.state.currentRowItem.component.children = [
+      {label: 'A', value: 'B'}
+    ]
+    this.forceUpdate();
+  }
+  onUpdateCenterPanel = (element)=>{
+    this.renderCenterPanel(element);
   }
   @Debounce(300)
-  renderCenterBox(element) {
+  renderCenterPanel(element) {
     console.log(this.state.currentRowItem)
     console.log(element);
     const {value, id} = element;
@@ -302,26 +284,25 @@ export default class Designer extends React.PureComponent {
   render() {
     return (
       <div className={styles.container}>
-        <div className={styles.leftPage} >
-          <AddPanel
+        <Row gutter={16}>
+          <Col span={6} ><AddPanel
             selections={this.state.selections}
             onAddItem={this.onAddItem}
-          />
-          <CenterBox
+          /></Col>
+          <Col span={12} ><CenterPanel
             rowItems={this.state.rowItems}
             onRowItemClick={this.onRowItemClick}
             onRowItemIconCopy={this.onRowItemIconCopy}
             onRowItemIconDelete={this.onRowItemIconDelete}
             onFormSubmit={this.onFormSubmit}
-          />
-        </div>
-        <div className={styles.rightPage} >
-          <EditPanel
+          /></Col>
+          <Col span={6} ><EditPanel
             currentRowItem={this.state.currentRowItem}
-            updateCenterBox={this.onUpdateCenterBox}
+            updateCenterPanel={this.onUpdateCenterPanel}
             onRowItemIconCopy={this.onRowItemIconCopy}
-            onRowItemIconDelete={this.onRowItemIconDelete} />
-        </div>
+            onRowItemIconDelete={this.onRowItemIconDelete}
+            onPlusClick={this.onPlusClick} /></Col>
+        </Row>
     </div>)
   }
 }
