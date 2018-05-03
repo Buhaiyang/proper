@@ -24,6 +24,7 @@ module.exports = {
     {"id":"pep-auth-user-groups","name":"用户组管理","route":"auth/group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-auth","menuCode":null,"root":false},
     {"id":"pep-workflow-designer","name":"流程设计","route":"workflow/designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-workflow","menuCode":null,"root":false},
     {"id":"pep-form-designer","name":"问卷设计","route":"form/designer","sequenceNumber":1,"icon":"file","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-form","menuCode":null,"root":false},
+    // {"id":"pep-form-simple","name":"例子","route":"form/simple","sequenceNumber":2,"icon":"file","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-form","menuCode":null,"root":false},
   ],
   "GET:/auth/users": {
     "count":100,

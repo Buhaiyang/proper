@@ -19,9 +19,9 @@ export default (name, props, children)=> {
         }
     </Select>),
     RadioGroup: (
-      <RadioGroup options={children} />),
+      <RadioGroup options={children} {...props} />),
     CheckboxGroup: (
-      <CheckboxGroup options={children} />),
+      <CheckboxGroup options={children} {...props} />),
     InputNumber: <InputNumber {...props} />
   }
   return Map[name];
