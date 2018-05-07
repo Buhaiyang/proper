@@ -5,6 +5,7 @@ import styles from './index.less';
 export default class OopTable extends PureComponent {
   state = {
     selectedRowKeys: [],
+    selectedRowItems: []
   }
   rowSelectionCfg = {
     onChange: this.rowSelectionChange,
@@ -13,9 +14,10 @@ export default class OopTable extends PureComponent {
       disabled: record.disabled,
     })
   }
-  rowSelectionChange = (selectedRowKeys)=>{
+  rowSelectionChange = (selectedRowKeys, selectedRowItems)=>{
     this.setState({
-      selectedRowKeys
+      selectedRowKeys,
+      selectedRowItems
     })
   }
   onChange = (pagination, filters, sorter)=>{
@@ -39,7 +41,9 @@ export default class OopTable extends PureComponent {
           key={btn.name}
           icon={btn.icon}
           type={btn.type}
-          onClick={()=>{ btn.onClick && btn.onClick(this.state.selectedRowKeys) }}>
+          onClick={()=>{
+            btn.onClick && btn.onClick(this.state.selectedRowKeys, this.state.selectedRowItems)
+          }}>
           {btn.text}
         </Button>
       )
