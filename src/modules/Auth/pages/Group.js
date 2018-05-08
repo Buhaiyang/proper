@@ -4,7 +4,7 @@ import { Card, Button, Divider, Spin, Transfer,
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OopSearch from '../../../components/Oopsearch';
+import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import DescriptionList from '../../../components/DescriptionList';
 import { oopToast } from './../../../common/oopUtils';

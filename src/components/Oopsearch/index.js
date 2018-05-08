@@ -53,17 +53,17 @@ const calculateLetterWidth = (letter, size)=>{
   return length;
 }
 
-const getSize = (size)=>{
-  const arr = ['default', 'small', 'middle', 'large'];
-  const index = arr.indexOf(size);
-  if (index === -1) {
-    return 'default'
-  } else if (index === 2) {
-    return 'default'
-  } else {
-    return arr[index]
-  }
-}
+// const getSize = (size)=>{
+//   const arr = ['default', 'small', 'middle', 'large'];
+//   const index = arr.indexOf(size);
+//   if (index === -1) {
+//     return 'default'
+//   } else if (index === 2) {
+//     return 'default'
+//   } else {
+//     return arr[index]
+//   }
+// }
 const { Search } = Input;
 @connect(({global})=>({
   global
@@ -76,7 +76,7 @@ export default class OopSearch extends React.Component {
     inputValue: '',
     defaultValue: ''
   }
-  componentDidMount() {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'global/clearOopSearchGrid'
     })
@@ -298,9 +298,10 @@ export default class OopSearch extends React.Component {
   }
   load = (param = {})=>{
     const { dispatch, moduleName } = this.props;
+    const pagination = param.pagination ||
+      this.props.global.oopSearchGrid.pagination || { pageNo: 1, pageSize: 10}
     const params = {
-      pageNo: 1,
-      pageSize: 10,
+      ...pagination,
       ...param,
       req: JSON.stringify(this.getCurrentParam()),
       moduleName
@@ -308,7 +309,7 @@ export default class OopSearch extends React.Component {
     dispatch({type: 'global/oopSearchResult', payload: params});
   }
   render() {
-    const {global: {searchOptions, size}, placeholder, enterButtonText} = this.props;
+    const {global: {searchOptions}, placeholder, enterButtonText} = this.props;
     return (
       <div className={styles.globalSearchWrapper}>
         <div className={styles.searchContainer}>
@@ -317,56 +318,55 @@ export default class OopSearch extends React.Component {
               { this.state.searchOptionsDesc.map(tips=>
                 (
                   <li key={tips.id}>
-                  <Tooltip placement="bottom" title={tips.text}>
+                    <Tooltip placement="bottom" title={tips.text}>
                     <span
                       className={tips.isTips ? styles.tips : ''}
-                       style={{height: '12px', display: 'inline-block', whiteSpace: 'nowrap', width: tips.width}}
-                            />
-                  </Tooltip>
-                </li>
+                      style={{height: '12px', display: 'inline-block', whiteSpace: 'nowrap', width: tips.width}}
+                    />
+                    </Tooltip>
+                  </li>
                 )
               )}
             </ul>
           </div>
           <Search
-                  placeholder={placeholder}
-                  enterButton={enterButtonText}
-                  size={getSize(size)}
-                  ref={(el)=>{ this.inputOSearch = el }}
-                  defaultValue={this.state.defaultValue}
-                  value={this.state.inputValue}
-                  onSearch={this.handleButtonClick}
-                  onClick={this.inputClick}
-                  onChange={this.inputChange}
-                  onKeyDown={this.inputKeyDown}
-                  onBlur={this.inputBlur} />
+            placeholder={placeholder}
+            enterButton={enterButtonText}
+            ref={(el)=>{ this.inputOSearch = el }}
+            defaultValue={this.state.defaultValue}
+            value={this.state.inputValue}
+            onSearch={this.handleButtonClick}
+            onClick={this.inputClick}
+            onChange={this.inputChange}
+            onKeyDown={this.inputKeyDown}
+            onBlur={this.inputBlur} />
           {this.state.showDropMenu && (
             <div className={styles.dropDown}>
-            <ul className="ant-menu ant-menu-light ant-menu-root ant-menu-vertical">
-              {!searchOptions.length ? '' : searchOptions.map(option =>
-                (
-                  <li
-                    className={`ant-select-dropdown-menu-item ${(option.preActive ? styles.preActive : '')}`}
-                    key={option.id}
-                    onClick={event=>this.handleOptionSelect(event, option)}>
-                  <a>
+              <ul className="ant-menu ant-menu-light ant-menu-root ant-menu-vertical">
+                {!searchOptions.length ? '' : searchOptions.map(option =>
+                  (
+                    <li
+                      className={`ant-select-dropdown-menu-item ${(option.preActive ? styles.preActive : '')}`}
+                      key={option.id}
+                      onClick={event=>this.handleOptionSelect(event, option)}>
+                      <a>
                     <span className={styles.name}>
                       <span className={styles.match}>{ option.matchLabel }</span>
                       <span>{ option.unMatchLabel}</span>
                     </span>
-                    <span className={styles.desc}>{ option.desc}</span>
-                  </a>
-                </li>
-                )
-              )}
-            </ul>
-          </div>)}
+                        <span className={styles.desc}>{ option.desc}</span>
+                      </a>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>)}
         </div>
-      {this.state.showDropMenu &&
+        {this.state.showDropMenu &&
         (
           <div className={styles.mask} onClick={this.handleMaskClick} />
         )
-      }
+        }
       </div>
     );
   }

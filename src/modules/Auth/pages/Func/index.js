@@ -7,7 +7,6 @@ import {connect} from 'dva';
 import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, Select } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import OopSearch from '../../../../components/Oopsearch';
 import OopTreeTable from '../../../../components/OopTreeTable';
 import TableForm from './TableForm';
 import styles from './index.less';
@@ -278,17 +277,17 @@ const ModalForm = connect()((props) => {
 }))
 export default class Func extends PureComponent {
   state = {
+    tableTitle: '所有',
     modalVisible: false,
     currentTabKey: 'basic',
     isCreate: true,
     parentNode: null,
-    parentId: null,
   }
   componentDidMount() {
     this.props.dispatch({
       type: 'authFunc/fetchTreeData'
     });
-    this.onLoad({currentTreeNode: ['-1']})
+    this.onLoad()
   }
   renderTreeNodes = (data)=>{
     return data.map((item) => {
@@ -301,13 +300,6 @@ export default class Func extends PureComponent {
       }
       return <TreeNode {...item} dataRef={item} />;
     });
-  }
-  handleOnSelect = (treeNode)=>{
-    this.onLoad({
-      parentId: treeNode[0]
-    });
-    this.state.parentId = treeNode[0].toString();
-    this.oopTreeTable.table.clearSelection()
   }
   setModalVisible = (flag) => {
     this.setState({
@@ -416,26 +408,16 @@ export default class Func extends PureComponent {
       })
     }
   }
-  onLoad = (param)=>{
-    let p = null;
-    let parentNode = null;
-    if (param) {
-      // param为[]代表反选的时候
-      if ((!param.currentTreeNode) || param.currentTreeNode.length === 0) {
-        return;
-      }
-      // 正常树节点下查询的时候
-      [parentNode] = param.currentTreeNode
-      p = {
-        parentId: parentNode
-      };
-    }
-    // 没穿参数全部查询
-    this.oopSearch.load({
-      ...p,
+  onLoad = (param = {})=>{
+    const currentSelectTreeNode = this.oopTreeTable.getCurrentSelectTreeNode();
+    const parentId = (currentSelectTreeNode && currentSelectTreeNode.key);
+    const {pagination} = param;
+    this.oopTreeTable.oopSearch.load({
+      pagination,
+      parentId,
       menuEnable: 'ALL'
     })
-    this.setParentNode(parentNode)
+    this.setParentNode(parentId)
   }
   onBatchDelete = (items)=>{
     const me = this;
@@ -498,6 +480,12 @@ export default class Func extends PureComponent {
       parentNode,
     });
   }
+  handleTableTreeNodeSelect = ()=>{
+    const treeNode = this.oopTreeTable.getCurrentSelectTreeNode();
+    this.setState({
+      tableTitle: treeNode.name || treeNode.title || '所有'
+    })
+  }
   render() {
     const {
       loading,
@@ -505,8 +493,8 @@ export default class Func extends PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
-    const { parentNode } = this.state;
-    const column = [
+    const { parentNode, tableTitle } = this.state;
+    const columns = [
       {
         title: '菜单名称', dataIndex: 'name'
       },
@@ -564,29 +552,36 @@ export default class Func extends PureComponent {
       },
     ]
     return (
-      <PageHeaderLayout content={
-        <OopSearch
-          placeholder="请输入"
-          enterButtonText="搜索"
-          moduleName="authmenus"
-          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
-        />
-      }>
+      <PageHeaderLayout>
         <OopTreeTable
           ref={(el)=>{ this.oopTreeTable = el }}
-          grid={oopSearchGrid}
-          columns={column}
-          gridLoading={gridLoading}
-          treeLoading={loading}
-          onLoad={this.onLoad}
-          size={size}
-          topButtons={topButtons}
-          rowButtons={rowButtons}
-          treeData={treeData}
-          treeRoot={{
-            key: '-1',
-            title: '菜单'
+          table={{
+            title: `${tableTitle}下级菜单`,
+            grid: oopSearchGrid,
+            columns,
+            gridLoading,
+            onLoad: this.onLoad,
+            topButtons,
+            rowButtons,
+            oopSearch: {
+              moduleName: 'authmenus',
+              placeholder: '请输入',
+              enterButtonText: '搜索'
+            }
           }}
+          tree={{
+            title: '菜单列表',
+            treeLoading: loading,
+            treeData,
+            treeTitle: 'name',
+            treeKey: 'id',
+            treeRoot: {
+              key: '-1',
+              title: '菜单'
+            },
+          }}
+          size={size}
+          onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
         />
         <ModalForm
           resourceList={resourceList}

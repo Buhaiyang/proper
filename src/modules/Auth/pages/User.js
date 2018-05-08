@@ -3,7 +3,7 @@ import {connect} from 'dva';
 import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Spin} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
-import OopSearch from '../../../components/Oopsearch';
+import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';
 import styles from './User.less';

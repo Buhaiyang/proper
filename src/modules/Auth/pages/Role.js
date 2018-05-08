@@ -5,7 +5,7 @@ import { connect } from 'dva';
 // import styles from './Role.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import OopSearch from '../../../components/Oopsearch';
+import OopSearch from '../../../components/OopSearch';
 import DescriptionList from '../../../components/DescriptionList';
 import OopTable from '../../../components/OopTable';
 import { oopToast } from './../../../common/oopUtils';

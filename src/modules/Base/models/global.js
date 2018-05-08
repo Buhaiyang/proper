@@ -119,7 +119,6 @@ export default {
       return {
         ...state,
         searchOptions: [
-          {id: 'history_20170101', label: '这是一条价的搜索历史', matchLabel: '这是一条价的搜索历史', desc: '昨天上午'}
         ],
       }
     },

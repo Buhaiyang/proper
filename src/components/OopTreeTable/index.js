@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import { Row, Col, Card, Tree, Spin, Input } from 'antd';
 import OopTable from '../OopTable';
+import OopSearch from '../OopSearch';
+import styles from './index.less';
 
 
 const { TreeNode } = Tree
@@ -35,15 +37,23 @@ const generateList = (data, props) => {
 };
 export default class OopTreeTable extends PureComponent {
   state = {
-    currentTreeNode: null,
+    currentSelectTreeNode: null,
     expandedKeys: [],
     searchValue: '',
     autoExpandParent: true
   }
-  handleOnSelect = (treeNode)=>{
+  handleOnSelect = (treeNode, event)=>{
+    const currentSelectTreeNode = treeNode.length ? {...event.node.props.dataRef} : null;
     this.setState({
-      currentTreeNode: treeNode
+      currentSelectTreeNode
     }, ()=>{
+      const { onTableTreeNodeSelect } = this.props;
+      if (onTableTreeNodeSelect) {
+        // 传递了树节点点击的函数 并且 执行结果为 false 那么不继续执行
+        if (onTableTreeNodeSelect(treeNode, event) === false) {
+          return
+        }
+      }
       this.onLoad();
       this.table.clearSelection()
     })
@@ -76,19 +86,23 @@ export default class OopTreeTable extends PureComponent {
       return <TreeNode {...item} dataRef={item} />;
     })
     return treeRoot ?
-      (<TreeNode title={treeRoot.title} key={treeRoot.key}>{treeNodes}</TreeNode>)
+      (
+        <TreeNode title={treeRoot.title} key={treeRoot.key} dataRef={{...treeRoot}}>
+        {treeNodes}
+        </TreeNode>)
       : treeNodes
   }
   handleOnChange = (e)=>{
-    const me = this
     const { value } = e.target;
-    generateList(this.props.treeData, this.props)
+    const { tree } = this.props;
+    const { treeData } = tree;
+    generateList(treeData, tree)
     const expandedKeys = dataList.map((item) => {
       if (item.parentId === null) {
         return item.key
       }
       if (item.title.indexOf(value) > -1) {
-        return getParentKey(item.key, me.props.treeData, this.props);
+        return getParentKey(item.key, treeData, tree);
       }
       return null;
     }).filter((item, i, self) => item && self.indexOf(item) === i);
@@ -99,11 +113,7 @@ export default class OopTreeTable extends PureComponent {
     });
   }
   onLoad = (param)=>{
-    const p = {
-      ...param,
-      currentTreeNode: this.state.currentTreeNode
-    }
-    this.props.onLoad(p)
+    this.props.table.onLoad(param)
   }
   onExpand = (expandedKeys) => {
     this.setState({
@@ -111,17 +121,28 @@ export default class OopTreeTable extends PureComponent {
       autoExpandParent: false,
     });
   }
-  getCurrentTreeNode = ()=>{
-    return {currentTreeNode: this.state.currentTreeNode}
+  getCurrentSelectTreeNode = ()=>{
+    return {...this.state.currentSelectTreeNode}
   }
   render() {
     const { searchValue, expandedKeys, autoExpandParent } = this.state;
-    const { treeData, treeTitle, treeKey, treeRoot, gridLoading, grid,
-      columns, treeLoading, topButtons = [], rowButtons = [], size } = this.props
+    const treeConfig = this.props.tree;
+    const tableConfig = this.props.table;
+    const { treeData, treeTitle, treeKey, treeRoot, treeLoading} = treeConfig;
+    const { gridLoading, grid, columns, topButtons = [], rowButtons = [], oopSearch: {
+      moduleName, placeholder, enterButtonText
+    }} = tableConfig;
+    const {size} = this.props;
     return (
-      <Row gutter={16}>
+      <Row gutter={16} className={styles.OopTreeTable}>
         <Col span={18} push={6}>
-          <Card bordered={false}>
+          <Card bordered={false} title={tableConfig.title}>
+            <OopSearch
+              placeholder={placeholder}
+              enterButtonText={enterButtonText}
+              moduleName={moduleName}
+              ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
+            />
             <OopTable
               grid={grid}
               columns={columns}
@@ -130,21 +151,22 @@ export default class OopTreeTable extends PureComponent {
               size={size}
               topButtons={topButtons}
               rowButtons={rowButtons}
+              {...tableConfig}
               ref={(el)=>{ this.table = el }}
             />
           </Card>
         </Col>
         <Col span={6} pull={18}>
-          <Card bordered={false}>
+          <Card bordered={false} title={treeConfig.title}>
             <Spin spinning={treeLoading}>
               <Search style={{ marginBottom: 8 }} placeholder="搜索" onChange={this.handleOnChange} />
               <Tree
                 defaultExpandAll={true}
-                defaultSelectedKeys={treeRoot ? [treeRoot.key] : []}
                 onExpand={this.onExpand}
                 expandedKeys={expandedKeys}
                 autoExpandParent={autoExpandParent}
                 onSelect={this.handleOnSelect}
+                {...treeConfig}
                 ref={(el)=>{ this.tree = el }}
               >
                 {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot, searchValue)}

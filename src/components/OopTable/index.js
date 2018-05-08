@@ -7,13 +7,6 @@ export default class OopTable extends PureComponent {
     selectedRowKeys: [],
     selectedRowItems: []
   }
-  rowSelectionCfg = {
-    onChange: this.rowSelectionChange,
-    selectedRowKeys: this.state.selectedRowKeys,
-    getCheckboxProps: record => ({
-      disabled: record.disabled,
-    })
-  }
   rowSelectionChange = (selectedRowKeys, selectedRowItems)=>{
     this.setState({
       selectedRowKeys,
@@ -21,15 +14,16 @@ export default class OopTable extends PureComponent {
     })
   }
   onChange = (pagination, filters, sorter)=>{
-    this.props.onLoad({
+    this.props.onLoad({pagination: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
       sorter
-    })
+    }})
   }
   clearSelection = ()=>{
     this.setState({
-      selectedRowKeys: []
+      selectedRowKeys: [],
+      selectedRowItems: []
     })
   }
   createTopButtons = (topButtons)=>{
