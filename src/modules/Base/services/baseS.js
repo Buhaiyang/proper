@@ -31,9 +31,9 @@ export async function searchSuggest(params) {
 export async function searchResult(params) {
   // TODO 不这样写  列表不出数据
   // begin
-  // if (params.moduleName === 'authmenus') {
-  //   return request(`/auth/menus?${stringify(params)}`);
-  // }
+  if (params.moduleName === 'devtoolsappver') {
+    return request(`/admin/app/versions?${stringify(params)}`);
+  }
   // if (params.moduleName === 'authroles') {
   //   return request(`/auth/roles?${stringify(params)}`);
   // }
