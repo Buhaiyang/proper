@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Button, Card, Row, Col, Radio } from 'antd';
+import { Form, Button, Card, Row, Col, Radio, Input, Tooltip } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import update from 'immutability-helper/index';
@@ -12,8 +12,9 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 // console.log(formJson)
 const CenterPanel = Form.create()((props) => {
-  const {form, rowItems, onRowItemClick, onRowItemIconCopy, onRowItemIconDelete, onRowItemDrag,
-    onFormSubmit, onFormLayoutChange, formLayout} = props;
+  const {form, rowItems, onFormTitleClick,
+    onRowItemClick, onRowItemIconCopy, onRowItemIconDelete, onRowItemDrag,
+    onFormSubmit, onFormLayoutChange, formLayout, formTitle} = props;
   const rowItemClick = (name)=>{
     onRowItemClick(name)
   }
@@ -37,11 +38,38 @@ const CenterPanel = Form.create()((props) => {
   const param = {formJson: rowItems, form, dragable: true, formLayout,
     rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag
   }
+  const editCss = {
+    color: '#1DA57A',
+    fontSize: '14px',
+    marginLeft: '8px',
+    display: (typeof formTitle === 'object') ? 'none' : 'inline-block'
+  }
+  const titleCss = {
+    maxWidth: '380px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: 'inline-block'
+  }
+  const wrapperCss = {
+    display: 'flex',
+    alignItems: 'center'
+  }
+  const titleClick = ()=>{
+    onFormTitleClick(formTitle)
+  }
+  const title = (
+    <div style={wrapperCss}>
+      { typeof formTitle === 'object' ? <span style={titleCss}>{formTitle}</span> : (
+        <Tooltip placement="topLeft" title={formTitle}>
+        <span style={titleCss}>{formTitle}</span>
+      </Tooltip>)}
+      <a onClick={titleClick} style={editCss}>编辑</a>
+    </div>);
   return (
   <div className={styles.centerPanel}>
-    <Card title="你的表单" extra={toggleFormLayoutButtons}>
+    <Card title={title} extra={toggleFormLayoutButtons}>
     {formGenerator(param)}
-      <div style={{textAlign: 'center'}}>
+      <div style={{textAlign: 'center', display: 'none'}}>
         {rowItems.length ? (<Button type="primary" onClick={onFormSubmit}>保存为自定义组件</Button>) : null}
       </div>
     </Card>
@@ -204,8 +232,9 @@ export default class OopFormDesigner extends React.PureComponent {
       {label: '选择器', key: 'Select', component: {name: 'Select', children: componentData}},
       {label: '数字输入框', key: 'InputNumber', component: {name: 'InputNumber'}}
     ],
-    rowItems: [],
-    formLayout: 'horizontal'
+    rowItems: this.props.formDetails.formJson,
+    formLayout: this.props.formDetails.formLayout,
+    formTitle: this.props.formDetails.formTitle
   }
   componentWillUnmount() {
     this.renderCenterPanel.cancel();
@@ -342,12 +371,45 @@ export default class OopFormDesigner extends React.PureComponent {
     }
     this.forceUpdate()
   }
-  onFormSubmit = ()=>{
-    console.log(this.state.rowItems)
+  getFormInfo = ()=>{
+    const {rowItems, formLayout, formTitle} = this.state;
+    return {
+      formJson: rowItems,
+      formTitle,
+      formLayout
+    }
+  }
+  resetForm = ()=>{
+    this.setState({
+      rowItems: [],
+      formLayout: 'horizontal',
+      formTitle: '你的表单'
+    })
   }
   onFormLayoutChange = (event)=>{
     this.setState({
       formLayout: event.target.value
+    })
+  }
+  onFormTitleClick = (title)=>{
+    const confirm = ()=>{
+      const {value} = this.formTitleEditInput.input;
+      this.setState({
+        formTitle: value
+      })
+    }
+    const cancel = ()=>{
+      this.setState({
+        formTitle: title
+      })
+    }
+    const formTitle = (
+      <div>
+        <Input defaultValue={title} style={{width: '208px'}} ref={ (el)=>{ this.formTitleEditInput = el } } />
+        <Button type="primary" onClick={confirm}>确定</Button><Button onClick={cancel}>取消</Button>
+    </div>);
+    this.setState({
+      formTitle
     })
   }
   render() {
@@ -366,7 +428,9 @@ export default class OopFormDesigner extends React.PureComponent {
             onRowItemDrag={this.onRowItemDrag}
             onFormSubmit={this.onFormSubmit}
             onFormLayoutChange={this.onFormLayoutChange}
+            formTitle={this.state.formTitle}
             formLayout={this.state.formLayout}
+            onFormTitleClick={this.onFormTitleClick}
           /></Col>
           <Col span={6} ><EditPanel
             currentRowItem={this.state.currentRowItem}

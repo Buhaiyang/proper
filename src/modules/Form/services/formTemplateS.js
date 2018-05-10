@@ -27,3 +27,9 @@ export async function deleteTemplate(param) {
     method: 'DELETE'
   });
 }
+export async function updateTemplateFormDetails(param) {
+  return request(`/form/template/${param.id}/formDetails`, {
+    method: 'PUT',
+    body: param.formDetails,
+  })
+}

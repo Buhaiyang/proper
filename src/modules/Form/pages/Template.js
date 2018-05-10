@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber } from 'antd';
+import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
 import {connect} from 'dva';
+import cloneDeep from 'lodash/cloneDeep';
 import OopFormDesigner from '../components/OopFormDesigner';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopTable from '../../../components/OopTable';
@@ -21,10 +22,10 @@ const formItemLayout = {
     sm: { span: 16 },
   },
 };
-// const TYPE_ENUM = [
-//   {label: '问卷', value: 'QUESTION'},
-//   {label: '工作流', value: 'WORKFLOW'},
-// ]
+const TYPE_ENUM = [
+  {label: '问卷', value: 'QUESTION'},
+  {label: '工作流', value: 'WORKFLOW'},
+]
 const ModalFormBasic = Form.create()((props) => {
   const { form, loading, visible, title, onModalCancel, onModalSubmit, formBasic } = props;
   const submitForm = ()=>{
@@ -122,7 +123,12 @@ export default class Template extends React.PureComponent {
   state = {
     formDesignerModalVisible: false,
     formBasicModalVisible: false,
+    formDetails: {
+      formJson: [],
+      formLayout: 'horizontal'
+    }
   }
+  currentRowRecordId = null;
   setFormDesignerModalVisible = (flag) =>{
     this.setState({formDesignerModalVisible: flag})
   }
@@ -153,8 +159,15 @@ export default class Template extends React.PureComponent {
     });
   }
   handleDesign = (record)=>{
-    console.log(record)
-    this.setFormDesignerModalVisible(true)
+    const { formDetails, id } = record;
+    if (formDetails) {
+      const fdCopy = cloneDeep(formDetails)
+      this.setState({
+        formDetails: fdCopy
+      })
+    }
+    this.currentRowRecordId = id;
+    this.setFormDesignerModalVisible(true);
   }
   handleCreate = ()=>{
     this.setFormBasicModalVisible(true)
@@ -178,11 +191,39 @@ export default class Template extends React.PureComponent {
       }
     });
   }
+  handleFormDesignerModalSubmit = ()=>{
+    const formDetails = this.oopFormDesigner.getFormInfo();
+    if (formDetails.formJson.length) {
+      this.props.dispatch({
+        type: 'formTemplate/updateFormDetails',
+        payload: {formDetails, id: this.currentRowRecordId},
+        callback: (res)=>{
+          oopToast(res, '保存成功', '保存失败');
+          this.onLoad();
+        }
+      });
+    } else {
+      message.warning('请设计表单')
+    }
+  }
+  handleFormDesignerModalCancel = ()=>{
+    this.setFormDesignerModalVisible(false);
+    this.currentRowRecordId = null;
+    this.oopFormDesigner.resetForm();
+    this.setState({
+      formDetails: {
+        formJson: [],
+        formLayout: 'horizontal'
+      }
+    })
+  }
   render() {
     const {formTemplate: {grid, entity}, loading, global: { size } } = this.props;
     const columns = [
       {title: '名称', dataIndex: 'name'},
-      {title: '类别', dataIndex: 'type'},
+      {title: '类别', dataIndex: 'type', render: (text)=>{
+        return TYPE_ENUM.filter(item=>item.value === text)[0].label
+      }},
       {title: '版本', dataIndex: 'version'},
       {title: '描述说明', dataIndex: 'description'},
       {title: '状态', dataIndex: 'enable', render: (text)=>{
@@ -244,8 +285,13 @@ export default class Template extends React.PureComponent {
           visible={this.state.formDesignerModalVisible}
           width="90%"
           style={{top: '50px'}}
-          onCancel={()=>this.setFormDesignerModalVisible(false)}>
-          <OopFormDesigner />
+          onCancel={this.handleFormDesignerModalCancel}
+          onOk={this.handleFormDesignerModalSubmit}
+          okText="保存"
+          destroyOnClose={true}>
+          <OopFormDesigner
+            ref={(el)=>{ this.oopFormDesigner = el }}
+            formDetails={this.state.formDetails} />
         </Modal>
     </PageHeaderLayout>)
   }
