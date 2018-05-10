@@ -47,7 +47,7 @@ export default class OopTable extends PureComponent {
     const cols = [...columns]
     rowButtons.length && cols.push({
       title: '操作',
-      width: 100,
+      width: rowButtons.length * 50,
       render: (text, record)=>{
         const actions = [];
         const renderButtons = ((item)=> {
@@ -89,15 +89,15 @@ export default class OopTable extends PureComponent {
   }
   render() {
     const { grid: {list, pagination },
-      columns, loading, topButtons = [], rowButtons = [], size } = this.props
+      columns, loading, topButtons = [], rowButtons = [], checkable = true, size } = this.props
     const cols = this.createRowButtons(columns, rowButtons)
-    const rowSelectionCfg = {
+    const rowSelectionCfg = checkable ? {
       onChange: this.rowSelectionChange,
       selectedRowKeys: this.state.selectedRowKeys,
       getCheckboxProps: record => ({
         disabled: record.disabled,
       })
-    }
+    } : undefined
     return (
       <div className={styles.oopTableWrapper}>
         <div className={styles.toolbar}>

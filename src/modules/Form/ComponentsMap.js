@@ -1,6 +1,6 @@
 import React from 'react';
 import { InputNumber, Input, Radio, Checkbox, Select, Button, Icon} from 'antd';
-import { getUuid } from './oopUtils';
+import { getUuid } from '../../common/oopUtils';
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;

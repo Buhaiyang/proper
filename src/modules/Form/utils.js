@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Icon, Tooltip } from 'antd';
-import getComponent from '../../common/ComponentsMap';
-import FormContainer from './pages/FormContainer';
+import getComponent from './ComponentsMap';
+import FormContainer from './components/FormContainer';
 
 export const formGenerator = (formConfig)=>{
   const {formJson, form, formLayout = 'horizontal', rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag,

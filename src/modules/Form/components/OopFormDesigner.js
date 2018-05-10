@@ -3,7 +3,7 @@ import { Form, Button, Card, Row, Col, Radio } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import update from 'immutability-helper/index';
-import styles from './Designer.less';
+import styles from './OopFormDesigner.less';
 import { getUuid } from '../../../common/oopUtils';
 import { formGenerator } from '../utils';
 
@@ -39,7 +39,7 @@ const CenterPanel = Form.create()((props) => {
   }
   return (
   <div className={styles.centerPanel}>
-    <Card title="你的表单" bordered={false} extra={toggleFormLayoutButtons}>
+    <Card title="你的表单" extra={toggleFormLayoutButtons}>
     {formGenerator(param)}
       <div style={{textAlign: 'center'}}>
         {rowItems.length ? (<Button type="primary" onClick={onFormSubmit}>保存为自定义组件</Button>) : null}
@@ -193,7 +193,7 @@ const componentData = [
   {label: 'D', value: 'D'}
 ]
 
-export default class Designer extends React.PureComponent {
+export default class OopFormDesigner extends React.PureComponent {
   state = {
     currentRowItem: null,
     selections: [
