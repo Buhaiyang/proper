@@ -9,7 +9,7 @@ export default {
     // 取得最新使用的版本信息
     *getLastedVer({ payload, callback }, { call }) {
       const response = yield call(getLastedVer, payload);
-      if (callback) callback(response.result);
+      if (callback) callback(response ? response.result : '');
     },
     // 删除
     *remove({ payload, callback }, { call }) {

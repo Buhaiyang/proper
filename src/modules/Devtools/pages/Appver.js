@@ -82,7 +82,7 @@ const CreateForm = Form.create()((props) => {
               initialValue: verInfo.ver,
               rules: [{ required: true, message: '版本号不能为空' }],
             })(
-              <Input placeholder="请输入版本号" />
+              <Input placeholder="请输入版本号" disabled={verInfo.ver != null} />
             )}
           </FormItem>
           <FormItem
@@ -161,7 +161,7 @@ export default class Appver extends React.Component {
     if (ids instanceof Array) {
       idsArray = ids;
     } else {
-      idsArray.push(ids.id);
+      idsArray.push(ids.ver);
     }
     this.props.dispatch({
       type: 'devtoolsAppver/remove',
@@ -238,13 +238,19 @@ export default class Appver extends React.Component {
     const self = this;
     const params = fields;
     this.props.dispatch({
-      type: 'devtoolsAppver/publish',
+      type: 'devtoolsAppver/createOrUpdate',
       payload: params,
-      callback: (res) => {
-        oopToast(res, '保存并发布成功');
-        self.refresh();
-        this.getLastedVer();
-        self.closeForm(form);
+      callback: () => {
+        this.props.dispatch({
+          type: 'devtoolsAppver/publish',
+          payload: params,
+          callback: (res) => {
+            oopToast(res, '保存并发布成功');
+            self.refresh();
+            this.getLastedVer();
+            self.closeForm(form);
+          }
+        });
       }
     });
   }
