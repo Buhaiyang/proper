@@ -8,8 +8,7 @@ module.exports = {
       "description":null,
       "enable":true,
       "version":1
-      },
-    );
+    });
   },
   "GET:/form/template":[
     {"id":"pep-form-workflow","name":"表单1","type":"QUESTION","sequenceNumber":1,"description":null,"enable":true,"version":1,"formDetails":{"formJson":[{"label":"文本域","key":"TextArea","component":{"name":"TextArea"},"name":"ydPxH"},{"label":"输入框","key":"Input","component":{"name":"Input"},"name":"PgK8u"}],"formLayout":"horizontal","formTitle":"我的表单"},},

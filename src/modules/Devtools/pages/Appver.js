@@ -80,7 +80,10 @@ const CreateForm = Form.create()((props) => {
           >
             {form.getFieldDecorator('ver', {
               initialValue: verInfo.ver,
-              rules: [{ required: true, message: '版本号不能为空' }],
+              rules: [
+                { required: true, message: '版本号不能为空' },
+                { pattern: /^[0-9]*$/, message: '版本号只能为数字'}
+              ],
             })(
               <Input placeholder="请输入版本号" disabled={verInfo.ver != null} />
             )}
@@ -91,7 +94,10 @@ const CreateForm = Form.create()((props) => {
           >
             {form.getFieldDecorator('url', {
               initialValue: verInfo.url,
-              rules: [{ required: true, message: '下载链接不能为空' }],
+              rules: [
+                { required: true, message: '下载链接不能为空' },
+                { pattern: /^http:\/\/|https:\/\/[A-Za-z0-9]+.[A-Za-z0-9]+[=?%\-&_~`@[\]':+!]*([^<>""])*$/, message: 'url地址格式不正确'}
+              ],
             })(
               <Input placeholder="请输入下载链接" />
             )}
