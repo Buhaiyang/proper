@@ -11,13 +11,13 @@ const {moduleName, modelName, pageName} = parse(routePath);
 
 console.log(`当前路由为${routePath},代码生成开始...`);
 // 当前工程中业务模块的路径
-const modulePath = '../src/modules';
+const modulePath = './src/modules';
 // dva中的model模板的路径
-const modelTplPath = './tpl/model.tpl';
+const modelTplPath = './producer/tpl/model.tpl';
 // 页面的page入口文件模板的路径
-const pageTplPath = './tpl/page.tpl';
+const pageTplPath = './producer/tpl/page.tpl';
 // 页面的service文件模板的路径
-const serviceTplPath = './tpl/service.tpl';
+const serviceTplPath = './producer/tpl/service.tpl';
 // 读取文件
 const readFile = (filePath, callback)=>{
   fs.readFile(filePath, 'utf-8', (err, res)=> {
