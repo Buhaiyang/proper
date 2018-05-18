@@ -243,10 +243,10 @@ export default class Group extends PureComponent {
     this.refresh();
   }
 
-  refresh = (param)=>{
-    const { pagination } = this.props.global.oopSearchGrid
+  refresh = (param = {})=>{
+    const { pagination } = param;
     const params = {
-      ...pagination,
+      pagination,
       ...param,
       userGroupEnable: 'ALL'
     }

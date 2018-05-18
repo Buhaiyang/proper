@@ -1,7 +1,6 @@
 import React from 'react';
 import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
 import {connect} from 'dva';
-import cloneDeep from 'lodash/cloneDeep';
 import OopFormDesigner from '../components/OopFormDesigner';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopTable from '../../../components/OopTable';
@@ -138,8 +137,15 @@ export default class Template extends React.PureComponent {
   componentDidMount() {
     this.onLoad();
   }
-  onLoad = ()=>{
-    this.props.dispatch({type: 'formTemplate/fetch'});
+  onLoad = (param = {})=>{
+    const { pagination, ...condition } = param;
+    this.props.dispatch({
+      type: 'formTemplate/fetch',
+      payload: {
+        pagination,
+        ...condition
+      }
+    });
   }
   handleEdit = (record)=>{
     this.setFormBasicModalVisible(true);
@@ -161,9 +167,8 @@ export default class Template extends React.PureComponent {
   handleDesign = (record)=>{
     const { formDetails, id } = record;
     if (formDetails) {
-      const fdCopy = cloneDeep(formDetails)
       this.setState({
-        formDetails: fdCopy
+        formDetails: JSON.parse(formDetails)
       })
     }
     this.currentRowRecordId = id;
@@ -187,7 +192,9 @@ export default class Template extends React.PureComponent {
       payload: values,
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
-        this.onLoad();
+        // 保留分页
+        const {pagination} = this.props.formTemplate.grid
+        this.onLoad({ pagination });
       }
     });
   }
@@ -266,6 +273,7 @@ export default class Template extends React.PureComponent {
           <OopTable
             loading={loading}
             grid={grid}
+            onLoad={this.onLoad}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}

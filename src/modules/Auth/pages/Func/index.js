@@ -268,7 +268,7 @@ const ModalForm = connect()((props) => {
     </Modal>
   );
 });
-@inject(['authFunc', 'global'])
+@inject(['authFunc', 'global', 'baseUser'])
 @connect(({authFunc, global, loading}) => ({
   authFunc,
   global,
@@ -332,6 +332,9 @@ export default class Func extends PureComponent {
         me.onLoad([me.state.parentId]);
         me.props.dispatch({
           type: 'authFunc/fetchTreeData'
+        });
+        me.props.dispatch({
+          type: 'baseUser/fetchMenus'
         });
       }
     })

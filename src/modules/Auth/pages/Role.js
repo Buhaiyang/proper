@@ -379,10 +379,10 @@ export default class Role extends PureComponent {
   }
 
   // 刷新角色列表
-  onLoad = (param) => {
-    const { pagination } = this.props.global.oopSearchGrid
+  onLoad = (param = {}) => {
+    const { pagination } = param;
     const params = {
-      ...pagination,
+      pagination,
       ...param,
       roleEnable: 'ALL'
     }

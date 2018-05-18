@@ -7,10 +7,8 @@ export default {
     grid: {
       list: [],
       pagination: {
-        pageNo: 1,
-        pageSize: 10,
-        total: 10
-      },
+        pageNo: 1, pageSize: 10, showSizeChanger: true, showQuickJumper: true, count: 0
+      }
     },
     entity: {}
   },
@@ -19,7 +17,8 @@ export default {
       const resp = yield call(queryFormTemplate, payload);
       yield put({
         type: 'saveGrid',
-        payload: resp
+        payload: resp,
+        pagination: payload.pagination
       })
     },
     *fetchById({ payload, callback }, { call, put }) {
@@ -53,12 +52,18 @@ export default {
   },
 
   reducers: {
-    saveGrid(state, action) {
+    saveGrid(state, { payload, pagination = {} }) {
       return {
         ...state,
         grid: {
           ...state.grid,
-          list: action.payload.result
+          list: payload.data,
+          pagination: {
+            ...state.grid.pagination,
+            pageNo: pagination.pageNo,
+            pageSize: pagination.pageSize,
+            count: payload.count,
+          }
         }
       }
     },

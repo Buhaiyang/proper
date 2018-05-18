@@ -437,10 +437,10 @@ export default class User extends React.PureComponent {
     });
   }
   // 查询方法 加载所有数据
-  onLoad = (param)=> {
-    const { pagination } = this.props.global.oopSearchGrid
+  onLoad = (param = {})=> {
+    const { pagination } = param;
     const params = {
-      ...pagination,
+      pagination,
       ...param,
       userEnable: 'ALL'
     }
