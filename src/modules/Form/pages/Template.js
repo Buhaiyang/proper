@@ -201,9 +201,16 @@ export default class Template extends React.PureComponent {
   handleFormDesignerModalSubmit = ()=>{
     const formDetails = this.oopFormDesigner.getFormInfo();
     if (formDetails.formJson.length) {
+      const { formJson, ...otherProps } = formDetails;
       this.props.dispatch({
         type: 'formTemplate/updateFormDetails',
-        payload: {formDetails, id: this.currentRowRecordId},
+        payload: {
+          formDetails: {
+            ...otherProps,
+            formJson: formJson.map(fj=>({...fj, active: false})),
+          },
+          id: this.currentRowRecordId
+        },
         callback: (res)=>{
           oopToast(res, '保存成功', '保存失败');
           this.onLoad();

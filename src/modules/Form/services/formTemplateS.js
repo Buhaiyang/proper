@@ -1,8 +1,6 @@
-import {stringify} from 'qs';
-import request from '../../../utils/request';
 import MongoService from '../../../utils/MongoService'
 
-const formTemplateService = new MongoService('FormTemplate');
+const formTemplateService = new MongoService('PEP_FORM_TEMPLATE');
 const {fetchPagable, fetchById, update, save, deleteById} = formTemplateService;
 
 export async function queryFormTemplate(param) {
@@ -25,11 +23,6 @@ export async function saveOrUpdateTemplate(param) {
   //   method: 'POST',
   //   body: param,
   // });
-}
-export async function deleteTemplates(param) {
-  return request(`/form/template/?${stringify(param)}`, {
-    method: 'DELETE'
-  });
 }
 export async function deleteTemplate(param) {
   return deleteById(param);

@@ -126,6 +126,25 @@ export default class MongoService {
       })
     }
   }
+  batchDelete = (param) =>{
+    if (param.ids) {
+      const query = new AV.Query(this.tableObj);
+      query.containedIn('_id', param.ids.split(','));
+      return new Promise((resolve)=>{
+        query.find().then((res)=>{
+          res.id = res._serverData._id.$oid;
+          AV.Object.destroyAll(res).then((msg)=>{
+            resolve({
+              status: 'ok',
+              result: msg
+            });
+          }, (errorMsg)=>{
+            console.err(errorMsg)
+          });
+        })
+      })
+    }
+  }
   fetchByEqual = (params)=> {
     return this.fetch((query)=>{
       if (params) {

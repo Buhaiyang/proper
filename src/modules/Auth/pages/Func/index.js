@@ -4,7 +4,7 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect, Select } from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopTreeTable from '../../../../components/OopTreeTable';
@@ -13,7 +13,6 @@ import styles from './index.less';
 import { oopToast } from './../../../../common/oopUtils';
 
 const { TreeNode } = Tree;
-const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -137,23 +136,6 @@ const FuncBasicInfoForm = Form.create()((props) => {
             <div className={styles.selectLoading}>
               <Spin size="small" />
             </div>
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="菜单类别"
-        >
-          {getFieldDecorator('menuType', {
-            initialValue: funcBasicInfo.menuCode,
-            rules: [{
-              required: true, message: '菜单类别不能为空',
-            }]
-          })(
-            <Select placeholder="菜单类别" >
-              <Option value="2">功能</Option>
-              <Option value="1">页面</Option>
-              <Option value="0">应用</Option>
-            </Select>
           )}
         </FormItem>
         <FormItem
@@ -330,12 +312,7 @@ export default class Func extends PureComponent {
         });
         oopToast(res, '保存成功', '保存失败');
         me.onLoad([me.state.parentId]);
-        me.props.dispatch({
-          type: 'authFunc/fetchTreeData'
-        });
-        me.props.dispatch({
-          type: 'baseUser/fetchMenus'
-        });
+        me.refreshMenusAndLeftTree();
       }
     })
   }
@@ -436,7 +413,8 @@ export default class Func extends PureComponent {
           callback(res) {
             me.oopTreeTable.table.clearSelection()
             oopToast(res, '删除成功', '删除失败');
-            me.onLoad([me.state.parentId])
+            me.onLoad([me.state.parentId]);
+            me.refreshMenusAndLeftTree();
           }
         })
       }
@@ -458,7 +436,8 @@ export default class Func extends PureComponent {
       payload: {ids: record.id},
       callback(res) {
         oopToast(res, '删除成功', '删除失败');
-        me.onLoad([me.state.parentId])
+        me.onLoad([me.state.parentId]);
+        me.refreshMenusAndLeftTree();
       }
     })
   }
@@ -489,6 +468,14 @@ export default class Func extends PureComponent {
       tableTitle: treeNode.name || treeNode.title || '所有'
     })
   }
+  refreshMenusAndLeftTree = ()=>{
+    this.props.dispatch({
+      type: 'authFunc/fetchTreeData'
+    });
+    this.props.dispatch({
+      type: 'baseUser/fetchMenus'
+    });
+  }
   render() {
     const {
       loading,
@@ -502,18 +489,6 @@ export default class Func extends PureComponent {
         title: '菜单名称', dataIndex: 'name'
       },
       {title: '前端路径', dataIndex: 'route'},
-      {title: '菜单类别', dataIndex: 'menuType', render: (record)=>{
-        if (record) {
-          const { code } = record
-          if (code === '0') {
-            return '应用';
-          } else if (code === '1') {
-            return '页面';
-          } else if (code === '2') {
-            return '功能';
-          }
-        }
-      }},
       {
         title: '状态', dataIndex: 'enable', render: (record)=>{
           if (record) {

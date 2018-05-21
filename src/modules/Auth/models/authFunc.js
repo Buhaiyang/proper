@@ -120,8 +120,7 @@ export default {
       return {
         ...state,
         funcBasicInfo: {
-          ...item,
-          menuCode: item.menuType.code
+          ...item
         }
       }
     },

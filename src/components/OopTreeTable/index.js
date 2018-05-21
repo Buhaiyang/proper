@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Row, Col, Card, Tree, Spin, Input } from 'antd';
+import { Row, Col, Card, Tree, Spin, Input, Icon } from 'antd';
 import OopTable from '../OopTable';
 import OopSearch from '../OopSearch';
 import styles from './index.less';
@@ -78,16 +78,29 @@ export default class OopTreeTable extends PureComponent {
       item.title = title;
       if (item.children) {
         return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
+          <TreeNode
+            title={item.title}
+            key={item.key}
+            icon={ item.icon ? <Icon type={item.icon} /> : null }
+            dataRef={item}
+          >
             {this.renderTreeNodes(item.children, treeTitle, treeKey, null, searchValue)}
           </TreeNode>
         );
       }
-      return <TreeNode {...item} dataRef={item} />;
+      return (
+        <TreeNode
+        {...item}
+         dataRef={item}
+         icon={ item.icon ? <Icon type={item.icon} /> : null } />);
     })
     return treeRoot ?
       (
-        <TreeNode title={treeRoot.title} key={treeRoot.key} dataRef={{...treeRoot}}>
+        <TreeNode
+          title={treeRoot.title}
+          key={treeRoot.key}
+          icon={ treeRoot.icon ? <Icon type={treeRoot.icon} /> : null }
+          dataRef={{...treeRoot}}>
         {treeNodes}
         </TreeNode>)
       : treeNodes
@@ -161,6 +174,7 @@ export default class OopTreeTable extends PureComponent {
             <Spin spinning={treeLoading}>
               <Search style={{ marginBottom: 8 }} placeholder="搜索" onChange={this.handleOnChange} />
               <Tree
+                showIcon
                 defaultExpandAll={true}
                 onExpand={this.onExpand}
                 expandedKeys={expandedKeys}

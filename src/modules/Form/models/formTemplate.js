@@ -1,4 +1,4 @@
-import { queryFormTemplate, queryTemplateById, deleteTemplates, saveOrUpdateTemplate,
+import { queryFormTemplate, queryTemplateById, saveOrUpdateTemplate,
   deleteTemplate, updateTemplateFormDetails} from '../services/formTemplateS';
 
 export default {
@@ -39,10 +39,6 @@ export default {
     },
     *remove({payload, callback}, {call}) {
       const resp = yield call(deleteTemplate, payload);
-      if (callback) callback(resp)
-    },
-    *batchRemove({payload, callback}, {call}) {
-      const resp = yield call(deleteTemplates, payload);
       if (callback) callback(resp)
     },
     *updateFormDetails({payload, callback}, {call}) {
