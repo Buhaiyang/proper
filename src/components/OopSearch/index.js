@@ -1,8 +1,11 @@
 import React from 'react';
 import {connect} from 'dva';
 import { Input, Tooltip } from 'antd';
+import cloneDeep from 'lodash/cloneDeep';
+import Debounce from 'lodash-decorators/debounce';
 import { throttle } from '../../utils/utils';
 import styles from './index.less';
+
 
 /*  光标向前直到空格之前的字符串 */
 const getCursorBackToWhitespaceValue = (element) =>{
@@ -64,6 +67,33 @@ const calculateLetterWidth = (letter, size)=>{
 //     return arr[index]
 //   }
 // }
+const filterTableList = (searchValue, tableList)=>{
+  const copyList = cloneDeep(tableList);
+  const filter = (value, index, item)=>{
+    const row = item;
+    const sValue = value.toString();
+    const sIndex = sValue.indexOf(searchValue);
+    const flag = sIndex > -1;
+    if (flag) {
+      const css = {
+        textDecoration: '#1DA57A dashed underline'
+      }
+      row[Object.keys(item)[index]] = (
+        <span>
+            {sValue.substr(0, sIndex)}
+          <span style={css}>{searchValue}</span>
+          {sValue.substr(sIndex + searchValue.length)}
+          </span>);
+    }
+    return flag
+  }
+  const data = copyList.filter(item=>
+    (
+      Object.values(item).filter((value, index)=>{ return filter(value, index, item) })
+    ).length > 0)
+  return data;
+}
+
 const { Search } = Input;
 @connect(({global})=>({
   global
@@ -109,6 +139,9 @@ export default class OopSearch extends React.Component {
   }
   // 根据input框触发最终查询
   handleButtonClick = ()=>{
+    if (this.props.moduleName === undefined) {
+      return
+    }
     this.load()
   }
   // 下拉框点击事件
@@ -169,6 +202,12 @@ export default class OopSearch extends React.Component {
   }
   // input框点击 事件
   inputClick = (event)=>{
+    const { moduleName } = this.props;
+    if (moduleName === undefined) {
+      event.stopPropagation;
+      event.preventDefault();
+      return
+    }
     const { value } = event.currentTarget;
     // const matchStr = getCursorBackToWhitespaceValue(element);
     this.inputChangeOrClick(value);
@@ -192,9 +231,15 @@ export default class OopSearch extends React.Component {
         searchOptionsDesc: []
       })
     }
-    throttle(this.inputChangeOrClick, this, 500, value, 3000);
+    this.inputChangeOrClick(value);
   }
-  inputChangeOrClick = (inputValue)=>{
+  @Debounce(300)
+  inputChangeOrClick(inputValue) {
+    const { moduleName } = this.props;
+    if (moduleName === undefined) {
+      this.staticRetrievalData(inputValue);
+      return
+    }
     this.setState({
       showDropMenu: true
     })
@@ -299,7 +344,7 @@ export default class OopSearch extends React.Component {
   load = (param = {})=>{
     const { dispatch, moduleName } = this.props;
     const pagination = param.pagination ||
-      this.props.global.oopSearchGrid.pagination || { pageNo: 1, pageSize: 10}
+      { pageNo: 1, pageSize: 10, ...this.props.global.oopSearchGrid.pagination};
     const params = {
       ...pagination,
       ...param,
@@ -307,6 +352,12 @@ export default class OopSearch extends React.Component {
       moduleName
     }
     dispatch({type: 'global/oopSearchResult', payload: params});
+  }
+
+  staticRetrievalData(inputValue) {
+    this.props.onInputChange && this.props.onInputChange(inputValue, (tableList)=>{
+      return filterTableList(inputValue, tableList);
+    })
   }
   render() {
     const {global: {searchOptions}, placeholder, enterButtonText} = this.props;

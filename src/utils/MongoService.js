@@ -1,10 +1,12 @@
 import AV from 'av-core';
+import { prefix, devMode } from '../config';
 
 export default class MongoService {
   constructor(tableName, url, ctx) {
     this.tableName = tableName;
     this.tableObj = AV.Object.extend(this.tableName);
-    const serverURL = url || window.localStorage.getItem('pea_dynamic_request_prefix') || window.location.host;
+    const {protocol, host, pathname} = window.location;
+    const serverURL = url || (devMode === 'development' && window.localStorage.getItem('pea_dynamic_request_prefix')) || `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`;
     const context = ctx || '/avdemo';
     const token = window.localStorage.getItem('proper-auth-login-token');
     AV.initialize(serverURL, context);

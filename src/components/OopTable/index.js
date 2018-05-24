@@ -14,7 +14,7 @@ export default class OopTable extends PureComponent {
     })
   }
   onChange = (pagination, filters, sorter)=>{
-    this.props.onLoad({pagination: {
+    this.props.onLoad && this.props.onLoad({pagination: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
       sorter
@@ -112,8 +112,12 @@ export default class OopTable extends PureComponent {
           columns={cols}
           loading={loading}
           pagination={
-            {...pagination,
-              current: pagination.pageNo, pageSize: pagination.pageSize, total: pagination.count}
+            pagination ? {...pagination,
+              current: pagination.pageNo, pageSize: pagination.pageSize, total: pagination.count
+            } : {
+              showSizeChanger: true,
+              showQuickJumper: true,
+            }
           }
           onChange={this.onChange}
           size={size}
