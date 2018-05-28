@@ -4,7 +4,7 @@ import request from '../../../utils/request';
 export async function queryGroups(params) {
   const p = {
     ...params,
-    userGroupEnable: 'ENABLE',
+    userGroupEnable: 'ALL',
   }
   return request(`/auth/user-groups?${stringify(p)}`);
 }

@@ -50,13 +50,9 @@ export default {
     },
     *saveOrUpdateFunc({payload, callback}, {call, put}) {
       const resp = yield call(saveOrUpdateFunc, payload);
-      let response = {};
-      if (resp) {
-        response = resp.result;
-      }
       yield put({
         type: 'saveFuncBasicInfo',
-        payload: response
+        payload: resp
       })
       if (callback) callback(resp)
     },
@@ -68,7 +64,7 @@ export default {
       const resp = yield call(queryFuncById, payload);
       yield put({
         type: 'saveFuncBasicInfo',
-        payload: resp.result
+        payload: resp
       })
       if (callback) callback()
     },
@@ -116,7 +112,11 @@ export default {
       }
     },
     saveFuncBasicInfo(state, action) {
-      const item = action.payload;
+      const item = action.payload.result;
+      const {parentId} = item;
+      if (parentId === null) {
+        item.parentId = '-1'
+      }
       return {
         ...state,
         funcBasicInfo: {

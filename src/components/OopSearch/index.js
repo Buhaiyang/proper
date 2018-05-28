@@ -70,6 +70,11 @@ const calculateLetterWidth = (letter, size)=>{
 const filterTableList = (searchValue, tableList)=>{
   const copyList = cloneDeep(tableList);
   const filter = (value, index, item)=>{
+    const itemName = Object.keys(item)[index];
+    // 不对数据中的id和key做过滤
+    if (itemName === 'id' || itemName === 'key' || itemName.indexOf('_') > -1) {
+      return false;
+    }
     const row = item;
     const sValue = value.toString();
     const sIndex = sValue.indexOf(searchValue);
@@ -78,7 +83,7 @@ const filterTableList = (searchValue, tableList)=>{
       const css = {
         textDecoration: '#1DA57A dashed underline'
       }
-      row[Object.keys(item)[index]] = (
+      row[itemName] = (
         <span>
             {sValue.substr(0, sIndex)}
           <span style={css}>{searchValue}</span>
@@ -356,6 +361,10 @@ export default class OopSearch extends React.Component {
 
   staticRetrievalData(inputValue) {
     this.props.onInputChange && this.props.onInputChange(inputValue, (tableList)=>{
+      if (tableList === undefined) {
+        console.error('error: source list not be undefined');
+        return [];
+      }
       return filterTableList(inputValue, tableList);
     })
   }

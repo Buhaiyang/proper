@@ -1,5 +1,6 @@
 import moment from 'moment';
 import pathToRegexp from 'path-to-regexp';
+import { getRouterData } from '../common/frameHelper';
 
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
@@ -228,9 +229,12 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
         const { moduleName, pathName } = exchangePath2Router(k);
         if (moduleName && pathName) {
           // console.log(k, '====>', path)
-          routerConfig[`/${k}`] = {
-            component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
-          };
+          const originRouter = getRouterData();
+          if (originRouter[`/${k}`] === undefined) {
+            routerConfig[`/${k}`] = {
+              component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
+            };
+          }
         }
       }
     }

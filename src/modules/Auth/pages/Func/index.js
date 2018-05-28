@@ -263,7 +263,7 @@ export default class Func extends PureComponent {
     modalVisible: false,
     currentTabKey: 'basic',
     isCreate: true,
-    parentNode: null,
+    parentNode: null
   }
   componentDidMount() {
     this.props.dispatch({
@@ -308,10 +308,9 @@ export default class Func extends PureComponent {
       callback(res) {
         me.setState({
           isCreate: false,
-          parentId: data.parentId
         });
         oopToast(res, '保存成功', '保存失败');
-        me.onLoad([me.state.parentId]);
+        me.onLoad();
         me.refreshMenusAndLeftTree();
       }
     })
@@ -397,7 +396,6 @@ export default class Func extends PureComponent {
       parentId,
       menuEnable: 'ALL'
     })
-    this.setParentNode(parentId)
   }
   onBatchDelete = (items)=>{
     const me = this;
@@ -413,7 +411,7 @@ export default class Func extends PureComponent {
           callback(res) {
             me.oopTreeTable.table.clearSelection()
             oopToast(res, '删除成功', '删除失败');
-            me.onLoad([me.state.parentId]);
+            me.onLoad();
             me.refreshMenusAndLeftTree();
           }
         })
@@ -421,12 +419,22 @@ export default class Func extends PureComponent {
     });
   }
   onCreate = ()=>{
+    this.refreshMenusAndLeftTree()
     this.setState({
       modalVisible: true,
       isCreate: true
     });
     this.props.dispatch({
-      type: 'authFunc/fetchParentTreeData'
+      type: 'authFunc/fetchParentTreeData',
+      callback: ()=>{
+        const node = this.oopTreeTable.getCurrentSelectTreeNode();
+        const parentId = node.id || node.key
+        if (parentId) {
+          this.setState({
+            parentNode: parentId
+          })
+        }
+      }
     })
   }
   onDelete = (record)=>{
@@ -436,7 +444,7 @@ export default class Func extends PureComponent {
       payload: {ids: record.id},
       callback(res) {
         oopToast(res, '删除成功', '删除失败');
-        me.onLoad([me.state.parentId]);
+        me.onLoad();
         me.refreshMenusAndLeftTree();
       }
     })
@@ -455,11 +463,6 @@ export default class Func extends PureComponent {
           payload: record.id
         });
       }
-    });
-  }
-  setParentNode = (parentNode) => {
-    this.setState({
-      parentNode,
     });
   }
   handleTableTreeNodeSelect = ()=>{
