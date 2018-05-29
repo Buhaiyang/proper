@@ -4,7 +4,7 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, TreeSelect } from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, Select, TreeSelect } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopTreeTable from '../../../../components/OopTreeTable';
@@ -13,6 +13,7 @@ import styles from './index.less';
 import { oopToast } from './../../../../common/oopUtils';
 
 const { TreeNode } = Tree;
+const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -136,6 +137,23 @@ const FuncBasicInfoForm = Form.create()((props) => {
             <div className={styles.selectLoading}>
               <Spin size="small" />
             </div>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="菜单类别"
+        >
+          {getFieldDecorator('menuType', {
+            initialValue: funcBasicInfo.menuCode,
+            rules: [{
+              required: true, message: '菜单类别不能为空',
+            }]
+          })(
+            <Select placeholder="菜单类别" >
+              <Option value="2">功能</Option>
+              <Option value="1">页面</Option>
+              <Option value="0">应用</Option>
+            </Select>
           )}
         </FormItem>
         <FormItem
