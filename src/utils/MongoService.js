@@ -3,12 +3,16 @@ import { prefix, devMode } from '../config';
 
 export default class MongoService {
   constructor(tableName, url, ctx) {
+    const token = window.localStorage.getItem('proper-auth-login-token');
+    if (!token) {
+      throw Error('invalid token');
+    }
+    this.currentUser = JSON.parse(window.atob(token.split('.')[0]));
     this.tableName = tableName;
     this.tableObj = AV.Object.extend(this.tableName);
     const {protocol, host, pathname} = window.location;
     const serverURL = url || (devMode === 'development' && window.localStorage.getItem('pea_dynamic_request_prefix')) || `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`;
     const context = ctx || '/avdemo';
-    const token = window.localStorage.getItem('proper-auth-login-token');
     AV.initialize(serverURL, context);
     AV.setToken(token)
   }
@@ -155,6 +159,9 @@ export default class MongoService {
         }
       }
     })
+  }
+  getCurrentUser = ()=>{
+    return this.currentUser
   }
 }
 

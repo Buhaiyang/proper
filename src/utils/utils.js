@@ -331,3 +331,32 @@ export function formatDate(date) {
   const str2 = date.substr(11, 8);
   return `${str1} ${str2}`;
 }
+export const format = (fmt) =>{
+  let formMate = fmt;
+  const now = new Date();
+  const o = {
+    'M+': now.getMonth() + 1, // 月份
+    'd+': now.getDate(), // 日
+    'h+': now.getHours(), // 小时
+    'm+': now.getMinutes(), // 分
+    's+': now.getSeconds(), // 秒
+    'q+': Math.floor((now.getMonth() + 3) / 3), // 季度
+    S: now.getMilliseconds() // 毫秒
+  };
+  if (/(y+)/.test(formMate)) {
+    formMate = formMate.replace(RegExp.$1, (now.getFullYear().toString().concat('')).substr(4 - RegExp.$1.length));
+  }
+  for (const k in o) {
+    if (new RegExp('('.concat(k).concat(')')).test(formMate)) {
+      formMate = formMate.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00'.concat(o[k])).substr((''.concat(o[k])).length)));
+    }
+  }
+  return formMate;
+}
+export const getParamObj = (search)=>{
+  const param = {};
+  search.replace('?', '').split('&')
+    .map(str=>'{"'.concat(str.replace('=', '":"')).concat('"}'))
+    .forEach((jsonStr)=>{ Object.assign(param, JSON.parse(jsonStr)) });
+  return param;
+}

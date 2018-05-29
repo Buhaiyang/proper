@@ -13,11 +13,11 @@ export default (name, props, children)=> {
     Icon: <Icon {...props} />,
     TextArea: <TextArea {...props} />,
     Select: (
-      <Select style={{ width: '100%' }}>
+      <Select style={{ width: '100%' }} {...props}>
         {
           children.map(item=>(<Option key={getUuid(5)} value={item.value}>{item.label}</Option>))
         }
-    </Select>),
+      </Select>),
     RadioGroup: (
       <RadioGroup options={children} {...props} />),
     CheckboxGroup: (
