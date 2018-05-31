@@ -26,6 +26,8 @@ module.exports = {
     {"id":"pep-workflow-designer","name":"流程设计","route":"workflow/designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-workflow","root":false,"leaf":true},
     {"id":"pep-devtools","name":"开发者工具","route":"devtools","sequenceNumber":2,"icon":"tool","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
     {"id":"pep-devtools-appver","name":"APP版本管理","route":"devtools/appver","sequenceNumber":0,"icon":"tag-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-system","name":"PEP配置管理","route":"system","sequenceNumber":2,"icon":"profile","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
+    {"id":"pep-system-config","name":"oopsearch配置","route":"system/config","sequenceNumber":0,"icon":"setting","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
   ],
   "GET:/auth/users": {
     "count":100,

@@ -1,0 +1,330 @@
+import React, {Fragment} from 'react';
+import { Modal, Card, Form, Input, Button } from 'antd';
+import {connect} from 'dva';
+import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
+import OopSearch from '../../../components/OopSearch';
+import OopTable from '../../../components/OopTable';
+import {inject} from '../../../common/inject';
+import { oopToast } from './../../../common/oopUtils';
+import DescriptionList from './../../../components/DescriptionList/index';
+
+const { Description } = DescriptionList;
+const FormItem = Form.Item;
+const { TextArea } = Input;
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 },
+  },
+};
+const ModalForm = Form.create()((props) => {
+  const { form, loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
+  const submitForm = () => {
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      onModalSubmit(fieldsValue, form);
+    });
+  }
+  const cancelForm = () => {
+    onModalCancel(form)
+  }
+  const footer = (
+    <Fragment>
+      <Button onClick={cancelForm}>取消</Button>
+      <Button type="primary" onClick={submitForm} loading={loading}>保存</Button>
+    </Fragment>);
+  return (
+    <Modal
+      title={title}
+      visible={visible}
+      footer={footer}
+      onCancel={cancelForm}
+      destroyOnClose={true}
+    >
+      <Form>
+        <div>
+          {form.getFieldDecorator('id', {
+            initialValue: formEntity.id,
+          })(
+            <Input type="hidden" />
+          )}
+        </div>
+        <FormItem
+          {...formItemLayout}
+          label="模块名称"
+        >
+          {form.getFieldDecorator('moduleName', {
+            initialValue: formEntity.moduleName,
+            rules: [{ required: true, message: '模块名称不能为空' }],
+          })(
+            <Input placeholder="请输入模块名称" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="URL"
+        >
+          {form.getFieldDecorator('url', {
+            initialValue: formEntity.url,
+            rules: [{ required: true, message: 'url不能为空' }],
+          })(
+            <Input placeholder="请输入url" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="表名称"
+        >
+          {form.getFieldDecorator('tableName', {
+            initialValue: formEntity.tableName,
+            rules: [{ required: true, message: '表名称不能为空' }],
+          })(
+            <Input placeholder="请输入表名称" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="字段名称"
+        >
+          {form.getFieldDecorator('searchColumn', {
+            initialValue: formEntity.searchColumn,
+            rules: [{ required: true, message: '字段名称不能为空' }],
+          })(
+            <Input placeholder="请输入字段名称" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="别名"
+        >
+          {form.getFieldDecorator('columnAlias', {
+            initialValue: formEntity.columnAlias,
+            rules: [{ required: true, message: '别名不能为空' }],
+          })(
+            <Input placeholder="请输入别名" />
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="描述"
+        >
+          {form.getFieldDecorator('columnDesc', {
+            initialValue: formEntity.columnDesc,
+            rules: [{ required: true, message: '描述不能为空' }],
+          })(
+            <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
+          )}
+        </FormItem>
+      </Form>
+    </Modal>
+  )
+});
+
+@inject(['systemConfig', 'global'])
+@connect(({ systemConfig, global, loading }) => ({
+  systemConfig,
+  global,
+  loading: loading.models.systemConfig,
+  gridLoading: loading.effects['global/oopSearchResult']
+}))
+export default class Config extends React.PureComponent {
+  state = {
+    modalFormVisible: false,
+    entity: {},
+    visible: false,
+    info: {}
+  }
+  componentDidMount() {
+    this.onLoad();
+  }
+  onLoad = (param = {}) => {
+    const {pagination} = param;
+    this.oopSearch.load({
+      pagination
+    })
+  }
+  handleCreate = () => {
+    this.setModalFormVisible(true);
+  }
+  handleEdit = (record) => {
+    this.setState({
+      entity: record
+    });
+    this.setModalFormVisible(true);
+  }
+  handleRemove = (record) => {
+    this.props.dispatch({
+      type: 'systemConfig/remove',
+      payload: record.id,
+      callback: (res)=>{
+        oopToast(res, '删除成功', '删除失败');
+        this.onLoad();
+      }
+    });
+  }
+  handleBatchRemove = (items) => {
+    const me = this;
+    Modal.confirm({
+      title: '提示',
+      content: `确定删除选中的${items.length}条数据吗`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        me.props.dispatch({
+          type: 'systemConfig/remove',
+          payload: items.toString(),
+          callback(res) {
+            me.oopTable.clearSelection()
+            oopToast(res, '删除成功', '删除失败');
+            me.onLoad()
+          }
+        })
+      }
+    });
+  }
+  handleModalCancel = (form) => {
+    this.setModalFormVisible(false);
+    setTimeout(()=>{
+      form.resetFields();
+    }, 300)
+  }
+  handleModalSubmit = (values, form) => {
+    this.props.dispatch({
+      type: 'systemConfig/saveOrUpdate',
+      payload: values,
+      callback: (res)=>{
+        oopToast(res, '保存成功', '保存失败');
+        this.handleModalCancel(form);
+        this.onLoad();
+      }
+    });
+  }
+  setModalFormVisible = (flag) => {
+    if (!flag) {
+      this.setState({
+        modalFormVisible: false,
+        entity: {}
+      });
+    } else {
+      this.setState({modalFormVisible: flag});
+    }
+  }
+  handleView = (record) => {
+    this.setState({
+      visible: true,
+      info: record
+    });
+  }
+  handleClose = () => {
+    this.setState({
+      visible: false,
+      info: {}
+    });
+  }
+  render() {
+    const { loading, global: { oopSearchGrid, size }, gridLoading } = this.props;
+    const { modalFormVisible, entity, visible, info } = this.state;
+    const columns = [
+      {title: '模块名称', dataIndex: 'moduleName', render: (text, record)=>(
+        <span
+          onClick={()=>this.handleView(record)}
+          style={{textDecoration: 'underline', cursor: 'pointer'}}>
+          {text}
+        </span>
+      )},
+      {title: 'URL', dataIndex: 'url'},
+      {title: '描述', dataIndex: 'columnDesc'},
+    ];
+    const topButtons = [
+      {
+        text: '新建',
+        name: 'create',
+        type: 'primary',
+        icon: 'plus',
+        onClick: ()=>{ this.handleCreate() }
+      },
+      {
+        text: '删除',
+        name: 'batchDelete',
+        icon: 'delete',
+        display: items=>(items.length > 0),
+        onClick: (items)=>{ this.handleBatchRemove(items) }
+      },
+    ];
+    const rowButtons = [
+      {
+        text: '编辑',
+        name: 'edit',
+        icon: 'edit',
+        onClick: (record)=>{ this.handleEdit(record) },
+      },
+      {
+        text: '删除',
+        name: 'delete',
+        icon: 'delete',
+        confirm: '是否要删除此条信息',
+        onClick: (record)=>{ this.handleRemove(record) },
+      },
+    ];
+    return (
+      <PageHeaderLayout content={
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          moduleName="systemconfig"
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
+        />
+      }>
+        <Card bordered={false}>
+          <OopTable
+            loading={gridLoading}
+            grid={oopSearchGrid}
+            columns={columns}
+            rowButtons={rowButtons}
+            topButtons={topButtons}
+            size={size}
+            ref={(el)=>{ this.oopTable = el }}
+          />
+        </Card>
+        <ModalForm
+          visible={modalFormVisible}
+          title={entity.id ? '编辑oopsearch配置' : '新建oopsearch配置'}
+          onModalCancel={this.handleModalCancel}
+          onModalSubmit={this.handleModalSubmit}
+          formEntity={entity}
+          loading={!!loading}
+        />
+        <Modal
+          visible={visible}
+          title="oopsearch配置"
+          onCancel={()=>this.handleClose()}
+          footer={<Button type="primary" onClick={()=>this.handleClose()}>确定</Button>}
+        >
+          <DescriptionList size={size} col="1">
+            <Description term="模块名称">
+              {info.moduleName}
+            </Description>
+            <Description term="URL">
+              {info.url}
+            </Description>
+            <Description term="表名称">
+              {info.tableName}
+            </Description>
+            <Description term="字段名称">
+              {info.searchColumn}
+            </Description>
+            <Description term="别名">
+              {info.columnAlias}
+            </Description>
+            <Description term="描述">
+              {info.columnDesc}
+            </Description>
+          </DescriptionList>
+        </Modal>
+      </PageHeaderLayout>)
+  }
+}
