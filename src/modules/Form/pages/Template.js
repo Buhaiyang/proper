@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
 import {connect} from 'dva';
-import OopFormDesigner from '../components/OopFormDesigner';
+import OopFormDesigner from '../../../components/OopFormDesigner';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';

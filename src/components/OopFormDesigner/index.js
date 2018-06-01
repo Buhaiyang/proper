@@ -3,9 +3,9 @@ import { Form, Button, Card, Row, Col, Radio, Input, Tooltip } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import update from 'immutability-helper/index';
-import styles from './OopFormDesigner.less';
-import { getUuid } from '../../../common/oopUtils';
-import { formGenerator } from '../utils';
+import { getUuid } from '../../common/oopUtils';
+import OopForm from '../../components/OopForm';
+import styles from './index.less';
 
 
 const RadioButton = Radio.Button;
@@ -32,9 +32,9 @@ const CenterPanel = Form.create()((props) => {
   }
   const toggleFormLayoutButtons = (
     <RadioGroup defaultValue={formLayout} onChange={formLayoutChange}>
-    <RadioButton value="horizontal">横向布局</RadioButton>
-    <RadioButton value="vertical">纵向布局</RadioButton>
-  </RadioGroup>)
+      <RadioButton value="horizontal">横向布局</RadioButton>
+      <RadioButton value="vertical">纵向布局</RadioButton>
+    </RadioGroup>)
   const param = {formJson: rowItems, form, dragable: true, formLayout,
     rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag
   }
@@ -61,19 +61,19 @@ const CenterPanel = Form.create()((props) => {
     <div style={wrapperCss}>
       { typeof formTitle === 'object' ? <span style={titleCss}>{formTitle}</span> : (
         <Tooltip placement="topLeft" title={formTitle}>
-        <span style={titleCss}>{formTitle}</span>
-      </Tooltip>)}
+          <span style={titleCss}>{formTitle}</span>
+        </Tooltip>)}
       <a onClick={titleClick} style={editCss}>编辑</a>
     </div>);
   return (
-  <div className={styles.centerPanel}>
-    <Card title={title} extra={toggleFormLayoutButtons}>
-    {formGenerator(param)}
-      <div style={{textAlign: 'center', display: 'none'}}>
-        {rowItems.length ? (<Button type="primary" onClick={onFormSubmit}>保存为自定义组件</Button>) : null}
-      </div>
-    </Card>
-  </div>);
+    <div className={styles.centerPanel}>
+      <Card title={title} extra={toggleFormLayoutButtons}>
+        <OopForm {...param} />
+        <div style={{textAlign: 'center', display: 'none'}}>
+          {rowItems.length ? (<Button type="primary" onClick={onFormSubmit}>保存为自定义组件</Button>) : null}
+        </div>
+      </Card>
+    </div>);
 });
 const AddPanel = (props) => {
   const { selections, onAddItem} = props;
@@ -82,7 +82,7 @@ const AddPanel = (props) => {
   }
   return (
     <div className={styles.addPanel}><Card title="添加组件" bordered={false}><ul>{
-    selections.map(item=>(<li key={item.key}><Button type="primary" ghost onClick={()=>addItem(item)}>{item.label}</Button></li>))
+      selections.map(item=>(<li key={item.key}><Button type="primary" ghost onClick={()=>addItem(item)}>{item.label}</Button></li>))
     }</ul></Card></div>);
 };
 const EditPanel = Form.create()((props) => {
@@ -134,7 +134,7 @@ const EditPanel = Form.create()((props) => {
             initialValue: name
           }];
           const param = {formJson: editFormJson, form, formLayout: 'vertical'}
-          return formGenerator(param)
+          return (<OopForm {...param} />);
         } else if ('RadioGroup,CheckboxGroup,Select'.includes(cName)) {
           let editFormJson = [{
             name: `${name}${prefix}_label`,
@@ -203,7 +203,7 @@ const EditPanel = Form.create()((props) => {
           }
           const param = {formJson: editFormJson, form, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete,
             rowItemDrag}
-          return formGenerator(param)
+          return (<OopForm {...param} />);
         }
       }
     }
@@ -212,7 +212,7 @@ const EditPanel = Form.create()((props) => {
     <div className={styles.editPanel}>
       <Card title="编辑组件详情" bordered={false}>
         {createFormByFormItemData(currentRowItem)}
-    </Card></div>);
+      </Card></div>);
 });
 const componentData = [
   {label: 'A', value: 'A'},
@@ -407,7 +407,7 @@ export default class OopFormDesigner extends React.PureComponent {
       <div>
         <Input defaultValue={title} style={{width: '208px'}} ref={ (el)=>{ this.formTitleEditInput = el } } />
         <Button type="primary" onClick={confirm}>确定</Button><Button onClick={cancel}>取消</Button>
-    </div>);
+      </div>);
     this.setState({
       formTitle
     })
@@ -440,6 +440,6 @@ export default class OopFormDesigner extends React.PureComponent {
             onPlusClick={this.onPlusClick}
             onRowItemDrag={this.onEditPanelRowItemDrag} /></Col>
         </Row>
-    </div>)
+      </div>)
   }
 }

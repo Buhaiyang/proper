@@ -94,9 +94,18 @@ export default function request(url, options) {
         codeStyle = 'err';
       }
       if (response.headers) {
-        if (response.headers.get('content-type').indexOf('text/') !== -1) {
+        const contentType = response.headers.get('content-type');
+        if (contentType === null) {
+          return new Promise((resolve)=>{
+            resolve({
+              status: codeStyle,
+              result: '操作成功'
+            });
+          });
+        }
+        if (contentType.indexOf('text/') !== -1) {
           thePromise = response.text();
-        } else if (response.headers.get('content-type').indexOf('application/json') !== -1) {
+        } else if (contentType.indexOf('application/json') !== -1) {
           thePromise = response.json();
         }
       } else {
