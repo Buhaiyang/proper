@@ -1,4 +1,8 @@
 var url = require('url');
+module.exports = {
+  'GET:/search/inverse':[{"id":"5aab6ea828cc0f09784a0730","con":"用户1","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|45f438a3-1af0-4c27-9850-04e046adb6d3"},{"id":"5aab6ea828cc0f09784a0733","con":"用户2","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|b18de59a-261a-4df6-9327-30ba7e00f8f1"},{"id":"5aab6ea828cc0f09784a072c","con":"用户3","col":"name","tab":"pep_auth_users","des":"name","pri":"pep_dev|pep_auth_users|000673e6-e87a-4d6b-a641-b2fcf8bb9cb3"}],
+  'GET:/search/query':getQueryList,
+}
 const authUser = {
   "count":11,
   "data": [
