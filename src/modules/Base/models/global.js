@@ -34,10 +34,10 @@ export default {
 
   effects: {
     *oopSearchResult({ payload }, { put, call }) {
-      const data = yield call(searchResult, payload);
+      const resp = yield call(searchResult, payload);
       yield put({
         type: 'saveOopSearchGrid',
-        payload: data.result,
+        payload: resp,
         pagination: {
           ...payload
         }
@@ -123,14 +123,29 @@ export default {
       }
     },
     saveOopSearchGrid(state, { payload, pagination }) {
-      return {
-        ...state,
-        oopSearchGrid: {
-          list: payload.data,
-          pagination: {
-            pageNo: pagination.pageNo,
-            pageSize: pagination.pageSize,
-            count: payload.count,
+      if (payload) {
+        const { result } = payload
+        return {
+          ...state,
+          oopSearchGrid: {
+            list: result.data,
+            pagination: {
+              pageNo: pagination.pageNo,
+              pageSize: pagination.pageSize,
+              count: result.count,
+            }
+          }
+        }
+      } else {
+        return {
+          ...state,
+          oopSearchGrid: {
+            list: [],
+            pagination: {
+              pageNo: pagination.pageNo,
+              pageSize: pagination.pageSize,
+              count: 0,
+            }
           }
         }
       }

@@ -44,8 +44,8 @@ export async function queryUserGroupsById(params) {
 
 export async function queryGroupUsers(params) {
   const p = {
-    userGroupEnable: 'ENABLE',
-    userEnable: 'ENABLE'
+    userGroupEnable: 'ALL',
+    userEnable: 'ALL'
   }
   return request(`/auth/user-groups/${params}/users?${stringify(p)}`);
 }

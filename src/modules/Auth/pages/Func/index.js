@@ -4,7 +4,7 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, Select, TreeSelect } from 'antd';
+import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, Select, TreeSelect, Badge } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopTreeTable from '../../../../components/OopTreeTable';
@@ -511,13 +511,11 @@ export default class Func extends PureComponent {
       },
       {title: '前端路径', dataIndex: 'route'},
       {
-        title: '状态', dataIndex: 'enable', render: (record)=>{
-          if (record) {
-            return '已启用';
-          } else {
-            return '已停用';
-          }
-        }
+        title: '状态', dataIndex: 'enable', render: record=>(
+          <Fragment>
+            {record === true ? '已启用' : <Badge status="default" text="已停用" />}
+          </Fragment>
+        )
       }
     ]
     const topButtons = [

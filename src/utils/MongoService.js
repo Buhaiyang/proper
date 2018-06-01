@@ -5,7 +5,7 @@ export default class MongoService {
   constructor(tableName, url, ctx) {
     const token = window.localStorage.getItem('proper-auth-login-token');
     if (!token) {
-      throw Error('invalid token');
+      throw Error('the token cannot be empty when you instantiate an \'MongoService\' object ');
     }
     this.currentUser = JSON.parse(window.atob(token.split('.')[0]));
     this.tableName = tableName;
@@ -98,7 +98,7 @@ export default class MongoService {
         })
       })
     } else {
-      console.error('\'id\' must be not null when update action !')
+      console.error('\'id\' cannot be null when update operation ')
     }
   }
   fetchById = (id) =>{
@@ -138,15 +138,25 @@ export default class MongoService {
       query.containedIn('_id', param.ids.split(','));
       return new Promise((resolve)=>{
         query.find().then((res)=>{
-          res.id = res._serverData._id.$oid;
-          AV.Object.destroyAll(res).then((msg)=>{
-            resolve({
-              status: 'ok',
-              result: msg
+          if (res.length) {
+            res.forEach((re)=>{
+              const r = re;
+              r.id = r._serverData._id.$oid
             });
-          }, (errorMsg)=>{
-            console.err(errorMsg)
-          });
+            AV.Object.destroyAll(res).then((msg)=>{
+              resolve({
+                status: 'ok',
+                result: msg
+              });
+            }, (errorMsg)=>{
+              console.err(errorMsg)
+            });
+          } else {
+            resolve({
+              status: 'error',
+              result: 'the record no exit'
+            });
+          }
         })
       })
     }

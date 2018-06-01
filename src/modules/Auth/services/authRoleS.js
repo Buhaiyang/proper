@@ -2,8 +2,11 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 // 取得roles列表
-export async function queryRoles(params) {
-  return request(`/auth/roles?${stringify(params)}`);
+export async function queryRoles() {
+  const p = {
+    roleEnable: 'ALL'
+  }
+  return request(`/auth/roles?${stringify(p)}`);
 }
 
 // 取得指定角色ID详情信息

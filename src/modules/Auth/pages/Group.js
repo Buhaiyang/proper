@@ -354,7 +354,7 @@ export default class Group extends PureComponent {
         type: 'authGroups/createOrUpdate',
         payload: fields,
         callback: (res) => {
-          oopToast(res, '保存成功', '保存失败');
+          oopToast(res, '保存成功');
           this.refresh();
           self.setState({
             isCreate: false
@@ -548,7 +548,7 @@ export default class Group extends PureComponent {
       { title: '顺序', dataIndex: 'seq', key: 'seq', },
       { title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
         <Fragment>
-          {text === true ? '已启用' : '已停用'}
+          {text === true ? '已启用' : <Badge status="default" text="已停用" />}
         </Fragment>
       )},
     ];

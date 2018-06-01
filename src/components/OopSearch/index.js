@@ -3,7 +3,6 @@ import {connect} from 'dva';
 import { Input, Tooltip } from 'antd';
 import cloneDeep from 'lodash/cloneDeep';
 import Debounce from 'lodash-decorators/debounce';
-import { throttle } from '../../utils/utils';
 import styles from './index.less';
 
 
@@ -45,7 +44,7 @@ const getCursorForwardWhitespaceValue = (element)=>{
 const calculateLetterWidth = (letter, size)=>{
   const constant = ['并且', '或者'];
   if (constant.indexOf(letter) !== -1) {
-    return 40
+    return 35
   }
   const span = document.createElement('span');
   span.innerText = letter
@@ -147,7 +146,16 @@ export default class OopSearch extends React.Component {
     if (this.props.moduleName === undefined) {
       return
     }
-    this.load()
+    // 如果显示下拉 那么不请求
+    if (this.state.showDropMenu) {
+      return
+    }
+    this.load({
+      pagination: {
+        pageNo: 1,
+        pageSize: 10
+      }
+    })
   }
   // 下拉框点击事件
   handleOptionSelect = (event, option)=>{
@@ -178,20 +186,20 @@ export default class OopSearch extends React.Component {
     if (inputValueArr.length === searchOptionsDesc.length) {
       searchOptionsDesc[i] = {
         id: option.id,
-        col: option.col,
+        col: option.col || option.id,
         label: optionLabel,
         text: desc || '',
-        width: `${calculateLetterWidth(optionLabel, '16px')}px`,
+        width: `${calculateLetterWidth(optionLabel, '14px')}px`,
         operate: option.operate || 'like',
         isTips: desc
       }
     } else {
       searchOptionsDesc.push({
         id: option.id,
-        col: option.col,
+        col: option.col || option.id,
         label: optionLabel,
         text: desc || '',
-        width: `${calculateLetterWidth(optionLabel, '16px')}px`,
+        width: `${calculateLetterWidth(optionLabel, '14px')}px`,
         table: option.table,
         operate: option.operate || 'like',
         isTips: desc
@@ -271,14 +279,10 @@ export default class OopSearch extends React.Component {
           this.setPreActive(true)
           break
         case 37:
-          setTimeout(()=> {
-            throttle(this.inputChangeOrClick, this, 50, this.state.inputValue, 3000);
-          })
+          this.inputChangeOrClick();
           break
         case 39:
-          setTimeout(()=> {
-            throttle(this.inputChangeOrClick, this, 50, this.state.inputValue, 3000);
-          })
+          this.inputChangeOrClick();
           break
         default: 100;
       }
@@ -334,7 +338,7 @@ export default class OopSearch extends React.Component {
   onMouseOver = (event)=>{
     console.log(event.currentTarget)
   }
-  getCurrentParam = ()=>{
+  getRepParam = ()=>{
     const param = [];
     this.state.searchOptionsDesc.forEach((sod) => {
       param.push({
@@ -346,6 +350,10 @@ export default class OopSearch extends React.Component {
     });
     return param
   }
+  getRestPathParam = ()=>{
+    const {restPath} = this.props;
+    return restPath
+  }
   load = (param = {})=>{
     const { dispatch, moduleName } = this.props;
     const pagination = param.pagination ||
@@ -353,7 +361,8 @@ export default class OopSearch extends React.Component {
     const params = {
       ...pagination,
       ...param,
-      req: JSON.stringify(this.getCurrentParam()),
+      req: JSON.stringify(this.getRepParam()),
+      restPath: JSON.stringify(this.getRestPathParam()),
       moduleName
     }
     dispatch({type: 'global/oopSearchResult', payload: params});

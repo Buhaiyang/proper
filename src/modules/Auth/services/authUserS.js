@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '../../../utils/request';
 
 export async function queryUsers() {
-  const params = {pageNo: 1, pageSize: 999, userEnable: 'ENABLE'};
+  const params = {pageNo: 1, pageSize: 999, userEnable: 'ALL'};
   return request(`/auth/users?${stringify(params)}`);
 }
 export async function queryUsersById(params) {
@@ -15,25 +15,25 @@ export async function deleteUsers(params) {
 }
 export async function queryUserRoles(params) {
   const p = {
-    roleEnable: 'ENABLE'
+    roleEnable: 'ALL'
   }
   return request(`/auth/users/${params}/roles?${stringify(p)}`);
 }
 export async function queryUserRolesAll() {
   const p = {
-    roleEnable: 'ENABLE',
+    roleEnable: 'ALL',
   }
   return request(`/auth/roles?${stringify(p)}`);
 }
 export async function queryUserGroups(params) {
   const p = {
-    userGroupEnable: 'ENABLE',
+    userGroupEnable: 'ALL',
   }
   return request(`/auth/users/${params}/user-groups?${stringify(p)}`);
 }
 export async function queryUserGroupsAll() {
   const p = {
-    userGroupEnable: 'ENABLE',
+    userGroupEnable: 'ALL',
   }
   return request(`/auth/user-groups?${stringify(p)}`);
 }

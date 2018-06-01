@@ -1,8 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
-  Form, Tabs, Input, Radio, Select, Tree } from 'antd';
+  Form, Tabs, Input, Radio, Select, Tree, Tooltip } from 'antd';
 import { connect } from 'dva';
-// import styles from './Role.less';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
@@ -63,20 +62,19 @@ const BasicInfoForm = Form.create()((props) => {
               showSearch
               placeholder="请选择"
               optionFilterProp="children"
+              allowClear={true}
               filterOption={(input, option) =>
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              <Option
-                key="role_no_select">
-                不继承任何角色
-              </Option>
               {
                 roleList ? roleList.map(item => (
-                  <Option
-                    key={item.id}
-                    disabled={item.id === roleInfo.id}>
-                    {item.name}
-                  </Option>
+                  (
+                    <Option
+                      key={item.id}
+                      disabled={item.id === roleInfo.id}>
+                      {item.enable ? item.name :
+                        (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+                    </Option>)
                   // <Option key={item.id}>{item.name}</Option>
                 )) : null
               }
@@ -182,7 +180,11 @@ const UserInfoForm = Form.create()((props) => {
               onChange={value => handleChange(value, roleInfo.id)}
             >
               {allUsers.length ? allUsers.map(item =>
-                <Option key={item.id}>{item.name}</Option>
+                (
+                  <Option key={item.id}>
+              {item.enable ? item.name :
+                (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+                </Option>)
               ) : allUsers}
             </Select>
           )
@@ -216,7 +218,11 @@ const GroupInfoForm = Form.create()((props) => {
               onChange={value => handleChange(value, roleInfo.id)}
             >
               {allGroups.length ? allGroups.map(item =>
-                <Option key={item.id}>{item.name}</Option>
+                (
+                  <Option key={item.id}>
+                    {item.enable ? item.name :
+                      (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+                  </Option>)
               ) : allGroups}
             </Select>
           )
@@ -660,7 +666,7 @@ export default class Role extends PureComponent {
         type: 'authRole/createOrUpdate',
         payload: params,
         callback: (res) => {
-          oopToast(res, '保存成功', '保存失败');
+          oopToast(res, '保存成功');
           this.getAllRoles();
           this.onLoad();
           self.setState({
@@ -743,7 +749,7 @@ export default class Role extends PureComponent {
       { title: '继承', dataIndex: 'parentName', key: 'parentName', },
       { title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
           <Fragment>
-            {text === true ? '已启用' : '已停用'}
+            {text === true ? '已启用' : <Badge status="default" text="已停用" />}
           </Fragment>
       )}
     ];

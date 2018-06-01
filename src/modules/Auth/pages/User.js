@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Spin} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Badge, Tooltip, Spin} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/OopSearch';
@@ -165,10 +165,15 @@ const RoleInfoForm = Form.create()((props) => {
             mode="multiple"
             style={{width: '100%'}}
             placeholder="请选择角色 "
+            optionFilterProp="children"
             onChange={handleChange}
           >
             {userRolesAll.length ? userRolesAll.map(item =>
-              <Option key={item.id}>{item.name}</Option>
+              (
+              <Option key={item.id}>
+                {item.enable ? item.name :
+                  (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+              </Option>)
             ) : userRolesAll}
           </Select>
         )
@@ -201,10 +206,15 @@ const UserGroupInfoForm = Form.create()((props) => {
             mode="multiple"
             style={{width: '100%'}}
             placeholder="请选择用户组"
+            optionFilterProp="children"
             onChange={handleChange}
           >
             {userGroupsAll.length ? userGroupsAll.map(item =>
-              <Option key={item.id}>{item.name}</Option>
+              (
+                <Option key={item.id}>
+                  {item.enable ? item.name :
+                    (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+                </Option>)
             ) : userGroupsAll}
           </Select>
         )}
@@ -527,7 +537,7 @@ export default class User extends React.PureComponent {
       {
         title: '状态', dataIndex: 'enable', render: text => (
           <Fragment>
-            {text === true ? '已启用' : '已停用'}
+            {text === true ? '已启用' : <Badge status="default" text="已停用" />}
           </Fragment>
         )
       }

@@ -54,7 +54,12 @@ export default class OopTreeTable extends PureComponent {
           return
         }
       }
-      this.onLoad();
+      this.onLoad({
+        pagination: {
+          pageNo: 1,
+          pageSize: 10
+        }
+      });
       this.table.clearSelection()
     })
   }
@@ -142,18 +147,14 @@ export default class OopTreeTable extends PureComponent {
     const treeConfig = this.props.tree;
     const tableConfig = this.props.table;
     const { treeData, treeTitle, treeKey, treeRoot, treeLoading} = treeConfig;
-    const { gridLoading, grid, columns, topButtons = [], rowButtons = [], oopSearch: {
-      moduleName, placeholder, enterButtonText
-    }} = tableConfig;
+    const { gridLoading, grid, columns, topButtons = [], rowButtons = [], oopSearch } = tableConfig;
     const {size} = this.props;
     return (
       <Row gutter={16} className={styles.OopTreeTable}>
         <Col span={18} push={6}>
           <Card bordered={false} title={tableConfig.title}>
             <OopSearch
-              placeholder={placeholder}
-              enterButtonText={enterButtonText}
-              moduleName={moduleName}
+              {...oopSearch}
               ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
             />
             <OopTable
