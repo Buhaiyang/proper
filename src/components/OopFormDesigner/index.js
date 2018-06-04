@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Button, Card, Row, Col, Radio, Input, Tooltip } from 'antd';
+import { Button, Card, Row, Col, Radio, Input, Tooltip } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import update from 'immutability-helper/index';
@@ -11,8 +11,8 @@ import styles from './index.less';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 // console.log(formJson)
-const CenterPanel = Form.create()((props) => {
-  const {form, rowItems, onFormTitleClick,
+const CenterPanel = (props) => {
+  const {rowItems, onFormTitleClick,
     onRowItemClick, onRowItemIconCopy, onRowItemIconDelete, onRowItemDrag,
     onFormSubmit, onFormLayoutChange, formLayout, formTitle} = props;
   const rowItemClick = (name)=>{
@@ -35,7 +35,7 @@ const CenterPanel = Form.create()((props) => {
       <RadioButton value="horizontal">横向布局</RadioButton>
       <RadioButton value="vertical">纵向布局</RadioButton>
     </RadioGroup>)
-  const param = {formJson: rowItems, form, dragable: true, formLayout,
+  const param = {formJson: rowItems, dragable: true, formLayout,
     rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag
   }
   const editCss = {
@@ -74,7 +74,7 @@ const CenterPanel = Form.create()((props) => {
         </div>
       </Card>
     </div>);
-});
+};
 const AddPanel = (props) => {
   const { selections, onAddItem} = props;
   const addItem = (item)=>{
@@ -85,9 +85,8 @@ const AddPanel = (props) => {
       selections.map(item=>(<li key={item.key}><Button type="primary" ghost onClick={()=>addItem(item)}>{item.label}</Button></li>))
     }</ul></Card></div>);
 };
-const EditPanel = Form.create()((props) => {
-  const { form,
-    currentRowItem,
+const EditPanel = (props) => {
+  const { currentRowItem,
     updateCenterPanel, onRowItemIconCopy, onRowItemIconDelete, onPlusClick, onRowItemDrag } = props;
   const rowItemIconCopy = (event, name)=>{
     onRowItemIconCopy(name)
@@ -133,7 +132,7 @@ const EditPanel = Form.create()((props) => {
             },
             initialValue: name
           }];
-          const param = {formJson: editFormJson, form, formLayout: 'vertical'}
+          const param = {formJson: editFormJson, formLayout: 'vertical'}
           return (<OopForm {...param} />);
         } else if ('RadioGroup,CheckboxGroup,Select'.includes(cName)) {
           let editFormJson = [{
@@ -201,7 +200,7 @@ const EditPanel = Form.create()((props) => {
               initialValue: layout
             })
           }
-          const param = {formJson: editFormJson, form, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete,
+          const param = {formJson: editFormJson, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete,
             rowItemDrag}
           return (<OopForm {...param} />);
         }
@@ -213,7 +212,7 @@ const EditPanel = Form.create()((props) => {
       <Card title="编辑组件详情" bordered={false}>
         {createFormByFormItemData(currentRowItem)}
       </Card></div>);
-});
+};
 const componentData = [
   {label: 'A', value: 'A'},
   {label: 'B', value: 'B'},
@@ -426,7 +425,6 @@ export default class OopFormDesigner extends React.PureComponent {
             onRowItemIconCopy={this.onRowItemIconCopy}
             onRowItemIconDelete={this.onRowItemIconDelete}
             onRowItemDrag={this.onRowItemDrag}
-            onFormSubmit={this.onFormSubmit}
             onFormLayoutChange={this.onFormLayoutChange}
             formTitle={this.state.formTitle}
             formLayout={this.state.formLayout}
