@@ -94,18 +94,18 @@ const authMenu = {
 const systemConfig = {
   "count":12,
   "data": [
-    {"id": "1","moduleName": "流程设置","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "2","moduleName": "权限管理","tableName": "pep-system-config","searchColumn": "角色","columnAlias": "role","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "3","moduleName": "用户管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "4","moduleName": "功能管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "5","moduleName": "角色管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "6","moduleName": "用户组管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "7","moduleName": "流程设计","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "8","moduleName": "组织机构","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "9","moduleName": "人员管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "10","moduleName": "机构管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "11","moduleName": "角色管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"},
-    {"id": "12","moduleName": "权限管理","tableName": "pep-system-config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "http://localhost:8000/#/system/config"}
+    {"id": "1","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "2","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "角色","columnAlias": "role","columnDesc": "高管角色用户组","url": "/authusers"},
+    {"id": "3","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "4","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system/config"},
+    {"id": "5","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system"},
+    {"id": "6","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "7","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "8","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "9","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "10","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "11","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "12","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"}
   ]
 };
 

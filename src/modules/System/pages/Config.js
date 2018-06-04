@@ -59,62 +59,67 @@ const ModalForm = Form.create()((props) => {
         >
           {form.getFieldDecorator('moduleName', {
             initialValue: formEntity.moduleName,
-            rules: [{ required: true, message: '模块名称不能为空' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z]+$/, message: '模块名称不能为空,且必须是英文字符' }],
           })(
-            <Input placeholder="请输入模块名称" />
+            <Input placeholder="请输入模块名称 如：authusers" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="URL"
+          extra="模块请求跳转的业务url"
         >
           {form.getFieldDecorator('url', {
             initialValue: formEntity.url,
-            rules: [{ required: true, message: 'url不能为空' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z/]+$/, message: 'url不能为空,且必须是英文字符或"/"' }],
           })(
-            <Input placeholder="请输入url" />
+            <Input placeholder="请输入url 如：/authusers" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="表名称"
+          extra="查询使用到的表名"
         >
           {form.getFieldDecorator('tableName', {
             initialValue: formEntity.tableName,
-            rules: [{ required: true, message: '表名称不能为空' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z_]+$/, message: '表名不能为空,且必须是英文字符或"_"' }],
           })(
-            <Input placeholder="请输入表名称" />
+            <Input placeholder="请输入表名称 如：pep_auth_users" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="字段名称"
+          extra="查询的字段名"
         >
           {form.getFieldDecorator('searchColumn', {
             initialValue: formEntity.searchColumn,
-            rules: [{ required: true, message: '字段名称不能为空' }],
+            rules: [{ required: true, whitespace: true, message: '字段名称不能为空' }],
           })(
-            <Input placeholder="请输入字段名称" />
+            <Input placeholder="请输入字段名称 如：用户1" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="别名"
+          extra="查询字段别名(为了区分多表同名字段设置)，该字段内容即为RESTFul接口调用的参数名称。"
         >
           {form.getFieldDecorator('columnAlias', {
             initialValue: formEntity.columnAlias,
-            rules: [{ required: true, message: '别名不能为空' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z_]+$/, message: '别名不能为空,且必须是英文字符或"_"' }],
           })(
-            <Input placeholder="请输入别名" />
+            <Input placeholder="请输入别名 如：authusers_user_id" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="描述"
+          extra="查询字段的描述(在输入框输入内容后下方显示数据中的描述内容)"
         >
           {form.getFieldDecorator('columnDesc', {
             initialValue: formEntity.columnDesc,
-            rules: [{ required: true, message: '描述不能为空' }],
+            rules: [{ required: true, whitespace: true, message: '描述不能为空' }],
           })(
             <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
           )}
