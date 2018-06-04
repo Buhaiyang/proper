@@ -95,9 +95,9 @@ const ModalForm = Form.create()((props) => {
         >
           {form.getFieldDecorator('searchColumn', {
             initialValue: formEntity.searchColumn,
-            rules: [{ required: true, whitespace: true, message: '字段名称不能为空' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z]+$/, message: '字段名称不能为空,且必须是英文字符' }],
           })(
-            <Input placeholder="请输入字段名称 如：用户1" />
+            <Input placeholder="请输入字段名称 如：userName" />
           )}
         </FormItem>
         <FormItem
@@ -107,9 +107,9 @@ const ModalForm = Form.create()((props) => {
         >
           {form.getFieldDecorator('columnAlias', {
             initialValue: formEntity.columnAlias,
-            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z_]+$/, message: '别名不能为空,且必须是英文字符或"_"' }],
+            rules: [{ required: true, whitespace: true, pattern: /^[A-Za-z]+$/, message: '别名不能为空,且必须是英文字符' }],
           })(
-            <Input placeholder="请输入别名 如：authusers_user_id" />
+            <Input placeholder="请输入别名 如：authusersUserId" />
           )}
         </FormItem>
         <FormItem
