@@ -147,10 +147,7 @@ export default class Config extends React.PureComponent {
     this.onLoad();
   }
   onLoad = (param = {}) => {
-    const {pagination} = param;
-    this.oopSearch.load({
-      pagination
-    })
+    this.oopSearch.load(param);
   }
   handleCreate = () => {
     this.setModalFormVisible(true);
@@ -242,6 +239,9 @@ export default class Config extends React.PureComponent {
         </span>
       )},
       {title: 'URL', dataIndex: 'url'},
+      {title: '表名称', dataIndex: 'tableName'},
+      {title: '字段名称', dataIndex: 'searchColumn'},
+      {title: '别名', dataIndex: 'columnAlias'},
       {title: '描述', dataIndex: 'columnDesc'},
     ];
     const topButtons = [
@@ -289,6 +289,7 @@ export default class Config extends React.PureComponent {
             loading={gridLoading}
             grid={oopSearchGrid}
             columns={columns}
+            onLoad={this.onLoad}
             rowButtons={rowButtons}
             topButtons={topButtons}
             size={size}

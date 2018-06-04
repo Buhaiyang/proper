@@ -94,18 +94,18 @@ const authMenu = {
 const systemConfig = {
   "count":12,
   "data": [
-    {"id": "1","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "2","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "角色","columnAlias": "role","columnDesc": "高管角色用户组","url": "/authusers"},
-    {"id": "3","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "4","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system/config"},
-    {"id": "5","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system"},
-    {"id": "6","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "7","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "8","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "9","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "10","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "11","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
-    {"id": "12","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "用户","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"}
+    {"id": "1","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "2","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "role","columnDesc": "高管角色用户组","url": "/authusers"},
+    {"id": "3","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "4","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system/config"},
+    {"id": "5","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/system"},
+    {"id": "6","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "7","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "8","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "9","moduleName": "hrmpep","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "10","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "11","moduleName": "workflow","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"},
+    {"id": "12","moduleName": "pepAuth","tableName": "pep_system_config","searchColumn": "userName","columnAlias": "user","columnDesc": "高管角色用户组","url": "/config"}
   ]
 };
 
