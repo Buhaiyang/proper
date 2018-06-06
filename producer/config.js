@@ -1,4 +1,5 @@
 module.exports = {
-  // routePath: 'question/manager',
-  routePath: 'appconfig/version',
+  routePath: 'auth/test',
+  formConfig: {"formJson":[{"label":"输入框","key":"Input","component":{"name":"Input"},"name":"5RRGi"},{"label":"文本域","key":"TextArea","component":{"name":"TextArea"},"name":"3v3PM"},{"label":"单选框","key":"RadioGroup","component":{"name":"RadioGroup","children":[{"label":"A","value":"A"},{"label":"B","value":"B"},{"label":"C","value":"C"},{"label":"D","value":"D"}]},"name":"JzVHT"},{"label":"数字输入框","key":"InputNumber","component":{"name":"InputNumber"},"name":"eakge"},{"label":"选择器","key":"Select","component":{"name":"Select","children":[{"label":"A","value":"A"},{"label":"B","value":"B"},{"label":"C","value":"C"},{"label":"D","value":"D"}]},"name":"Yr5I3"},{"label":"多选框","key":"CheckboxGroup","component":{"name":"CheckboxGroup","children":[{"label":"A","value":"A"},{"label":"B","value":"B"},{"label":"C","value":"C"},{"label":"D","value":"D"}]},"initialValue":[],"name":"tLewT"}],"formLayout":"horizontal"},
+  gridConfig: {"columns":[{"title":"输入框","dataIndex":"5RRGi"},{"title":"文本域","dataIndex":"3v3PM"},{"title":"单选框","dataIndex":"JzVHT"},{"title":"数字输入框","dataIndex":"eakge"},{"title":"选择器","dataIndex":"Yr5I3"},{"title":"多选框","dataIndex":"tLewT"}]}
 }

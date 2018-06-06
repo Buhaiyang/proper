@@ -1,5 +1,7 @@
 import AV from 'av-core';
+import { routerRedux } from 'dva/router';
 import { prefix, devMode } from '../config';
+import app from '../index';
 
 export default class MongoService {
   constructor(tableName, url, ctx) {
@@ -14,7 +16,18 @@ export default class MongoService {
     const serverURL = url || (devMode === 'development' && window.localStorage.getItem('pea_dynamic_request_prefix')) || `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`;
     const context = ctx || '/avdemo';
     AV.initialize(serverURL, context);
-    AV.setToken(token)
+    AV.setToken(token);
+  }
+  errorFn = (resolve, err)=>{
+    if (err.status === 401) {
+      const { dispatch } = app._store;
+      window.localStorage.removeItem('proper-auth-login-token');
+      dispatch(routerRedux.push('/base/login'));
+    }
+    resolve({
+      status: 'error',
+      result: []
+    });
   }
   fetch =(callback) =>{
     const query = new AV.Query(this.tableObj);
@@ -27,8 +40,8 @@ export default class MongoService {
               result: res.map(item=> ({...item._serverData, id: item._serverData._id.$oid})),
               extra: callbackReturnValue
             });
-          })
-        })
+          }, (err)=>{ this.errorFn(resolve, err) });
+        }, (err)=>{ this.errorFn(resolve, err) })
         return
       }
       query.find().then((res)=>{
@@ -36,7 +49,7 @@ export default class MongoService {
           result: res.map(item=>
             ({...item._serverData, id: item._serverData._id.$oid}))
         });
-      })
+      }, (err)=>{ this.errorFn(resolve, err) })
     })
   }
   fetchPagable = (params = {}) =>{
@@ -49,8 +62,11 @@ export default class MongoService {
         return query.count();
       }).then((res)=>{
         resolve({
-          data: res.result,
-          count: res.extra
+          status: 'ok',
+          result: {
+            data: res.result,
+            count: res.extra
+          }
         })
       })
     })
@@ -64,13 +80,7 @@ export default class MongoService {
           status: 'ok',
           result: {...res._serverData, id: res.id}
         });
-      }, (err)=>{
-        console.log(err);
-        resolve({
-          status: 'error',
-          result: '更新失败'
-        });
-      })
+      }, (err)=>{ this.errorFn(resolve, err) })
     })
   }
   update = (formValues)=> {
@@ -88,14 +98,8 @@ export default class MongoService {
               status: 'ok',
               result: {...res._serverData, id: res._serverData._id.$oid}
             });
-          }, (err)=>{
-            console.log(err);
-            resolve({
-              status: 'error',
-              result: '更新失败'
-            });
-          })
-        })
+          }, (err)=>{ this.errorFn(resolve, err) })
+        }, (err)=>{ this.errorFn(resolve, err) })
       })
     } else {
       console.error('\'id\' cannot be null when update operation ')
@@ -110,7 +114,7 @@ export default class MongoService {
             status: 'ok',
             result: {...res._serverData, id: res._serverData._id.$oid}
           });
-        })
+        }, (err)=>{ this.errorFn(resolve, err) })
       })
     }
   }
@@ -125,10 +129,8 @@ export default class MongoService {
               status: 'ok',
               result: msg
             });
-          }, (errorMsg)=>{
-            console.err(errorMsg)
-          });
-        })
+          }, (err)=>{ this.errorFn(resolve, err) });
+        }, (err)=>{ this.errorFn(resolve, err) })
       })
     }
   }
@@ -148,16 +150,14 @@ export default class MongoService {
                 status: 'ok',
                 result: msg
               });
-            }, (errorMsg)=>{
-              console.err(errorMsg)
-            });
+            }, (err)=>{ this.errorFn(resolve, err) });
           } else {
             resolve({
               status: 'error',
               result: 'the record no exit'
             });
           }
-        })
+        }, (err)=>{ this.errorFn(resolve, err) })
       })
     }
   }

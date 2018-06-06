@@ -5,9 +5,9 @@ const parse = require('./util');
 
 const {readdir} = fs;
 // 浏览器的路由路径
-const { routePath} = config;
-// moduleName: 模块名称, modelName: dva中的model名称, pageName: 页面的page入口文件名称
-const {moduleName, modelName, pageName} = parse(routePath);
+const { routePath, formConfig, gridConfig} = config;
+// moduleName: 模块名称, modelName: dva中的model名称, pageName: 页面的page入口文件名称 tableName: mongo的表名
+const {moduleName, modelName, pageName, tableName} = parse(routePath);
 
 console.log(`当前路由为${routePath},代码生成开始...`);
 // 当前工程中业务模块的路径
@@ -43,6 +43,12 @@ const replaceFileTemplateStr = (str, variableName, name)=>{
   const fun = new Function(variableName, content);
   return fun(name);
 }
+
+const getReplaceFunction = (str, ...variableName)=>{
+  return Function.call(null, variableName, 'return'.concat('`').concat(str).concat('`'))
+}
+
+
 // 写入一个model文件
 const generateFile = (content, fileName, type, callback)=>{
   readdir(`${modulePath}/${moduleName}`, (err, paths)=>{
@@ -70,11 +76,12 @@ readFile(modelTplPath, (str)=>{
   generateFile(content, modelName, 'models',f=>{
     // 生成page
     readFile(pageTplPath, (str)=>{
-      const content = replaceFileTemplateStr(str, 'modelName', modelName);
+      //const content = replaceFileTemplateStr(str, 'modelName', modelName);
+      const content = getReplaceFunction(str, 'modelName', 'formConfig', 'gridConfig')(modelName, JSON.stringify(formConfig), JSON.stringify(gridConfig));
       generateFile(content, pageName, 'pages', f=>{
         // 生成service
         readFile(serviceTplPath, (str)=>{
-          const content = replaceFileTemplateStr(str, 'routeName', routePath);
+          const content = getReplaceFunction(str, 'routeName', 'modelName', 'tableName')(routePath, modelName, tableName);
           generateFile(content, `${modelName}S`, 'services', f=>{
             console.log('代码生成结束###')
           });

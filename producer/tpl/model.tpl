@@ -43,7 +43,7 @@ export default {
     saveList(state, action) {
       return {
         ...state,
-        list: action.payload.result
+        list: action.payload.result.data
       }
     },
     saveEntity(state, action) {

@@ -20,7 +20,8 @@ function exchangePath2Router(path) {
   return {
     moduleName,
     modelName: firstLowerCase(moduleName).concat(pathName),
-    pageName: pathName.join('/')
+    pageName: pathName.join('/'),
+    tableName: "PEP_".concat(result.map(item=>(item.toString().toUpperCase())).join('_'))
   };
 }
 

@@ -1,34 +1,24 @@
 import React, {Fragment} from 'react';
-import { Modal, Card, Form, Spin, Input, Select, Badge, Button } from 'antd';
+import { Modal, Card, Form, Spin, Button } from 'antd';
 import {connect} from 'dva';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
+import OopForm from '../../../components/OopForm';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';
 import { oopToast } from './../../../common/oopUtils';
 
-const FormItem = Form.Item;
-const { TextArea } = Input;
-const { Option } = Select;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 },
-  },
-};
 const ModalForm = Form.create()((props) => {
-  const { form, loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
+  const {loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
   const submitForm = ()=>{
+    const form = this.oopForm.getForm()
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       onModalSubmit(fieldsValue, form);
     });
   }
   const cancelForm = ()=>{
+    const form = this.oopForm.getForm()
     onModalCancel(form)
   }
   const footer = (
@@ -36,53 +26,11 @@ const ModalForm = Form.create()((props) => {
       <Button onClick={cancelForm}>取消</Button>
       <Button type="primary" onClick={submitForm} loading={loading}>保存</Button>
     </Fragment>);
+  const formConfig = ${formConfig}
   return (
     <Modal title={title} visible={visible} footer={footer} onCancel={cancelForm}>
       <Spin spinning={loading}>
-        <Form>
-          <div>
-            {form.getFieldDecorator('id', {
-              initialValue: formEntity.id,
-            })(
-              <Input type="hidden" />
-            )}
-          </div>
-          <FormItem
-            {...formItemLayout}
-            label="名称"
-          >
-            {form.getFieldDecorator('name', {
-              initialValue: formEntity.name,
-              rules: [{ required: true, message: '名称不能为空' }],
-            })(
-              <Input placeholder="请输入名称" />
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="问卷模板"
-          >
-            {form.getFieldDecorator('type', {
-              initialValue: formEntity.type,
-              rules: [{ required: true, message: '请选择模板' }],
-            })(<Select
-                placeholder="请选择">
-                <Option value={1}>是</Option>
-                <Option value={0}>否</Option>
-              </Select>
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="描述"
-          >
-            {form.getFieldDecorator('description', {
-              initialValue: formEntity.description
-            })(
-              <TextArea placeholder="请输入描述" autosize={{ minRows: 2, maxRows: 5 }} />
-            )}
-          </FormItem>
-        </Form>
+        <OopForm {...formConfig} ref={(el)=>{ this.oopForm = el }} />
       </Spin>
     </Modal>
   )
@@ -103,10 +51,17 @@ export default class Manager extends React.PureComponent {
     this.onLoad();
   }
   onLoad = (param = {})=>{
-    const {pagination} = param;
-    this.oopSearch.load({
-      pagination
-    })
+    const {pagination, condition} = param;
+    // this.oopSearch.load({
+    //  pagination
+    // });
+    this.props.dispatch({
+      type: '${modelName}/fetch',
+      payload: {
+        pagination,
+        ...condition
+      }
+    });
   }
   handleCreate = ()=>{
     this.setModalFormVisible(true);
@@ -171,14 +126,9 @@ export default class Manager extends React.PureComponent {
     this.setState({modalFormVisible: flag})
   }
   render() {
-    const {${modelName}: {entity, templateList}, loading,
+    const {${modelName}: {entity, list}, loading,
       global: { oopSearchGrid, size }, gridLoading } = this.props;
-    const columns = [
-      {title: '名称', dataIndex: 'name'},
-      {title: '创建时间', dataIndex: 'createDate'},
-      {title: '发布时间', dataIndex: 'publishDate'},
-      {title: '问卷状态', dataIndex: 'status'},
-    ];
+    const { columns } = ${gridConfig};
     const topButtons = [
       {
         text: '新建',
@@ -221,8 +171,8 @@ export default class Manager extends React.PureComponent {
       }>
         <Card bordered={false}>
           <OopTable
-            loading={gridLoading}
-            grid={oopSearchGrid}
+            loading={loading === undefined ? gridLoading : loading}
+            grid={{list} || oopSearchGrid}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}
@@ -236,7 +186,6 @@ export default class Manager extends React.PureComponent {
           onModalCancel={this.handleModalCancel}
           onModalSubmit={this.handleModalSubmit}
           formEntity={entity}
-          templateList={templateList}
           loading={!!loading}
         />
       </PageHeaderLayout>)
