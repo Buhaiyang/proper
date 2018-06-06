@@ -13,21 +13,28 @@ export default class OopForm extends React.PureComponent {
     return this.state.form
   }
   render() {
-    const { disabled = false, formJson = [] } = this.props;
-    if (disabled) {
-      if (formJson.length) {
-        formJson.forEach((item)=>{
-          const {component} = item;
-          if (!component.$$typeof) {
-            if (!component.attrs) {
-              component.attrs = [];
-            }
-            component.attrs.push({disabled: true});
-          }
-        });
+    const { disabled = false, formJson = [], defaultValue = {} } = this.props;
+    const { form } = this.state;
+    formJson.forEach((item)=>{
+      const {initialValue, component} = item;
+      // initialValue是数组但是长度为0 或者 没有initialValue
+      if ((Array.isArray(initialValue) && initialValue.length === 0)
+        || initialValue === undefined) {
+        item.initialValue = defaultValue[item.name]
+      } else {
+        item.initialValue = defaultValue[item.name] || initialValue
       }
-    }
-    const formConfig = {...this.props, form: this.state.form};
+      // 如果是只读的组件
+      if (disabled) {
+        if (!component.$$typeof) {
+          if (!component.attrs) {
+            component.attrs = [];
+          }
+          component.attrs.push({disabled: true});
+        }
+      }
+    });
+    const formConfig = {...this.props, form};
     return formGenerator(formConfig)
   }
 }

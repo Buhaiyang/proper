@@ -74,6 +74,12 @@ export default class PageHeader extends PureComponent {
         </Breadcrumb.Item>
       ) : null;
     });
+    // TODO 添加parent path
+    extraBreadcrumbItems.unshift(
+      <Breadcrumb.Item key="home">
+        {createElement('span', {to: '/' }, 'parent')}
+      </Breadcrumb.Item>
+    );
     // Add home breadcrumbs to your head
     extraBreadcrumbItems.unshift(
       <Breadcrumb.Item key="home">

@@ -14,7 +14,7 @@ const RadioGroup = Radio.Group;
 const CenterPanel = (props) => {
   const {rowItems, onFormTitleClick,
     onRowItemClick, onRowItemIconCopy, onRowItemIconDelete, onRowItemDrag,
-    onFormSubmit, onFormLayoutChange, formLayout, formTitle} = props;
+    onFormSubmit, onFormLayoutChange, formLayout, formTitle, self} = props;
   const rowItemClick = (name)=>{
     onRowItemClick(name)
   }
@@ -68,7 +68,7 @@ const CenterPanel = (props) => {
   return (
     <div className={styles.centerPanel}>
       <Card title={title} extra={toggleFormLayoutButtons}>
-        <OopForm {...param} />
+        <OopForm {...param} ref={(el)=>{ self.oopForm = el }} />
         <div style={{textAlign: 'center', display: 'none'}}>
           {rowItems.length ? (<Button type="primary" onClick={onFormSubmit}>保存为自定义组件</Button>) : null}
         </div>
@@ -370,8 +370,19 @@ export default class OopFormDesigner extends React.PureComponent {
     }
     this.forceUpdate()
   }
-  getFormInfo = ()=>{
+  getFormConfig = ()=>{
     const {rowItems, formLayout, formTitle} = this.state;
+    console.log('getFormConfig', this)
+    const form = this.oopForm.getForm();
+    const fieldsValue = form.getFieldsValue();
+    // 设置默认值
+    rowItems.forEach((item)=>{
+      const {name} = item;
+      const value = fieldsValue[name];
+      if (value) {
+        item.initialValue = value
+      }
+    })
     return {
       formJson: rowItems,
       formTitle,
@@ -429,6 +440,7 @@ export default class OopFormDesigner extends React.PureComponent {
             formTitle={this.state.formTitle}
             formLayout={this.state.formLayout}
             onFormTitleClick={this.onFormTitleClick}
+            self={this}
           /></Col>
           <Col span={6} ><EditPanel
             currentRowItem={this.state.currentRowItem}

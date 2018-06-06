@@ -37,7 +37,7 @@ export default class PageDesigner extends PureComponent {
     }
   }
   handleFormDesignerModalSubmit = ()=>{
-    const formDetails = this.oopFormDesigner.getFormInfo();
+    const formDetails = this.oopFormDesigner.getFormConfig();
     if (formDetails.formJson.length === 0) {
       message.warn('表单不能为空');
       return
@@ -61,12 +61,17 @@ export default class PageDesigner extends PureComponent {
         return
       }
       formDetails.formJson.forEach((item)=>{
-        const json = item
-        delete json.active
+        delete item.active
       })
       const gridConfig = {
         columns: formDetails.formJson.map(item=>({title: item.label, dataIndex: item.name}))
       }
+      // 添加默认的ID
+      formDetails.formJson.unshift({
+        name: 'id',
+        component: {name: 'Input', attrs: [{type: 'hidden'}]},
+        wrapper: true
+      })
       const config = {
         ...fieldsValue,
         formConfig: formDetails,
@@ -117,7 +122,7 @@ export default class PageDesigner extends PureComponent {
     return (
       <PageHeaderLayout content={<Alert closable message="页面设计器用于生成#代码生成器#所需要的'config.js'配置文件" type="info" showIcon />}>
         <Card bordered={false}>
-          <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
+          <Form hideRequiredMark style={{ marginTop: 8 }}>
             <FormItem {...formItemLayout} label="前端页面的路由">
               {getFieldDecorator('route', {
                 rules: [

@@ -30,7 +30,7 @@ const ModalForm = Form.create()((props) => {
   return (
     <Modal title={title} visible={visible} footer={footer} onCancel={cancelForm}>
       <Spin spinning={loading}>
-        <OopForm {...formConfig} ref={(el)=>{ this.oopForm = el }} />
+        <OopForm {...formConfig} ref={(el)=>{ this.oopForm = el }} defaultValue={formEntity} />
       </Spin>
     </Modal>
   )
@@ -182,7 +182,7 @@ export default class Manager extends React.PureComponent {
         </Card>
         <ModalForm
           visible={this.state.modalFormVisible}
-          title={entity.id ? '编辑问卷' : '新建问卷'}
+          title={entity.id ? '编辑' : '新建'}
           onModalCancel={this.handleModalCancel}
           onModalSubmit={this.handleModalSubmit}
           formEntity={entity}

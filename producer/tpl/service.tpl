@@ -10,7 +10,7 @@ export async function fetch(param) {
   // return request(\`/${routeName}/?\$\{stringify(param)\}\`);
 }
 export async function fetchById(param) {
-  return questionManagerService.fetchById(param)
+  return ${modelName}Service.fetchById(param)
   // return request(\`/${routeName}/\$\{param\}\`);
 }
 export async function saveOrUpdate(param) {
