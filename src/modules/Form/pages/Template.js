@@ -4,6 +4,7 @@ import {connect} from 'dva';
 import OopFormDesigner from '../../../components/OopFormDesigner';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopTable from '../../../components/OopTable';
+import OopUpload from '../../../components/OopUpload';
 import {inject} from '../../../common/inject';
 import { oopToast } from './../../../common/oopUtils';
 
@@ -231,6 +232,9 @@ export default class Template extends React.PureComponent {
       }
     })
   }
+  handleUploadChange = (info)=>{
+    console.log(info, 123)
+  }
   render() {
     const {formTemplate: {grid, entity}, loading, global: { size } } = this.props;
     const columns = [
@@ -274,6 +278,10 @@ export default class Template extends React.PureComponent {
         onClick: (record)=>{ this.handleRemove(record) }
       },
     ];
+    const fileList = [{
+      id: '2b55fb1f-7256-4972-b67a-b84eaffac51d',
+      name: 'xxx.png'
+    }]
     return (
       <PageHeaderLayout>
         <Card bordered={false}>
@@ -288,6 +296,11 @@ export default class Template extends React.PureComponent {
             size={size}
           />
         </Card>
+        <OopUpload
+          modelName="asdfsdf"
+          defaultFileList={fileList}
+          onChange={this.handleUploadChange}
+          listType="picture-card" />
         <ModalFormBasic
           visible={this.state.formBasicModalVisible}
           title="表单模板"
