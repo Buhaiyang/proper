@@ -83,8 +83,8 @@ const ModalForm = Form.create()((props) => {
             })(<InputNumber style={{ paddingLeft: 10}} min={0} max={999} />)}
           </FormItem>
           <FormItem {...formItemLayout} label="是否默认">
-            {form.getFieldDecorator('isDefault', {
-              initialValue: formEntity.isDefault == null ? true : formEntity.isDefault,
+            {form.getFieldDecorator('deft', {
+              initialValue: formEntity.deft != null ? formEntity.deft : true,
             })(<RadioGroup>
                 <Radio value={true}>是</Radio>
                 <Radio value={false}>否</Radio>
@@ -148,7 +148,7 @@ export default class Dictionary extends React.PureComponent {
   handleRemove = (record) => {
     record.dataDicType === 'SYSTEM' ? message.warning('系统字典不可以删除') : this.deleteById(record)
   }
-  handleModalCancel = (form)=>{
+  handleModalCancel = (form) => {
     this.setModalFormVisible(false);
     setTimeout(()=>{
       form.resetFields();
@@ -157,14 +157,14 @@ export default class Dictionary extends React.PureComponent {
       });
     }, 300)
   }
-  handleModalSubmit = (values) => {
+  handleModalSubmit = (values, form) => {
     this.props.dispatch({
       type: 'systemDictionary/saveOrUpdate',
       payload: values,
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
+        this.handleModalCancel(form);
         this.onLoad();
-        this.setModalFormVisible(false);
       }
     });
   }
@@ -180,7 +180,7 @@ export default class Dictionary extends React.PureComponent {
       { title: '字典编码', dataIndex: 'code' },
       { title: '字典值', dataIndex: 'name' },
       { title: '排序', dataIndex: 'order' },
-      { title: '是否默认', dataIndex: 'isDefault', render: text => (
+      { title: '是否默认', dataIndex: 'deft', render: text => (
         <Fragment>
           {text === true ? '是' : '否'}
         </Fragment>

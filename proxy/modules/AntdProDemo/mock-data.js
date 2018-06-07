@@ -118,7 +118,7 @@ const systemDic = {
       "code": "1",
       "name": "女",
       "order": 1,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -127,7 +127,7 @@ const systemDic = {
       "code": "1",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     },
     {
@@ -136,7 +136,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 0,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -145,7 +145,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     },
     {
@@ -154,7 +154,7 @@ const systemDic = {
       "code": "1",
       "name": "名称",
       "order": 0,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -163,7 +163,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     },
     {
@@ -172,7 +172,7 @@ const systemDic = {
       "code": "1",
       "name": "名称",
       "order": 0,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -181,7 +181,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     },
     {
@@ -190,7 +190,7 @@ const systemDic = {
       "code": "1",
       "name": "名称",
       "order": 0,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -199,7 +199,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     },
     {
@@ -208,7 +208,7 @@ const systemDic = {
       "code": "1",
       "name": "名称",
       "order": 0,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "SYSTEM"
     },
     {
@@ -217,7 +217,7 @@ const systemDic = {
       "code": "1ss",
       "name": "名称",
       "order": 2,
-      "isDefault": true,
+      "deft": true,
       "dataDicType": "BUSINESS"
     }
   ]

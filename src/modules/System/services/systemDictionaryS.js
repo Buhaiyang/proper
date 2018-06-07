@@ -1,7 +1,7 @@
 import request from '../../../utils/request';
 
 export async function fetchById(param) {
-  return request(`/sys/datadic/id/${param}`);
+  return request(`/sys/datadic/${param}`);
 }
 export async function saveOrUpdate(param) {
   return param.id ? request(`/sys/datadic/${param.id}`, {

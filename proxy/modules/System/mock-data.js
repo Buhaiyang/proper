@@ -12,20 +12,20 @@ module.exports = {
     res.status(200).send('编辑成功')
   },
   "POST:/sys/datadic": (req, res) => {
-    res.status(200).send('创建成功')
+    res.status(201).send('创建成功')
   },
   "DELETE:/sys/datadic": (req, res) => {
     // res.setHeader('X-PEP-ERR-TYPE', 'PEP_BIZ_ERR');
     // res.status(500).send('失败');
-    res.status(200).send('创建成功')
+    res.status(202).send('');
   },
-  "GET:/sys/datadic/id/:id": {
+  "GET:/sys/datadic/:id": {
     "id": "23",
     "catalog": "sex",
     "code": "1",
     "name": "男",
     "order": 1,
-    "isDefault": true,
+    "deft": true,
     "dataDicType": "BUSINESS"
   },
   "GET:/sys/datadic/":{
@@ -37,7 +37,7 @@ module.exports = {
         "code": "1",
         "name": "女",
         "order": 1,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -46,7 +46,7 @@ module.exports = {
         "code": "1",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       },
       {
@@ -55,7 +55,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 0,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -64,7 +64,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       },
       {
@@ -73,7 +73,7 @@ module.exports = {
         "code": "1",
         "name": "名称",
         "order": 0,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -82,7 +82,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       },
       {
@@ -91,7 +91,7 @@ module.exports = {
         "code": "1",
         "name": "名称",
         "order": 0,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -100,7 +100,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       },
       {
@@ -109,7 +109,7 @@ module.exports = {
         "code": "1",
         "name": "名称",
         "order": 0,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -118,7 +118,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       },
       {
@@ -127,7 +127,7 @@ module.exports = {
         "code": "1",
         "name": "名称",
         "order": 0,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "SYSTEM"
       },
       {
@@ -136,7 +136,7 @@ module.exports = {
         "code": "1ss",
         "name": "名称",
         "order": 2,
-        "isDefault": true,
+        "deft": true,
         "dataDicType": "BUSINESS"
       }
     ]
