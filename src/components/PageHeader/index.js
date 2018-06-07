@@ -4,6 +4,7 @@ import pathToRegexp from 'path-to-regexp';
 import { Breadcrumb, Tabs } from 'antd';
 import classNames from 'classnames';
 import styles from './index.less';
+import { getMenuData } from '../../common/frameHelper';
 
 
 const { TabPane } = Tabs;
@@ -74,10 +75,24 @@ export default class PageHeader extends PureComponent {
         </Breadcrumb.Item>
       ) : null;
     });
-    // TODO 添加parent path
+    // Add crumbs from the first order menu
+    const _menudata = getMenuData();
+    const path = routerLocation.pathname.substr(1, routerLocation.pathname.length);
+    const menu = _menudata.find((item) => {
+      if (item.route === path) {
+        return item;
+      }
+      return null;
+    })
+    const menuParent = _menudata.find((item) => {
+      if (item.id === menu.parentId) {
+        return item
+      }
+      return null;
+    })
     extraBreadcrumbItems.unshift(
-      <Breadcrumb.Item key="home">
-        {createElement('span', {to: '/' }, 'parent')}
+      <Breadcrumb.Item key="parent">
+        {createElement('span', {to: '/' }, menuParent.name)}
       </Breadcrumb.Item>
     );
     // Add home breadcrumbs to your head

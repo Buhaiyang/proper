@@ -1,6 +1,6 @@
 import { query as queryUsers, queryCurrent, queryCurrentMenus } from '../services/baseS';
 import { getRouterDataFromMenuData, formatter, controlMenu } from '../../../utils/utils';
-import { dynamicWrapper, addRoutersData } from '../../../common/frameHelper';
+import { dynamicWrapper, addRoutersData, addMenuData } from '../../../common/frameHelper';
 
 export default {
   namespace: 'baseUser',
@@ -28,6 +28,7 @@ export default {
     *fetchMenus({ callback }, { call, put }) {
       const response = yield call(queryCurrentMenus);
       const menus = formatter(controlMenu(response.result));
+      addMenuData(response.result);
       yield put({
         type: 'saveMenus',
         payload: menus

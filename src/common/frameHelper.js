@@ -28,6 +28,8 @@ export const dynamicWrapper = (component) => {
     },
   });
 };
+
+let _menuData = [];
 let _routerData = {
   '/customframe': {
     component: dynamicWrapper(()=>import('../layouts/CustomFrameLayout'))
@@ -55,6 +57,7 @@ let _routerData = {
   },
 };
 export const getRouterData = ()=> _routerData;
+export const getMenuData = ()=> _menuData;
 
 
 export const addRoutersData = (routerData)=> {
@@ -63,4 +66,9 @@ export const addRoutersData = (routerData)=> {
     return _routerData
   }
 }
-
+export const addMenuData = (menuData)=> {
+  if (menuData) {
+    _menuData = Object.assign(_menuData, menuData)
+    return _menuData
+  }
+}
