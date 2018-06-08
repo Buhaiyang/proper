@@ -69,7 +69,7 @@ export default class PageDesigner extends PureComponent {
       // 添加默认的ID
       formDetails.formJson.unshift({
         name: 'id',
-        component: {name: 'Input', attrs: [{type: 'hidden'}]},
+        component: {name: 'Input', props: {type: 'hidden'}},
         wrapper: true
       })
       const config = {

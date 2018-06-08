@@ -38,12 +38,6 @@ const CenterPanel = (props) => {
   const param = {formJson: rowItems, dragable: true, formLayout,
     rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag
   }
-  const editCss = {
-    color: '#1DA57A',
-    fontSize: '14px',
-    marginLeft: '8px',
-    display: (typeof formTitle === 'object') ? 'none' : 'inline-block'
-  }
   const titleCss = {
     maxWidth: '380px',
     overflow: 'hidden',
@@ -63,7 +57,7 @@ const CenterPanel = (props) => {
         <Tooltip placement="topLeft" title={formTitle}>
           <span style={titleCss}>{formTitle}</span>
         </Tooltip>)}
-      <a onClick={titleClick} style={editCss}>编辑</a>
+      {(typeof formTitle === 'object') ? null : (<a onClick={titleClick} className="form-title">编辑</a>)}
     </div>);
   return (
     <div className={styles.centerPanel}>
@@ -98,114 +92,151 @@ const EditPanel = (props) => {
     onRowItemDrag(i, j, item)
   }
   const createFormByFormItemData = (item)=>{
-    if (item) {
-      // console.log(item)
-      const { name, label, initialValue, component} = item;
-      const cName = component.name;
-      const { children, attrs } = component;
-      const onChange = (e)=>{
-        const element = e.currentTarget;
-        updateCenterPanel(element.id, element.value);
-      }
-      const plusClick = ()=>{
-        onPlusClick(name)
-      }
-      if (cName) {
-        const prefix = '_edit'
-        // 输入框 文本域 数字输入框
-        if ('Input,TextArea,InputNumber'.includes(cName)) {
-          const editFormJson = [{
-            name: `${name}${prefix}_label`,
-            label: '标题',
-            component: {
-              name: 'Input',
-              attrs: [{placeholder: label, onChange}]
-            },
-            initialValue: initialValue || label
+    if (!item) {
+      return
+    }
+    // console.log(item)
+    const { name, label, initialValue, component} = item;
+    const cName = component.name;
+    if (!cName) {
+      return
+    }
+    const { children } = component;
+    const onChange = (e)=>{
+      const element = e.currentTarget;
+      updateCenterPanel(element.id, element.value);
+    }
+    const plusClick = ()=>{
+      onPlusClick(name)
+    }
+    const prefix = '_edit';
+    let formConfig = {
+      formJson: []
+    }
+    // 输入框 文本域 数字输入框
+    if ('Input,TextArea,InputNumber'.includes(cName)) {
+      formConfig.formJson = [{
+        name: `${name}${prefix}_label`,
+        label: '标题',
+        component: {
+          name: 'Input',
+          props: {placeholder: label, onChange}
+        },
+        initialValue: initialValue || label
+      }, {
+        name: `${name}${prefix}_props_placeholder`,
+        label: '占位符',
+        component: {
+          name: 'Input',
+          props: {placeholder: '该输入些什么', onChange}
+        },
+      },
+      {
+        name: `${name}${prefix}_name`,
+        label: 'name',
+        component: {
+          name: 'Input',
+          props: {placeholder: name, onChange}
+        },
+        initialValue: name
+      }];
+      formConfig = {...formConfig, formLayout: 'vertical'}
+    } else if ('RadioGroup,CheckboxGroup,Select'.includes(cName)) {
+      formConfig.formJson = [{
+        name: `${name}${prefix}_label`,
+        label: '标题',
+        component: {
+          name: 'Input',
+          props: {placeholder: label, onChange}
+        },
+        initialValue: initialValue || label
+      },
+      {
+        name: `${name}${prefix}_children`,
+        label: '选项',
+        component: children.length === 0 ? {
+          name: 'Button',
+          props: {icon: 'plus', onClick: plusClick}
+        } : {
+          name: 'Input',
+          props: {type: 'hidden'}
+        },
+        initialValue: ''
+      }];
+      const childrenArr = children.map((cld, i)=>(
+        {
+          name: `${name}${prefix}_${i}_children`,
+          label: '',
+          component: {
+            name: 'Input',
+            props: {onChange}
           },
-          {
-            name: `${name}${prefix}_name`,
-            label: 'name',
-            component: {
-              name: 'Input',
-              attrs: [{placeholder: name, onChange}]
-            },
-            initialValue: name
-          }];
-          const param = {formJson: editFormJson, formLayout: 'vertical'}
-          return (<OopForm {...param} />);
-        } else if ('RadioGroup,CheckboxGroup,Select'.includes(cName)) {
-          let editFormJson = [{
-            name: `${name}${prefix}_label`,
-            label: '标题',
-            component: {
-              name: 'Input',
-              attrs: [{placeholder: label, onChange}]
-            },
-            initialValue: initialValue || label
-          },
-          {
-            name: `${name}${prefix}_children`,
-            label: '选项',
-            component: children.length === 0 ? {
-              name: 'Button',
-              attrs: [{icon: 'plus'}, {onClick: plusClick}]
-            } : {
-              name: 'Input',
-              attrs: [{type: 'hidden'}]
-            },
-            initialValue: ''
-          }];
-          const arr = children.map((cld, i)=>(
-            {
-              name: `${name}${prefix}_${i}_children`,
-              label: '',
-              component: {
-                name: 'Input',
-                attrs: [{onChange}]
-              },
-              initialValue: cld.label,
-              dragable: true,
-              active: true
-            }
-          ))
-          arr.push({
-            name: `${name}${prefix}_name`,
-            label: 'name',
-            component: {
-              name: 'Input',
-              attrs: [{placeholder: name}]
-            },
-            initialValue: name
-          })
-          editFormJson = [...editFormJson, ...arr];
-          // radio checkbox 增加布局判断
-          if ('RadioGroup,CheckboxGroup'.includes(cName)) {
-            const layoutChange = (event)=>{
-              updateCenterPanel(event.target.name, event.target.value)
-            }
-            let layout = 'horizontal';
-            if (attrs && attrs.filter(attr=>attr.className === 'vertical').length) {
-              layout = 'vertical'
-            }
-            const toggleFormLayoutButtons = (
-              <RadioGroup onChange={layoutChange} size="small" name={`${name}${prefix}_layout`} >
-                <RadioButton value="horizontal">横向布局</RadioButton>
-                <RadioButton value="vertical">纵向布局</RadioButton>
-              </RadioGroup>)
-            editFormJson.push({
-              name: `${name}${prefix}_layout`,
-              label: '布局',
-              component: toggleFormLayoutButtons,
-              initialValue: layout
-            })
-          }
-          const param = {formJson: editFormJson, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete,
-            rowItemDrag}
-          return (<OopForm {...param} />);
+          initialValue: cld.label,
+          dragable: true,
+          active: true
         }
+      ))
+      childrenArr.push({
+        name: `${name}${prefix}_name`,
+        label: 'name',
+        component: {
+          name: 'Input',
+          props: {placeholder: name}
+        },
+        initialValue: name
+      })
+      formConfig.formJson = formConfig.formJson.concat(childrenArr)
+      // radio checkbox 增加布局判断
+      if ('RadioGroup,CheckboxGroup'.includes(cName)) {
+        const layoutChange = (event)=>{
+          updateCenterPanel(event.target.name, event.target.value)
+        }
+        let layout = 'horizontal';
+        if (component.props && component.props.className === 'vertical') {
+          layout = 'vertical'
+        }
+        const componentName = `${name}${prefix}_props_className`
+        const toggleFormLayoutButtons = (
+          <RadioGroup onChange={layoutChange} size="small" name={componentName} >
+            <RadioButton value="horizontal">横向布局</RadioButton>
+            <RadioButton value="vertical">纵向布局</RadioButton>
+          </RadioGroup>)
+        formConfig.formJson.push({
+          name: componentName,
+          label: '布局',
+          component: toggleFormLayoutButtons,
+          initialValue: layout
+        })
+      }
+      formConfig = {...formConfig, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete, rowItemDrag}
+    }
+    const ruleChange = (event)=>{
+      const {value} = event.target;
+      if (value === '1') {
+        const rule = {required: true, message: '此项为必填项'};
+        updateCenterPanel(event.target.name, rule);
+      } else if (value === '0') {
+        const rule = {required: false};
+        updateCenterPanel(event.target.name, rule);
+      } else if (value === '2') {
+        // TODO show modal custom
       }
     }
+    const requieRulesRadio = (
+      <RadioGroup onChange={ruleChange} size="small" name={`${name}${prefix}_rules`} >
+        <Radio value="1">必填</Radio>
+        <Radio value="0">不必填</Radio>
+        <Radio value="2">自定义</Radio>
+      </RadioGroup>);
+    // 增加规则判断
+    const rulesArr = [{
+      name: `${name}${prefix}_rules`,
+      label: '规则',
+      component: requieRulesRadio,
+      initialValue: '0'
+    }]
+    formConfig.formJson = formConfig.formJson.concat(rulesArr)
+    return (<OopForm {...formConfig} />);
   }
   return (
     <div className={styles.editPanel}>
@@ -358,13 +389,29 @@ export default class OopFormDesigner extends React.PureComponent {
     console.log(id, value);
     const idAttr = id.split('_');
     const attr = idAttr.pop();
+    // 组件内部props的同步
+    if (idAttr.pop() === 'props') {
+      const { component } = this.state.currentRowItem;
+      component.props = {
+        ...component.props,
+        [attr]: value
+      };
+      this.forceUpdate();
+      return
+    }
+    // children 或者 组件外部属性的同步
     if (attr === 'children') {
       const {children} = this.state.currentRowItem.component;
       const i = idAttr.pop();
       children[i].label = value;
-    } else if (attr === 'layout') {
-      const { component } = this.state.currentRowItem;
-      component.attrs = [{className: value}];
+    } else if (attr === 'rules') {
+      const {rules = []} = this.state.currentRowItem;
+      if (rules.length) {
+        rules[0].required = value.required;
+      } else {
+        rules.push(value)
+      }
+      this.state.currentRowItem.rules = rules;
     } else {
       this.state.currentRowItem[attr] = value;
     }

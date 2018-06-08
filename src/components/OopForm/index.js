@@ -27,10 +27,10 @@ export default class OopForm extends React.PureComponent {
       // 如果是只读的组件
       if (disabled) {
         if (!component.$$typeof) {
-          if (!component.attrs) {
-            component.attrs = [];
+          if (!component.props) {
+            component.props = {};
           }
-          component.attrs.push({disabled: true});
+          component.props.disabled = true;
         }
       }
     });

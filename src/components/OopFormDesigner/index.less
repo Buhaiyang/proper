@@ -1,3 +1,5 @@
+@import "~antd/lib/style/themes/default.less";
+
 .container {
   position: relative;
   .addPanel ul {
@@ -20,7 +22,7 @@
     max-width: 700px;
     :global {
       .ant-form-item:hover {
-        background: #d8e6df;
+        background: @item-hover-bg;
       }
       .ant-form-item-action {
         position: absolute;
@@ -29,6 +31,7 @@
       }
       .ant-form-item-action i.anticon {
         font-size: 24px;
+        color: @primary-color;
       }
       .ant-form-item-action i.anticon:hover {
         cursor: pointer;
@@ -41,7 +44,7 @@
         position: relative;
       }
       .active {
-        background: #d8e6df;
+        background: @item-hover-bg;
       }
       .active:hover {
         cursor: move;
@@ -60,6 +63,12 @@
       }
       .ant-card-head-title button {
         margin-left: 8px;
+      }
+      .form-title {
+        font-size: 14px;
+        margin-left: 8px;
+        display: inline-block;
+        color: @primary-color;
       }
     }
   }
@@ -81,6 +90,7 @@
       }
       .ant-form-item-action i.anticon {
         font-size: 16px;
+        color: @primary-color;
       }
       .ant-form-item-action i.anticon:hover {
         cursor: pointer;

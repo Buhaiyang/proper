@@ -49,9 +49,7 @@ const createComponent = (component)=>{
   if (typeof component === 'object') {
     if (component.name) {
       // object desc
-      const {name, attrs = [], children = [] } = component;
-      let props = {};
-      attrs.map((attr)=>{ props = {...props, ...attr}; return props })
+      const {name, props = {}, children = [] } = component;
       if (name) {
         return getComponent(name, props, children)
       }
@@ -81,15 +79,15 @@ const getFormItem = (formItemInner, formItemConfig)=>{
       </FormItem>{active ? (
       <div className="ant-form-item-action">
         <Tooltip title="复制">
-          <Icon type="copy" style={{color: '#1DA57A'}} onClick={(event)=>{ rowItemIconCopy(event, name) }} />
+          <Icon type="copy" onClick={(event)=>{ rowItemIconCopy(event, name) }} />
         </Tooltip>
         <Tooltip title="删除">
-          <Icon type="delete" style={{color: '#1DA57A'}} onClick={(event)=>{ rowItemIconDelete(event, name) }} />
+          <Icon type="delete" onClick={(event)=>{ rowItemIconDelete(event, name) }} />
         </Tooltip>
         <Tooltip title="拖拽">
           <Icon
             type="pause-circle-o"
-            style={{color: '#1DA57A', cursor: 'move', transform: 'rotate(90deg)', display: 'none'}} />
+            style={{cursor: 'move', transform: 'rotate(90deg)', display: 'none'}} />
         </Tooltip>
       </div>) : null}</div>);
 }

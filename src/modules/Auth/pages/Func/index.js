@@ -574,7 +574,8 @@ export default class Func extends PureComponent {
             treeKey: 'id',
             treeRoot: {
               key: '-1',
-              title: '菜单'
+              title: '菜单',
+              icon: 'laptop'
             },
           }}
           size={size}
