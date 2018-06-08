@@ -6,7 +6,9 @@ import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../common/inject';
 import { oopToast } from './../../../common/oopUtils';
+import DescriptionList from './../../../components/DescriptionList/index';
 
+const { Description } = DescriptionList;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const formItemLayout = {
@@ -49,27 +51,27 @@ const ModalForm = Form.create()((props) => {
               initialValue: formEntity.id
             })(<Input type="hidden" />)}
           </div>
-          <FormItem {...formItemLayout} label="字典编码">
-            {form.getFieldDecorator('code', {
-              initialValue: formEntity.code,
-              rules: [
-                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '字典编码不能为空，且非汉字即可', },
-              ]
-            })(<Input placeholder="请输入字典编码" />)}
-          </FormItem>
           <FormItem {...formItemLayout} label="字典项">
             {form.getFieldDecorator('catalog', {
               initialValue: formEntity.catalog,
               rules: [
-                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '字典项不能为空，且非汉字即可', }
+                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '字典项不能为空，且为非汉字', }
               ]
             })(<Input placeholder="请输入字典项内容" />)}
+          </FormItem>
+          <FormItem {...formItemLayout} label="字典编码">
+            {form.getFieldDecorator('code', {
+              initialValue: formEntity.code,
+              rules: [
+                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '字典编码不能为空，且为非汉字', },
+              ]
+            })(<Input placeholder="请输入字典编码" />)}
           </FormItem>
           <FormItem {...formItemLayout} label="字典值">
             {form.getFieldDecorator('name', {
               initialValue: formEntity.name,
               rules: [
-                { required: true, whitespace: true, message: '字典值不能为空，且不可以有空格间隔' }
+                { required: true, whitespace: true, pattern: /^[^ ]+$/, message: '字典值不能为空，且不可以有空格' }
               ]
             })(<Input placeholder="请输入字典值" />)}
           </FormItem>
@@ -78,7 +80,7 @@ const ModalForm = Form.create()((props) => {
               initialValue: formEntity.order,
               rules: [
                 { required: true, message: '排序不可以为空' },
-                { whitespace: true, message: '排序只可以为 0 ~ 999 范围的数字', pattern: /^(0|([1-9]\d{0,2}))$/ }
+                { whitespace: true, message: '排序只可以为 1 ~ 999 范围的数字', pattern: /^([1-9]\d{0,2})$/ }
               ]
             })(<InputNumber style={{ paddingLeft: 10}} min={0} max={999} />)}
           </FormItem>
@@ -88,14 +90,6 @@ const ModalForm = Form.create()((props) => {
             })(<RadioGroup>
                 <Radio value={true}>是</Radio>
                 <Radio value={false}>否</Radio>
-            </RadioGroup>)}
-          </FormItem>
-          <FormItem {...formItemLayout} label="系统字典">
-            {form.getFieldDecorator('dataDicType', {
-              initialValue: formEntity.dataDicType !== undefined ? formEntity.dataDicType : 'SYSTEM',
-            })(<RadioGroup>
-                <Radio value="SYSTEM">是</Radio>
-                <Radio value="BUSINESS">否</Radio>
             </RadioGroup>)}
           </FormItem>
         </Form>
@@ -113,7 +107,9 @@ const ModalForm = Form.create()((props) => {
 }))
 export default class Dictionary extends React.PureComponent {
   state = {
-    modalFormVisible: false
+    modalFormVisible: false,
+    visible: false,
+    info: {}
   }
   componentDidMount() {
     this.onLoad();
@@ -158,6 +154,7 @@ export default class Dictionary extends React.PureComponent {
     }, 300)
   }
   handleModalSubmit = (values, form) => {
+    Object.assign(values, { dataDicType: 'BUSINESS' });
     this.props.dispatch({
       type: 'systemDictionary/saveOrUpdate',
       payload: values,
@@ -168,15 +165,33 @@ export default class Dictionary extends React.PureComponent {
       }
     });
   }
+  handleView = (record) => {
+    this.setState({
+      visible: true,
+      info: record
+    });
+  }
+  handleClose = () => {
+    this.setState({
+      visible: false,
+      info: {}
+    });
+  }
   setModalFormVisible = (flag) =>{
     this.setState({modalFormVisible: flag})
   }
   render() {
     const {systemDictionary: {entity}, loading,
       global: { oopSearchGrid, size }, gridLoading } = this.props;
-    const { newForm, editFrom } = { newForm: '新建配置', editFrom: '编辑配置' }
+    const { visible, info } = this.state;
+    const { newForm, editFrom } = { newForm: '新建数据字典', editFrom: '编辑数据字典' }
     const columns = [
-      { title: '字典项', dataIndex: 'catalog' },
+      { title: '字典项', dataIndex: 'catalog', render: (text, record)=>(
+        <span
+          onClick={()=>this.handleView(record)}
+          style={{textDecoration: 'underline', cursor: 'pointer'}}>
+          {text}
+      </span>)},
       { title: '字典编码', dataIndex: 'code' },
       { title: '字典值', dataIndex: 'name' },
       { title: '排序', dataIndex: 'order' },
@@ -245,6 +260,33 @@ export default class Dictionary extends React.PureComponent {
           formEntity={entity}
           loading={!!loading}
         />
+        <Modal
+          visible={visible}
+          title="数据字典配置"
+          onCancel={()=>this.handleClose()}
+          footer={<Button type="primary" onClick={()=>this.handleClose()}>确定</Button>}
+        >
+          <DescriptionList size={size} col="1">
+            <Description term="字典项">
+              {info.catalog}
+            </Description>
+            <Description term="字典编码">
+              {info.code}
+            </Description>
+            <Description term="字典值">
+              {info.name}
+            </Description>
+            <Description term="排序">
+              {info.order}
+            </Description>
+            <Description term="是否默认">
+              {info.deft === true ? '是' : '否'}
+            </Description>
+            <Description term="系统字典">
+              {info.dataDicType === 'SYSTEM' ? '是' : '否'}
+            </Description>
+          </DescriptionList>
+        </Modal>
       </PageHeaderLayout>)
   }
 }
