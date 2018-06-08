@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import { Modal, Card, Form, Spin, Input, Button, Radio, InputNumber, message} from 'antd';
+import { Modal, Card, Form, Spin, Input, Button, Radio, InputNumber } from 'antd';
 import {connect} from 'dva';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
@@ -141,9 +141,6 @@ export default class Dictionary extends React.PureComponent {
       }
     })
   }
-  handleRemove = (record) => {
-    record.dataDicType === 'SYSTEM' ? message.warning('系统字典不可以删除') : this.deleteById(record)
-  }
   handleModalCancel = (form) => {
     this.setModalFormVisible(false);
     setTimeout(()=>{
@@ -220,14 +217,16 @@ export default class Dictionary extends React.PureComponent {
         text: '编辑',
         name: 'edit',
         icon: 'edit',
-        onClick: (record)=>{ this.handleEdit(record) },
+        onClick: (record) => { this.handleEdit(record) },
+        display: record=>(record.dataDicType !== 'SYSTEM'),
       },
       {
         text: '删除',
         name: 'delete',
         icon: 'delete',
         confirm: '是否要删除此条信息',
-        onClick: (record)=>{ this.handleRemove(record) },
+        onClick: (record) => { this.deleteById(record) },
+        display: record=>(record.dataDicType !== 'SYSTEM'),
       },
     ];
     return (
