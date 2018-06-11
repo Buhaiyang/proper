@@ -80,9 +80,9 @@ const ModalForm = Form.create()((props) => {
               initialValue: formEntity.order,
               rules: [
                 { required: true, message: '排序不可以为空' },
-                { whitespace: true, message: '排序只可以为 1 ~ 999 范围的数字', pattern: /^([1-9]\d{0,2})$/ }
+                { whitespace: true, message: '排序只可以为 1 ~ 9999 范围的数字', pattern: /^([1-9]\d{0,3})$/ }
               ]
-            })(<InputNumber style={{ paddingLeft: 10}} min={0} max={999} />)}
+            })(<InputNumber style={{ paddingLeft: 10}} min={0} max={9999} />)}
           </FormItem>
           <FormItem {...formItemLayout} label="是否默认">
             {form.getFieldDecorator('deft', {
