@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Card, Form, Modal, Spin, Input, Button } from 'antd';
+import { Card, Form, Modal, Spin, Input, Button, List, Icon, Popconfirm, Tooltip, Badge } from 'antd';
 import { inject } from './../../../common/inject';
-import OopSearch from './../../../components/OopSearch/index';
-import OopTable from './../../../components/OopTable/index';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import { oopToast } from './../../../common/oopUtils';
+import styles from './Appver.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -13,7 +12,7 @@ const { TextArea } = Input;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 5 },
+    sm: { span: 6 },
   },
   wrapperCol: {
     xs: { span: 24 },
@@ -22,11 +21,16 @@ const formItemLayout = {
 };
 
 const CreateForm = Form.create()((props) => {
-  const { form, formVisible, loading, closeForm, submitForm, submitAndPublish, verInfo } = props;
+  const { form, formVisible, loading, closeForm, submitForm, submitAndPublish,
+    verInfo, handleRemove } = props;
 
   // 取消
   const handleCancel = () => {
     closeForm(form);
+  }
+
+  const handleDelte = () => {
+    handleRemove(verInfo);
   }
 
   const okHandle = () => {
@@ -45,23 +49,37 @@ const CreateForm = Form.create()((props) => {
 
   return (
     <Modal
+      width={650}
       visible={formVisible}
       onCancel={handleCancel}
       destroyOnClose={true}
       title="APP版本信息管理"
       footer={
         <div>
+          {
+            verInfo.ver ? (
+              <Popconfirm
+                title="您确定要删除吗？"
+                onConfirm={handleDelte}>
+                  <Button style={{float: 'left'}}>删除</Button>
+              </Popconfirm>
+            ) : null
+          }
           <Button onClick={handleCancel}>取消</Button>
           <Button
             type="primary"
             onClick={okHandle}>
             保存
           </Button>
-          <Button
-            type="primary"
-            onClick={okAndPublish}>
-            保存并发布
-          </Button>
+          {
+            !verInfo.ver ? (
+              <Button
+                type="primary"
+                onClick={okAndPublish}>
+                保存并发布
+              </Button>
+            ) : null
+          }
         </div>
       }
     >
@@ -90,16 +108,26 @@ const CreateForm = Form.create()((props) => {
           </FormItem>
           <FormItem
             {...formItemLayout}
-            label="下载链接"
+            label="android下载链接"
           >
-            {form.getFieldDecorator('url', {
-              initialValue: verInfo.url,
+            {form.getFieldDecorator('androidUrl', {
+              initialValue: verInfo.androidUrl,
               rules: [
                 { required: true, message: '下载链接不能为空' },
                 { pattern: /^http:\/\/|https:\/\/[A-Za-z0-9]+.[A-Za-z0-9]+[=?%\-&_~`@[\]':+!]*([^<>""])*$/, message: 'url地址格式不正确'}
               ],
             })(
-              <Input placeholder="请输入下载链接" />
+              <Input placeholder="请输入android下载链接" />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="ios下载链接"
+          >
+            {form.getFieldDecorator('iosUrl', {
+              initialValue: verInfo.iosUrl,
+            })(
+              <Input placeholder="请输入ios下载链接" />
             )}
           </FormItem>
           <FormItem
@@ -124,13 +152,13 @@ const CreateForm = Form.create()((props) => {
   devtoolsAppver,
   global,
   loading: loading.models.devtoolsAppver,
-  gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class Appver extends React.Component {
   state = {
     lastedVer: '',
     // 是否显示form表单
     formVisible: false,
+    list: []
   }
 
   componentDidMount() {
@@ -150,15 +178,16 @@ export default class Appver extends React.Component {
     })
   }
 
-  refresh = (param) => {
-    const { pagination } = this.props.global.oopSearchGrid
-    const params = {
-      ...pagination,
-      ...param,
-      isAllDataLoad: false,
-      loadIndex: 1,
-    }
-    this.oopSearch.load(params);
+  refresh = () => {
+    const self = this;
+    this.props.dispatch({
+      type: 'devtoolsAppver/fetch',
+      callback: (res)=>{
+        self.setState({
+          list: res
+        })
+      }
+    })
   }
 
   // 删除单项
@@ -174,10 +203,8 @@ export default class Appver extends React.Component {
       payload: { ver: idsArray.toString() },
       callback: (res) => {
         oopToast(res, '删除成功');
-        if (this.oopTable) {
-          this.oopTable.clearSelection();
-          this.refresh();
-        }
+        this.getLastedVer();
+        this.refresh();
       }
     });
   }
@@ -187,16 +214,12 @@ export default class Appver extends React.Component {
     this.props.dispatch({
       type: 'devtoolsAppver/publish',
       payload: {
-        ver: record.ver,
-        url: record.url,
-        note: record.note
+        ver: record.ver
       },
       callback: (res) => {
         oopToast(res, '发布成功');
-        if (this.oopTable) {
-          this.refresh();
-          this.getLastedVer();
-        }
+        this.refresh();
+        this.getLastedVer();
       }
     });
   }
@@ -244,19 +267,13 @@ export default class Appver extends React.Component {
     const self = this;
     const params = fields;
     this.props.dispatch({
-      type: 'devtoolsAppver/createOrUpdate',
+      type: 'devtoolsAppver/publish',
       payload: params,
-      callback: () => {
-        this.props.dispatch({
-          type: 'devtoolsAppver/publish',
-          payload: params,
-          callback: (res) => {
-            oopToast(res, '保存并发布成功');
-            self.refresh();
-            this.getLastedVer();
-            self.closeForm(form);
-          }
-        });
+      callback: (res) => {
+        oopToast(res, '保存并发布成功');
+        self.refresh();
+        this.getLastedVer();
+        self.closeForm(form);
       }
     });
   }
@@ -278,79 +295,94 @@ export default class Appver extends React.Component {
   }
 
   render() {
-    const { loading, gridLoading,
-      global: { size, oopSearchGrid },
+    const { loading,
+      global: { size },
       devtoolsAppver: { verInfo } } = this.props;
 
-    const { lastedVer, formVisible } = this.state;
-
-    const columns = [
-      { title: 'ID号', dataIndex: 'id', key: 'id'},
-      { title: '版本号', dataIndex: 'ver', key: 'ver', render: text => (
-        text && text === lastedVer ?
-          (<span style={{color: 'red'}}>{text}</span>) : (<span>{text}</span>)
-      )},
-      { title: '版本连接', dataIndex: 'url', key: 'url', render: text => (
-        text && text.length > 25 ?
-          (<span>{text.substr(0, 25)}...</span>) : (<span>{text}</span>)
-      )},
-      { title: '内容信息', dataIndex: 'note', key: 'note', render: text => (
-        text && text.length > 25 ?
-          (<span>{text.substr(0, 25)}...</span>) : (<span>{text}</span>)
-      )},
-    ];
-
-    const topButtons = [
-      {
-        text: '新建',
-        name: 'create',
-        type: 'primary',
-        icon: 'plus',
-        onClick: ()=>{ this.handleCreate(true) }
-      }
-    ];
-    const rowButtons = [
-      {
-        text: '编辑',
-        name: 'edit',
-        icon: 'edit',
-        onClick: (record)=>{ this.handleEdit(record) }
-      }, {
-        text: '发布',
-        name: 'publish',
-        icon: 'cloud-upload-o',
-        confirm: '是否要发布此版本',
-        onClick: (record)=>{ this.handlePublish(record) },
-        display: record=>(record.ver !== lastedVer)
-      }, {
-        text: '删除',
-        name: 'delete',
-        icon: 'delete',
-        confirm: '是否要删除此条信息',
-        onClick: (record)=>{ this.handleRemove(record) },
-        display: record=>(record.ver !== lastedVer)
-      },
-    ]
+    const { lastedVer, formVisible, list } = this.state;
 
     return (
       <PageHeaderLayout content={
-        <OopSearch
-          placeholder="请输入"
-          enterButtonText="搜索"
-          moduleName="devtoolsappver"
-          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
-        />
+        <div>
+          <Button type="primary" icon="plus" size={size} onClick={() => this.handleCreate(true)}>
+            新建
+          </Button>
+        </div>
       }>
         <Card bordered={false}>
-          <OopTable
-            grid={oopSearchGrid}
-            columns={columns}
-            loading={gridLoading}
-            onLoad={this.refresh}
-            size={size}
-            topButtons={topButtons}
-            rowButtons={rowButtons}
-            ref={(el)=>{ this.oopTable = el }}
+          <List
+            split={false}
+            dataSource={list}
+            className={styles.appverList}
+            pagination={{
+              pageSize: 5,
+            }}
+            renderItem={item => (
+              <List.Item key={item.id}>
+                <div className={styles.listContentItem}>
+                  <div className={styles.listContentItemLeft}>
+                    <div className={lastedVer === item.ver ? styles.activeDot : styles.dot} />
+                    <p className={lastedVer === item.ver ? styles.activeListP : styles.listP}>
+                      {lastedVer === item.ver ? <Badge status="processing" /> : <span />}
+                      <Icon type="tag-o" /><span>{item.ver}</span>
+                    </p>
+                    {(item.released && (item.publisher || item.publishTime)) ? (
+                      <p className={lastedVer === item.ver ? styles.activeListP : styles.listP}>
+                        {item.publisher} {item.publishTime}
+                      </p>
+                    ) : null}
+                    <p className={styles.listP}>
+                      {
+                        (item.released != null && !item.released) ? (
+                          <Popconfirm
+                            title="您确定进行此次版本发布吗？"
+                            onConfirm={() => this.handlePublish(item)}>
+                              <Tooltip placement="bottom" title="发布">
+                                <a>
+                                  <Icon type="cloud-upload-o" />
+                                </a>
+                              </Tooltip>
+                          </Popconfirm>
+                        ) : null
+                      }
+                      <Tooltip placement="bottom" title="编辑">
+                        <a style={{margin: '0 10px'}}>
+                          <Icon onClick={() => this.handleEdit(item)} type="edit" />
+                        </a>
+                      </Tooltip>
+                      <Popconfirm
+                        title="您确定要删除吗？"
+                        onConfirm={() => this.handleRemove(item)}>
+                          <Tooltip placement="bottom" title="删除">
+                            <a>
+                              <Icon type="delete" />
+                            </a>
+                          </Tooltip>
+                      </Popconfirm>
+                    </p>
+                  </div>
+                  <div className={styles.listContentItemRight}>
+                    <p className={styles.listPTitle}>
+                      v{item.ver}
+                    </p>
+                    <div className={styles.listDiv}>
+                      <div className={styles.listDivLeft}><Icon type="apple-o" />下载链接</div>
+                      <div className={styles.wordBreak}>{item.iosUrl}</div>
+                    </div>
+                    <div className={styles.listDiv}>
+                      <div className={styles.listDivLeft}><Icon type="android-o" />下载链接</div>
+                      <div className={styles.wordBreak}>{item.androidUrl}</div>
+                    </div>
+                    <div className={styles.listDiv} style={{marginBottom: '32px'}}>
+                      <div className={styles.listDivLeft}>更新内容</div>
+                      <div
+                        className={styles.wordBreak}
+                        dangerouslySetInnerHTML={{ __html: item.note }} />
+                    </div>
+                  </div>
+                </div>
+              </List.Item>
+            )}
           />
         </Card>
         <CreateForm
@@ -359,6 +391,7 @@ export default class Appver extends React.Component {
           closeForm={this.closeForm}
           submitForm={this.submitForm}
           submitAndPublish={this.submitAndPublish}
+          handleRemove={this.handleRemove}
           verInfo={verInfo}
         />
       </PageHeaderLayout>

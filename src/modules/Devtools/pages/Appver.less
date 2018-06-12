@@ -1,0 +1,92 @@
+@import '~antd/lib/style/themes/default.less';
+
+.appverList {
+  :global {
+    .ant-list-item {
+      padding: 0;
+    }
+  }
+
+  .listContentItem {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .listContentItemLeft {
+      width: 250px;
+      border-right: 1px solid #e5e5e5;
+      text-align: right;
+      padding-right: 24px;
+      position: relative;
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        background: #fff;
+        border-radius: 50%;
+        border: 1px solid;
+        border-color: #e5e5e5;
+        position: absolute;
+        right: -6px;
+        top: 9px;
+      }
+
+      .activeDot {
+        width: 11px;
+        height: 11px;
+        background: #fff;
+        border-radius: 50%;
+        border: 1px solid;
+        border-color: @primary-color;
+        position: absolute;
+        right: -6px;
+        top: 9px;
+      }
+    }
+
+    .listContentItemRight {
+      width: 500px;
+      padding-left: 24px;
+
+      .listDiv {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 16px;
+
+        .listDivLeft {
+          width: 90px;
+          text-align: right;
+          padding-right: 12px;
+        }
+
+        .listDivRight {
+          width: 386px;
+        }
+      }
+    }
+
+    .listP {
+      height: 30px;
+      line-height: 30px;
+    }
+
+    .activeListP {
+      height: 30px;
+      line-height: 30px;
+      color: @primary-color;
+    }
+
+    .listPTitle {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .wordBreak {
+      width: 396px;
+      word-wrap: break-word;
+      word-break: break-all;
+      white-space: normal;
+    }
+  }
+}

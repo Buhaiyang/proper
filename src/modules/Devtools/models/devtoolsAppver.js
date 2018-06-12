@@ -1,11 +1,20 @@
-import { getLastedVer, removeItem, queryVerInfo, publishVer, createOrUpdate } from '../services/devtoolsAppverS';
+import { getList, getLastedVer, removeItem, queryVerInfo, publishVer, createOrUpdate } from '../services/devtoolsAppverS';
 
 export default {
   namespace: 'devtoolsAppver',
   state: {
-    verInfo: {}
+    verInfo: {},
+    list: []
   },
   effects: {
+    *fetch({ payload, callback }, { call, put }) {
+      const response = yield call(getList, payload);
+      yield put({
+        type: 'saveList',
+        payload: response.result,
+      });
+      if (callback) callback(response ? response.result : []);
+    },
     // 取得最新使用的版本信息
     *getLastedVer({ payload, callback }, { call }) {
       const response = yield call(getLastedVer, payload);
@@ -41,6 +50,12 @@ export default {
     },
   },
   reducers: {
+    saveList(state, action) {
+      return {
+        ...state,
+        list: action.payload
+      };
+    },
     saveVerInfo(state, action) {
       return {
         ...state,

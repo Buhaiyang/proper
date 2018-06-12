@@ -1,8 +1,13 @@
+import { stringify } from 'qs';
 import request from '../../../utils/request';
+
+export async function getList(params) {
+  return request(`/admin/app/versions?${stringify(params)}`);
+}
 
 // 新建或编辑
 export async function createOrUpdate(params) {
-  return (params.id && params.ver) ? request(`/admin/app/versions/${params.ver}`, {
+  return (params.id && params.ver) ? request('/admin/app/versions', {
     method: 'PUT',
     body: params
   }) : request('/admin/app/versions', {
@@ -13,7 +18,7 @@ export async function createOrUpdate(params) {
 
 // 获取最新使用版本
 export async function getLastedVer() {
-  return request('/admin/app/versions/latest');
+  return request('/app/versions/latest');
 }
 
 // 删除
@@ -25,13 +30,13 @@ export async function removeItem(params) {
 
 // 获取单项信息
 export async function queryVerInfo(params) {
-  return request(`/admin/app/versions/${params}`);
+  return request(`/app/versions/${params}`);
 }
 
 // 发布
 export async function publishVer(params) {
   return request('/admin/app/versions/latest', {
-    method: 'PUT',
+    method: 'POST',
     body: params
   });
 }

@@ -7,7 +7,7 @@
     "precommit": "npm run lint-staged",
     "start": "cross-env ESLINT=none roadhog dev",
     "mock": "node proxy/proxy-server.js",
-    "code":"node  producer/main.js",
+    "code": "node  producer/main.js",
     "init": "node .init-project.js",
     "setup": "npm install && npm run init",
     "build": "cross-env ESLINT=none roadhog build",
