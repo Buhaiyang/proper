@@ -1,12 +1,11 @@
 import React from 'react';
-import { Button, Card, Row, Col, Radio, Input, Tooltip } from 'antd';
+import { Button, Card, Row, Col, Radio, Input, Tooltip, Popover, message } from 'antd';
 import Debounce from 'lodash-decorators/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import update from 'immutability-helper/index';
 import { getUuid } from '../../common/oopUtils';
 import OopForm from '../../components/OopForm';
 import styles from './index.less';
-
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -81,7 +80,8 @@ const AddPanel = (props) => {
 };
 const EditPanel = (props) => {
   const { currentRowItem,
-    updateCenterPanel, onRowItemIconCopy, onRowItemIconDelete, onPlusClick, onRowItemDrag } = props;
+    updateCenterPanel, onRowItemIconCopy, onRowItemIconDelete, onPlusClick, onRowItemDrag,
+    customRules = false, setCustomRules} = props;
   const rowItemIconCopy = (event, name)=>{
     onRowItemIconCopy(name)
   }
@@ -91,12 +91,67 @@ const EditPanel = (props) => {
   const rowItemDrag = (i, j, item)=>{
     onRowItemDrag(i, j, item)
   }
+  const createCustomRulesContent = (name, rules = [])=>{
+    const divValue = rules === [] ? null : rules.map(item=>Object.keys(item)[0].concat(',').concat(Object.values(item).join(','))).join(';');
+    const getRulesValueByStr = (str)=>{
+      const numReg = new RegExp('^[0-9]*$');
+      if (numReg.test(str)) {
+        return Number(str)
+      }
+      return str;
+    }
+    const saveRules = ()=>{
+      const {innerText} = this.contentEditable;
+      if (!innerText) {
+        message.error('自定义规则不能为空!');
+        return;
+      }
+      const arrs = innerText.split(';');
+      let flag = false;
+      const rulesResult = [];
+      arrs.forEach((item)=>{
+        if (item) {
+          const arr = item.split(',');
+          if (arr.length === 3) {
+            rulesResult.push({
+              [arr[0].trim()]: getRulesValueByStr(arr[1]),
+              message: arr[2].trim()
+            })
+          } else {
+            flag = true
+            message.error('自定义规则格式不正确!');
+          }
+        }
+      });
+      if (flag) {
+        return;
+      }
+      console.log(rulesResult);
+      setCustomRules(false);
+      updateCenterPanel(name, rulesResult);
+      message.success('规则已保存!');
+    }
+    return (
+      <div>
+        <div
+           ref={(el)=>{ this.contentEditable = el }}
+           contentEditable={true}
+           className={styles.customRulesContent}
+           dangerouslySetInnerHTML={{__html: divValue}}
+           title="格式例如:require,true,此项不能为空" />
+        <div style={{marginTop: 8, textAlign: 'right'}}>
+          <Button size="small" onClick={()=>setCustomRules(false)}>取消</Button>
+          <Button type="primary" size="small" onClick={saveRules} style={{marginLeft: 8}}>保存</Button>
+        </div>
+      </div>);
+  }
   const createFormByFormItemData = (item)=>{
+    console.log(item)
     if (!item) {
       return
     }
     // console.log(item)
-    const { name, label, initialValue, component} = item;
+    const { name, label, initialValue, component, rules} = item;
     const cName = component.name;
     if (!cName) {
       return
@@ -213,27 +268,46 @@ const EditPanel = (props) => {
     const ruleChange = (event)=>{
       const {value} = event.target;
       if (value === '1') {
-        const rule = {required: true, message: '此项为必填项'};
+        const rule = [{required: true, message: '此项为必填项'}];
         updateCenterPanel(event.target.name, rule);
+        setCustomRules(false);
       } else if (value === '0') {
-        const rule = {required: false};
-        updateCenterPanel(event.target.name, rule);
-      } else if (value === '2') {
-        // TODO show modal custom
+        updateCenterPanel(event.target.name, null);
+        setCustomRules(false);
       }
     }
-    const requieRulesRadio = (
+    const getRulesValue = (argsRules)=>{
+      if (!argsRules) {
+        return '0'
+      }
+      if (JSON.stringify(argsRules) === '[{"required":true,"message":"此项为必填项"}]') {
+        return '1'
+      }
+      return '2';
+    }
+    const content = createCustomRulesContent(`${name}${prefix}_rules`, rules);
+    const radioClick = ()=>{
+      setCustomRules(!customRules)
+    }
+    const requireRulesRadio = (
       <RadioGroup onChange={ruleChange} size="small" name={`${name}${prefix}_rules`} >
+        <Radio value="0">无</Radio>
         <Radio value="1">必填</Radio>
-        <Radio value="0">不必填</Radio>
-        <Radio value="2">自定义</Radio>
+        <Popover
+          style={{width: '1000px'}}
+          visible={customRules}
+          content={content}
+          getPopupContainer={triggerNode=>triggerNode.parentNode}
+          title="格式:[require,true,此项必填;]">
+          <Radio onClick={radioClick} value="2">自定义</Radio>
+        </Popover>
       </RadioGroup>);
     // 增加规则判断
     const rulesArr = [{
       name: `${name}${prefix}_rules`,
       label: '规则',
-      component: requieRulesRadio,
-      initialValue: '0'
+      component: requireRulesRadio,
+      initialValue: getRulesValue(rules)
     }]
     formConfig.formJson = formConfig.formJson.concat(rulesArr)
     return (<OopForm {...formConfig} />);
@@ -264,7 +338,8 @@ export default class OopFormDesigner extends React.PureComponent {
     ],
     rowItems: this.props.formDetails.formJson,
     formLayout: this.props.formDetails.formLayout,
-    formTitle: this.props.formDetails.formTitle
+    formTitle: this.props.formDetails.formTitle,
+    customRules: false
   }
   componentWillUnmount() {
     this.renderCenterPanel.cancel();
@@ -273,6 +348,7 @@ export default class OopFormDesigner extends React.PureComponent {
     console.log(this.state.currentRowItem, this.state.rowItems)
   }
   onRowItemClick = (name)=>{
+    this.setCustomRules(false);
     this.state.rowItems.forEach((item)=>{
       const aItem = item;
       if (aItem.name === name) {
@@ -405,11 +481,9 @@ export default class OopFormDesigner extends React.PureComponent {
       const i = idAttr.pop();
       children[i].label = value;
     } else if (attr === 'rules') {
-      const {rules = []} = this.state.currentRowItem;
-      if (rules.length) {
-        rules[0].required = value.required;
-      } else {
-        rules.push(value)
+      let rules = [];
+      if (value !== null) {
+        rules = value
       }
       this.state.currentRowItem.rules = rules;
     } else {
@@ -469,15 +543,22 @@ export default class OopFormDesigner extends React.PureComponent {
       formTitle
     })
   }
+  setCustomRules = (flag)=>{
+    this.setState({
+      customRules: flag
+    })
+  }
   render() {
     return (
-      <div className={styles.container}>
+      <div className={styles.container} id="OopFormDesigner">
         <Row gutter={16}>
-          <Col span={6} ><AddPanel
+          <Col span={6} >
+            <AddPanel
             selections={this.state.selections}
-            onAddItem={this.onAddItem}
-          /></Col>
-          <Col span={12} ><CenterPanel
+            onAddItem={this.onAddItem} />
+          </Col>
+          <Col span={12} >
+            <CenterPanel
             rowItems={this.state.rowItems}
             onRowItemClick={this.onRowItemClick}
             onRowItemIconCopy={this.onRowItemIconCopy}
@@ -487,15 +568,20 @@ export default class OopFormDesigner extends React.PureComponent {
             formTitle={this.state.formTitle}
             formLayout={this.state.formLayout}
             onFormTitleClick={this.onFormTitleClick}
-            self={this}
-          /></Col>
-          <Col span={6} ><EditPanel
+            self={this} />
+          </Col>
+          <Col span={6} >
+            <EditPanel
             currentRowItem={this.state.currentRowItem}
             updateCenterPanel={this.onUpdateCenterPanel}
             onRowItemIconCopy={this.onRowItemIconCopy}
             onRowItemIconDelete={this.onRowItemIconDelete}
             onPlusClick={this.onPlusClick}
-            onRowItemDrag={this.onEditPanelRowItemDrag} /></Col>
+            onRowItemDrag={this.onEditPanelRowItemDrag}
+            customRules={this.state.customRules}
+            setCustomRules={this.setCustomRules}
+            />
+          </Col>
         </Row>
       </div>)
   }
