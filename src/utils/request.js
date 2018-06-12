@@ -99,7 +99,7 @@ export default function request(url, options) {
           return new Promise((resolve)=>{
             resolve({
               status: codeStyle,
-              result: '操作成功'
+              result: []
             });
           });
         }
