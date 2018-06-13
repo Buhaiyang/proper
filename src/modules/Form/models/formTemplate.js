@@ -53,12 +53,12 @@ export default {
         ...state,
         grid: {
           ...state.grid,
-          list: payload.data,
+          list: payload.result.data,
           pagination: {
             ...state.grid.pagination,
             pageNo: pagination.pageNo,
             pageSize: pagination.pageSize,
-            count: payload.count,
+            count: payload.result.count,
           }
         }
       }

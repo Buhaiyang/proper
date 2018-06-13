@@ -76,7 +76,7 @@ export default class OopTreeTable extends PureComponent {
       const title = index > -1 ? (
         <span>
           {beforeStr}
-          <span style={{ color: '#1DA57A' }}>{searchValue}</span>
+          <span className={styles.primaryColor}>{searchValue}</span>
           {afterStr}
         </span>
       ) : <span>{item.title}</span>;

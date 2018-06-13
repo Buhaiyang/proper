@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Card, Form, Modal, Spin, Input, Button, List, Icon, Popconfirm, Tooltip, Badge } from 'antd';
+import { Card, Form, Modal, Spin, Input, Button, List, Icon, Popconfirm, Tooltip, Badge, Popover, Tabs } from 'antd';
+import QRCode from 'qrcode.react';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import { oopToast } from './../../../common/oopUtils';
@@ -8,6 +9,7 @@ import styles from './Appver.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const { TabPane } = Tabs;
 
 const formItemLayout = {
   labelCol: {
@@ -293,7 +295,18 @@ export default class Appver extends React.Component {
       }
     });
   }
-
+  // show qrcode
+  showQrCode = (item)=>{
+    return (
+      <Tabs defaultActiveKey="1" size="small" style={{width: 200}}>
+        <TabPane tab={<span><Icon type="apple" />苹果</span>} key="1" style={{display: 'flex', justifyContent: 'center'}}>
+          {item.iosUrl ? <QRCode value={item.iosUrl} /> : null}
+        </TabPane>
+        <TabPane tab={<span><Icon type="android" />安卓</span>} key="2" style={{display: 'flex', justifyContent: 'center'}} forceRender={true}>
+          {item.androidUrl ? <QRCode value={item.androidUrl} /> : null}
+        </TabPane>
+      </Tabs>);
+  }
   render() {
     const { loading,
       global: { size },
@@ -366,12 +379,18 @@ export default class Appver extends React.Component {
                       v{item.ver}
                     </p>
                     <div className={styles.listDiv}>
-                      <div className={styles.listDivLeft}><Icon type="apple-o" />下载链接</div>
-                      <div className={styles.wordBreak}>{item.iosUrl}</div>
-                    </div>
-                    <div className={styles.listDiv}>
-                      <div className={styles.listDivLeft}><Icon type="android-o" />下载链接</div>
-                      <div className={styles.wordBreak}>{item.androidUrl}</div>
+                      <div className={styles.listDivLeft}><Icon type="apple-o" /><a href={item.iosUrl} target="_blank">下载链接</a></div>
+                      <div className={styles.listDivLeft}><Icon type="android-o" /><a href={item.androidUrl} target="_blank">下载链接</a></div>
+                      <div className={styles.listDivLeft}>
+                        <Popover
+                          content={this.showQrCode(item)}
+                          title="手机扫描二维码"
+                          getPopupContainer={triggerNode=>triggerNode.parentNode}
+                        >
+                          <Icon type="qrcode" />
+                          <a>二维码</a>
+                        </Popover>
+                      </div>
                     </div>
                     <div className={styles.listDiv} style={{marginBottom: '32px'}}>
                       <div className={styles.listDivLeft}>更新内容</div>

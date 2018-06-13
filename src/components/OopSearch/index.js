@@ -79,13 +79,10 @@ const filterTableList = (searchValue, tableList)=>{
     const sIndex = sValue.indexOf(searchValue);
     const flag = sIndex > -1;
     if (flag) {
-      const css = {
-        textDecoration: '#1DA57A dashed underline'
-      }
       row[itemName] = (
         <span>
             {sValue.substr(0, sIndex)}
-          <span style={css}>{searchValue}</span>
+          <span className={styles.primaryColor}>{searchValue}</span>
           {sValue.substr(sIndex + searchValue.length)}
           </span>);
     }

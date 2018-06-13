@@ -19,8 +19,8 @@ export default class TomcatLog extends React.Component {
     type: '["ERROR"]',
     startTime: '',
     endTime: '',
-    lockColor: '#1da57a',
-    updateColor: '#1da57a',
+    lockColor: '#1890ff',
+    updateColor: '#1890ff',
     intervalTime: 5000,
     logs: [],
     timer: null,
@@ -147,7 +147,7 @@ export default class TomcatLog extends React.Component {
       })
     } else {
       this.setState({
-        lockColor: '#1da57a'
+        lockColor: '#1890ff'
       })
     }
   }
@@ -157,7 +157,7 @@ export default class TomcatLog extends React.Component {
     if (this.state.autoUpdate) {
       this.refresh();
       this.setState({
-        updateColor: '#1da57a'
+        updateColor: '#1890ff'
       });
     } else {
       if (this.state.timer) {
