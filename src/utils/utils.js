@@ -1,6 +1,7 @@
 import moment from 'moment';
 import pathToRegexp from 'path-to-regexp';
 import { getRouterData } from '../common/frameHelper';
+import { devMode } from '../config';
 
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
@@ -346,4 +347,12 @@ export const getParamObj = (search)=>{
     .map(str=>'{"'.concat(str.replace('=', '":"')).concat('"}'))
     .forEach((jsonStr)=>{ Object.assign(param, JSON.parse(jsonStr)) });
   return param;
+}
+export const getDownloadUrl = (id) => {
+  let url = '/file/'.concat('download/').concat(id);
+  const prefix = window.localStorage.getItem('pea_dynamic_request_prefix');
+  if (devMode === 'development' && prefix) {
+    url = prefix + url;
+  }
+  return url;
 }

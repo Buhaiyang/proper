@@ -1,11 +1,11 @@
 module.exports = {
-  "POST:/system/config":(req , res)=>{
+  "POST:/sys/config":(req , res)=>{
     res.status(200).send('');
   },
-  "PUT:/system/config":(req , res)=>{
+  "PUT:/sys/config":(req , res)=>{
     res.status(200).send('');
   },
-  "DELETE:/system/config":(req , res)=>{
+  "DELETE:/sys/config":(req , res)=>{
     res.status(200).send('');
   },
   "PUT:/sys/datadic/:id": (req, res) => {

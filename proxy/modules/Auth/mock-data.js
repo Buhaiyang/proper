@@ -51,11 +51,12 @@ module.exports = {
   },
   'GET:/auth/users/:id':{
     "id": "2",
-    "username": "zhangjianlin",
+    "username": "admin",
     "password": "123456",
     "name": "66666",
     "email": "276595311@qq.com",
     "phone": "15912345678",
+    "avatar": "12345678",
     "enable": true,
     "superuser": false
   },
@@ -83,13 +84,14 @@ module.exports = {
   'PUT:/auth/users/:id': (req , res)=>{
     res.send({
       "id": "2",
-      "username": "limiao",
+      "username": "admin",
       "password": "123456",
       "name": "7777",
       "email": "276595311@qq.com",
       "phone": "15912345678",
       "enable": true,
-      "superuser": false
+      "superuser": false,
+      "avatar": "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
     });
   },
   'POST:/auth/users':(req , res)=>{
@@ -453,5 +455,11 @@ module.exports = {
       identifier:'add',
       enable:true,
   },
-  'DELETE:/auth/resources/:id':{type:'ok'}
+  'DELETE:/auth/resources/:id':{type:'ok'},
+  'POST:/file/:id': {
+    id: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
+  },
+  'PUT:/auth/users/password': (req , res)=>{
+    res.send({})
+  }
 }

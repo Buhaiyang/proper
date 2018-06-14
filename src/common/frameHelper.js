@@ -55,6 +55,9 @@ let _routerData = {
   '/main': {
     component: dynamicWrapper(()=>import('../modules/Base/pages/Main'))
   },
+  '/personal-center': {
+    component: dynamicWrapper(()=>import('../modules/Base/pages/PersonalCenter'))
+  },
 };
 export const getRouterData = ()=> _routerData;
 export const getMenuData = ()=> _menuData;

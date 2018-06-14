@@ -149,6 +149,11 @@ export default class BasicLayout extends React.PureComponent {
       this.props.dispatch({
         type: 'baseLogin/logout',
       });
+      return;
+    }
+    if (key === 'personalCenter') {
+      if (this.props.history.location.pathname === '/personal-center') return;
+      this.props.dispatch(routerRedux.push('/personal-center'));
     }
   }
   handleNoticeVisibleChange = (visible) => {

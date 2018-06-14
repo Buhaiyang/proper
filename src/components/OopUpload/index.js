@@ -19,11 +19,10 @@ export default class OopUpload extends React.PureComponent {
   getInitProps = ()=>{
     const props = {
       name: 'file',
-      buttonText: '点击上传',
       disabled: !this.props.modelName,
+      extra: (<Button disabled={!this.props.modelName}><Icon type="upload" />{this.props.buttonText ? this.props.buttonText : '点击上传'}</Button>),
       ...this.props
     };
-    const extra = (<Button disabled={!props.modelName}><Icon type="upload" /> {props.buttonText}</Button>);
     const token = window.localStorage.getItem('proper-auth-login-token');
     props.action = this.uploadUrl;
     props.headers = {
@@ -35,7 +34,6 @@ export default class OopUpload extends React.PureComponent {
       const downloadUrl = this.uploadUrl.substr(0, this.uploadUrl.lastIndexOf('/')).concat('/download/').concat(id)
       item.url = downloadUrl;
     })
-    props.extra = extra;
     const callbackOnChange = props.onChange;
     props.onChange = (info)=> {
       // if (info.file.status !== 'uploading') {
