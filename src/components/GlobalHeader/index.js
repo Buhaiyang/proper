@@ -48,6 +48,9 @@ export default class GlobalHeader extends PureComponent {
     this.triggerResizeEvent();
   }
   getAvatar = (avatar) => {
+    if (!avatar) {
+      avatar = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+    }
     const index = avatar.indexOf('http');
     return index > -1 ? avatar : getDownloadUrl(avatar);
   }
