@@ -176,7 +176,13 @@ function getFlatMenuData(menus) {
 
 function exchangePath2Router(path) {
   const result = [];
-  path.split('/').forEach((item) => {
+  const paths = path.split('/');
+  const emptyStr = paths[0];
+  if (emptyStr === '') {
+    // 去掉第一个空格
+    paths.shift();
+  }
+  paths.forEach((item) => {
     if (item.indexOf('-') > 0) {
       let arr = '';
       item.split('-').forEach((sItem) => {
@@ -230,8 +236,8 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
         if (moduleName && pathName) {
           // console.log(k, '====>', path)
           const originRouter = getRouterData();
-          if (originRouter[`/${k}`] === undefined) {
-            routerConfig[`/${k}`] = {
+          if (originRouter[`${k}`] === undefined) {
+            routerConfig[`${k}`] = {
               component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
             };
           }
@@ -245,7 +251,7 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
     // Regular match item name
     // eg.  router /user/:id === /user/chen
     const pathRegexp = pathToRegexp(path);
-    const menuKey = Object.keys(menuData).find(key => pathRegexp.test(`/${key}`));
+    const menuKey = Object.keys(menuData).find(key => pathRegexp.test(`${key}`));
     let menuItem = {};
     // If menuKey is not empty
     if (menuKey) {
@@ -263,25 +269,6 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
   });
   return routerData;
 }
-/* 节流函数 */
-export function throttle(func, context, delay, text, mustApplyTime) {
-  const fn = func
-  clearTimeout(fn.timer);
-  fn.cur = Date.now();// 记录当前时间
-  if (!fn.start) { // 若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
-    fn.start = fn.cur;
-  }
-  if (fn.cur - fn.start > mustApplyTime) {
-    // 当前时间与上一次函数被执行的时间作差，与mustApplyTime比较，若大于，则必须执行一次函数，若小于，则重新设置计时器
-    fn.call(context, text);
-    fn.start = fn.cur;
-  } else {
-    fn.timer = setTimeout(()=> {
-      fn.call(context, text);
-    }, delay);
-  }
-}
-
 // 处理菜单函数
 export function controlMenu(oldMenu, newMenu = []) {
   if (oldMenu != null) {

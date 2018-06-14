@@ -92,7 +92,7 @@ export default class SiderMenu extends PureComponent {
   getSelectedMenuKeys = (path) => {
     const flatMenuKeys = this.getFlatMenuKeys(this.props.menuData);
     return flatMenuKeys.filter((item) => {
-      return pathToRegexp(`/${item}`).test(path);
+      return pathToRegexp(`${item}`).test(path);
     });
   }
   /**

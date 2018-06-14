@@ -15,23 +15,24 @@ module.exports = {
     }
   },
   "GET:/auth/menus":[
-    {"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
-    {"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
-    {"id":"pep-auth-users","name":"用户管理","route":"auth/user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
-    {"id":"pep-auth-functions","name":"功能管理","route":"auth/func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
-    {"id":"pep-auth-roles","name":"角色管理","route":"auth/role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
-    {"id":"pep-auth-user-groups","name":"用户组管理","route":"auth/group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
-    {"id":"pep-workflow-designer","name":"流程设计","route":"workflow/designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-workflow","root":false,"leaf":true},
-    {"id":"pep-devtools","name":"开发者工具","route":"devtools","sequenceNumber":2,"icon":"tool","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
-    {"id":"pep-devtools-tomcat","name":"tomcat日志","route":"devtools/tomcatLog","sequenceNumber":0,"icon":"code-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
-    {"id":"pep-devtools-appver","name":"APP版本管理","route":"devtools/appver","sequenceNumber":0,"icon":"tag-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
-    {"id":"pep-devtools-cache","name":"缓存管理","route":"devtools/cache","sequenceNumber":0,"icon":"hdd","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
-    {"id":"pep-devtools-mongoshell","name":"MongoShell GUI","route":"devtools/mongoshell","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-workflow","name":"流程设置","route":"/workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
+    {"id":"pep-auth","name":"权限管理","route":"/auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
+    {"id":"pep-auth-users","name":"用户管理","route":"/auth/user","sequenceNumber":0,"icon":"solution","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
+    {"id":"pep-auth-functions","name":"功能管理","route":"/auth/func","sequenceNumber":1,"icon":"bars","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
+    {"id":"pep-auth-roles","name":"角色管理","route":"/auth/role","sequenceNumber":2,"icon":"skin","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
+    {"id":"pep-auth-user-groups","name":"用户组管理","route":"/auth/group","sequenceNumber":3,"icon":"team","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-auth","root":false,"leaf":true},
+    {"id":"pep-workflow-designer","name":"流程设计","route":"/workflow/designer","sequenceNumber":0,"icon":"share-alt","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-workflow","root":false,"leaf":true},
+    {"id":"pep-devtools","name":"开发者工具","route":"/devtools","sequenceNumber":2,"icon":"tool","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-devtools-tomcat","name":"tomcat日志","route":"/devtools/tomcatLog","sequenceNumber":0,"icon":"code-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-devtools-page-designer","name":"页面设计器","route":"/devtools/page-designer","sequenceNumber":0,"icon":"code-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-devtools-appver","name":"APP版本管理","route":"/devtools/appver","sequenceNumber":0,"icon":"tag-o","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-devtools-cache","name":"缓存管理","route":"/devtools/cache","sequenceNumber":0,"icon":"hdd","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
+    {"id":"pep-devtools-mongoshell","name":"MongoShell GUI","route":"/devtools/mongoshell","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-devtools","menuCode":null,"root":false},
     {"id":"pep-devtools-conversion", "name": "JWT 辅助工具", "route": "devtools/conversion", "sequenceNumber": 0, "icon": "question-circle-o", "description": null, "menuType": {"catalog": "MENU_TYPE", "code": "1" }, "enable": true, "identifier": null, "parentId": "pep-devtools", "menuCode": null, "root": false },
     {"id":"pep-devtools-aes", "name": "加密解密辅助工具", "route": "devtools/aes", "sequenceNumber": 0, "icon":"safety", "description":null,"menuType":{"catalog":"MENU_TYPE","code":"1" },"enable":true,"identifier":null,"parentId": "pep-devtools","menuCode":null,"root":false},
-    {"id":"pep-system","name":"PEP配置管理","route":"system","sequenceNumber":2,"icon":"profile","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
-    {"id":"pep-system-config","name":"oopsearch配置","route":"system/config","sequenceNumber":0,"icon":"setting","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
-    {"id":"pep-system-dictionary","name":"数据字典配置","route":"system/dictionary","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
+    {"id":"pep-system","name":"PEP配置管理","route":"/system","sequenceNumber":2,"icon":"profile","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"menuCode":null,"parentId":null,"root":true,"leaf":false},
+    {"id":"pep-system-config","name":"oopsearch配置","route":"/system/config","sequenceNumber":0,"icon":"setting","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
+    {"id":"pep-system-dictionary","name":"数据字典配置","route":"/system/dictionary","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
   ],
   "GET:/auth/users": {
     "count":100,
@@ -414,8 +415,8 @@ module.exports = {
     "menuType": {"code": "1"}
   },
   'GET:/auth/menus/parents':[
-    {"id":"pep-workflow","name":"流程设置","route":"workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
-    {"id":"pep-auth","name":"权限管理","route":"auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true}
+    {"id":"pep-workflow","name":"流程设置","route":"/workflow","sequenceNumber":0,"icon":"database","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-auth","name":"权限管理","route":"/auth","sequenceNumber":1,"icon":"lock","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true}
   ],
   'DELETE:/auth/menus':{
     type:"ok"

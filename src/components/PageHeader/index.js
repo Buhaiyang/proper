@@ -78,24 +78,26 @@ export default class PageHeader extends PureComponent {
     // Add crumbs from the first order menu
     const menuData = getMenuData();
     if (menuData.length) {
-      const path = routerLocation.pathname.substr(1, routerLocation.pathname.length);
+      const path = routerLocation.pathname;
       const menu = menuData.find((item) => {
         if (item.route === path) {
           return item;
         }
         return null;
       })
-      const menuParent = menuData.find((item) => {
-        if (item.id === menu.parentId) {
-          return item
-        }
-        return null;
-      })
-      extraBreadcrumbItems.unshift(
-      <Breadcrumb.Item key="parent">
-        {createElement('span', {to: '/' }, menuParent.name)}
-      </Breadcrumb.Item>
-      );
+      if (menu) {
+        const menuParent = menuData.find((item) => {
+          if (item.id === menu.parentId) {
+            return item
+          }
+          return null;
+        })
+        extraBreadcrumbItems.unshift(
+          <Breadcrumb.Item key="parent">
+            {createElement('span', {to: '/' }, menuParent.name)}
+          </Breadcrumb.Item>
+        );
+      }
     }
     // Add home breadcrumbs to your head
     extraBreadcrumbItems.unshift(
