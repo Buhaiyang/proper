@@ -1,7 +1,7 @@
-import { remove, saveOrUpdate } from '../services/systemConfigS';
+import { remove, saveOrUpdate } from '../services/systemOopsearchConfigS';
 
 export default {
-  namespace: 'systemConfig',
+  namespace: 'systemOopsearchConfig',
   state: {},
   effects: {
     *saveOrUpdate({payload, callback}, {call}) {

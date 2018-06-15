@@ -129,11 +129,11 @@ const ModalForm = Form.create()((props) => {
   )
 });
 
-@inject(['systemConfig', 'global'])
-@connect(({ systemConfig, global, loading }) => ({
-  systemConfig,
+@inject(['systemOopsearchConfig', 'global'])
+@connect(({ systemOopsearchConfig, global, loading }) => ({
+  systemOopsearchConfig,
   global,
-  loading: loading.models.systemConfig,
+  loading: loading.models.systemOopsearchConfig,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class Config extends React.PureComponent {
@@ -160,7 +160,7 @@ export default class Config extends React.PureComponent {
   }
   handleRemove = (record) => {
     this.props.dispatch({
-      type: 'systemConfig/remove',
+      type: 'systemOopsearchConfig/remove',
       payload: record.id,
       callback: (res)=>{
         oopToast(res, '删除成功', '删除失败');
@@ -177,7 +177,7 @@ export default class Config extends React.PureComponent {
       cancelText: '取消',
       onOk: () => {
         me.props.dispatch({
-          type: 'systemConfig/remove',
+          type: 'systemOopsearchConfig/remove',
           payload: items.toString(),
           callback(res) {
             me.oopTable.clearSelection()
@@ -196,7 +196,7 @@ export default class Config extends React.PureComponent {
   }
   handleModalSubmit = (values, form) => {
     this.props.dispatch({
-      type: 'systemConfig/saveOrUpdate',
+      type: 'systemOopsearchConfig/saveOrUpdate',
       payload: values,
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
