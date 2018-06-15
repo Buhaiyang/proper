@@ -434,18 +434,20 @@ export default class Role extends PureComponent {
 
   // 删除功能
   handleRemove = (ids) => {
-    let idsArray = [];
-    if (ids instanceof Array) {
-      idsArray = ids;
-    } else {
-      idsArray.push(ids.id);
-    }
-    this.props.dispatch({
-      type: 'authRole/removeRoles',
-      payload: { ids: idsArray.toString() },
-      callback: (res) => {
-        oopToast(res, '删除成功', '删除失败');
-        this.onLoad();
+    Modal.confirm({
+      title: '提示',
+      content: `确定删除选中的${ids.length}条数据吗`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        this.props.dispatch({
+          type: 'authRole/removeRoles',
+          payload: { ids: ids.toString() },
+          callback: (res) => {
+            oopToast(res, '删除成功');
+            this.onLoad();
+          }
+        });
       }
     });
   }
