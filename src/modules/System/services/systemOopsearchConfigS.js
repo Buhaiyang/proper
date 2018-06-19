@@ -1,16 +1,16 @@
 import request from '../../../utils/request';
 
 export async function saveOrUpdate(param) {
-  return param.id ? request('/sys/config', {
+  return param.id ? request('/oopsearch/config', {
     method: 'PUT',
     body: param
-  }) : request('/sys/config', {
+  }) : request('/oopsearch/config', {
     method: 'POST',
     body: param
   });
 }
 export async function remove(param) {
-  return request(`/sys/config/?ids=${param}`, {
+  return request(`/oopsearch/config/?ids=${param}`, {
     method: 'DELETE'
   });
 }

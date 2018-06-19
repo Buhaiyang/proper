@@ -1,11 +1,11 @@
 module.exports = {
-  "POST:/sys/config":(req , res)=>{
+  "POST:/oopsearch/config":(req , res)=>{
     res.status(200).send('');
   },
-  "PUT:/sys/config":(req , res)=>{
+  "PUT:/oopsearch/config":(req , res)=>{
     res.status(200).send('');
   },
-  "DELETE:/sys/config":(req , res)=>{
+  "DELETE:/oopsearch/config":(req , res)=>{
     res.status(200).send('');
   },
   "PUT:/sys/datadic/:id": (req, res) => {
