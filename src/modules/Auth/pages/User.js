@@ -1,17 +1,17 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Form, Modal, Button, Input, Radio, Tabs, Select, Badge, Tooltip, Spin} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Select, Badge, Tooltip, Spin} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
+import OopModal from '../../../components/OopModal';
 import {inject} from '../../../common/inject';
 import styles from './User.less';
 import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const {TabPane} = Tabs;
 const {Option} = Select;
 const {Description} = DescriptionList;
 const formItemLayout = {
@@ -170,10 +170,10 @@ const RoleInfoForm = Form.create()((props) => {
           >
             {userRolesAll.length ? userRolesAll.map(item =>
               (
-              <Option key={item.id}>
-                {item.enable ? item.name :
-                  (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
-              </Option>)
+                <Option key={item.id}>
+                  {item.enable ? item.name :
+                    (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
+                </Option>)
             ) : userRolesAll}
           </Select>
         )
@@ -199,7 +199,7 @@ const UserGroupInfoForm = Form.create()((props) => {
         {...formItemLayout}
         label="用户组"
       >
-        {getFieldDecorator('roles', {
+        {getFieldDecorator('groups', {
           initialValue: userGroups && userGroups.map(item => item.id)
         })(
           <Select
@@ -226,79 +226,6 @@ const UserGroupInfoForm = Form.create()((props) => {
       </FormItem>
     </Form>);
 });
-const ModalForm = connect()((props) => {
-  const {
-    visible, size, handleTabChange, currentTabKey, onSubmitForm, userBasicInfo,
-    clearModalForms, userRoles, userRolesAll, userGroups, userGroupsAll,
-    isCreate, loading, userAddRoles, userAddGroups
-  } = props;
-  const onCancel = () => {
-    // 隐藏窗口时
-    const form = this[currentTabKey].getForm();
-    clearModalForms(form);
-  };
-  const onOk = () => {
-    const form = this[currentTabKey].getForm();
-    const {validateFields} = form;
-    validateFields((err, fieldsValue) => {
-      if (err) return;
-      onSubmitForm(fieldsValue);
-    });
-  };
-  const onTabChange = (activeKey) => {
-    handleTabChange(activeKey);
-  };
-  const tabList = [{
-    key: 'basicUser',
-    tab: '基本信息',
-    disabled: false,
-    content: <UserBasicInfoForm
-      ref={(el) => {
-        this.basicUser = el;
-      }}
-      userBasicInfo={userBasicInfo}
-      loading={loading} />
-  }, {
-    key: 'roleUser',
-    tab: '角色信息',
-    disabled: isCreate,
-    content: <RoleInfoForm
-      ref={(el) => {
-        this.roleUser = el;
-      }}
-      userRoles={userRoles}
-      userRolesAll={userRolesAll}
-      userAddRoles={userAddRoles}
-      loading={loading} />
-  }, {
-    key: 'userGroups',
-    tab: '用户组信息',
-    disabled: isCreate,
-    content: <UserGroupInfoForm
-      ref={(el) => {
-        this.userGroups = el;
-      }}
-      userGroups={userGroups}
-      userGroupsAll={userGroupsAll}
-      userAddGroups={userAddGroups}
-      loading={loading} />
-
-  }];
-  const footer = (
-    <Fragment>
-      <Button onClick={onCancel}>取消</Button>
-      {currentTabKey === 'basicUser' && <Button type="primary" onClick={onOk} loading={loading}>保存</Button>}
-    </Fragment>);
-  return (
-    <Modal visible={visible} onCancel={onCancel} onOk={onOk} footer={footer} destroyOnClose={true}>
-      <Tabs size={size} animated={false} onChange={onTabChange} activeKey={currentTabKey}>
-        {tabList.map(item =>
-          <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
-        )}
-      </Tabs>
-    </Modal>
-  );
-});
 @inject(['authUser', 'global'])
 @connect(({authUser, global, loading}) => ({
   authUser,
@@ -310,7 +237,6 @@ export default class User extends React.PureComponent {
   state = {
     modalVisible: false,
     viewModalVisible: false,
-    currentTabKey: 'basicUser',
     isCreate: !this.props.authUser.userBasicInfo.id
   }
 
@@ -338,6 +264,11 @@ export default class User extends React.PureComponent {
     this.setState({
       viewModalVisible: true
     });
+  }
+  handleDelete = ()=>{
+    const record = this.props.authUser.userBasicInfo;
+    this.onDelete(record);
+    this.clearModalForms();
   }
   onDelete = (record) => {
     const me = this
@@ -390,37 +321,29 @@ export default class User extends React.PureComponent {
       }
     }
   }
-  onSubmitForm = (data) => {
-    // 根据 currentTabKey dispatch action
-    console.log(this.state.currentTabKey, data);
-    const activeKey = this.state.currentTabKey;
-    const me = this;
-    if (activeKey === 'basicUser') {
-      this.props.dispatch({
-        type: 'authUser/saveOrUpdateUser',
-        payload: data,
-        callback(res) {
-          me.setState({
-            isCreate: false
-          });
-          oopToast(res, '保存成功', '保存失败');
-          me.onLoad();
-        }
+  onSubmitForm = () => {
+    const basicUserForm = this.basicUser.getForm();
+    if (basicUserForm) {
+      basicUserForm.validateFieldsAndScroll((err, data) => {
+        if (err) return;
+        this.props.dispatch({
+          type: 'authUser/saveOrUpdateUser',
+          payload: data,
+          callback: (res)=>{
+            this.setState({
+              isCreate: false
+            });
+            oopToast(res, '保存成功', '保存失败');
+            this.onLoad();
+          }
+        });
       });
-    } else if (activeKey === 'roleUser') {
-      // TODO
-    } else if (activeKey === 'userGroups') {
-      // TODO
     }
   }
   // 隐藏窗口时重置form 清空 userBasicInfo、userRoles
-  clearModalForms = (form) => {
+  clearModalForms = () => {
     this.handleModalVisible(false);
     setTimeout(() => {
-      form.resetFields();
-      this.setState({
-        currentTabKey: 'basicUser',
-      });
       this.props.dispatch({
         type: 'authUser/clear'
       });
@@ -537,7 +460,7 @@ export default class User extends React.PureComponent {
       {
         title: '状态', dataIndex: 'enable', render: text => (
           <Fragment>
-            {text === true ? '已启用' : <Badge status="default" text="已停用" />}
+            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
           </Fragment>
         )
       }
@@ -569,7 +492,7 @@ export default class User extends React.PureComponent {
         text: '删除',
         name: 'delete',
         icon: 'delete',
-        confirm: '是否要删除此行',
+        confirm: '确认删除吗？',
         onClick: (record)=>{ this.onDelete(record) },
         display: record=>(!record.superuser)
       },
@@ -595,22 +518,54 @@ export default class User extends React.PureComponent {
             ref={(el)=>{ this.oopTable = el }}
           />
         </Card>
-        <ModalForm
+        <OopModal
+          title={this.state.isCreate ? '新建用户' : '编辑用户'}
           visible={this.state.modalVisible}
-          currentTabKey={this.state.currentTabKey}
-          handleTabChange={this.handleTabChange}
-          onSubmitForm={this.onSubmitForm}
-          userBasicInfo={userBasicInfo}
-          userRoles={userRoles}
-          userRolesAll={userRolesAll}
-          userAddRoles={this.userAddRoles}
-          userGroups={userGroups}
-          userGroupsAll={userGroupsAll}
-          userAddGroups={this.userAddGroups}
-          clearModalForms={this.clearModalForms}
+          destroyOnClose={true}
+          width={800}
+          onCancel={this.clearModalForms}
+          onOk={this.onSubmitForm}
+          onDelete={this.handleDelete}
           isCreate={this.state.isCreate}
-          size={size}
-          loading={!!loading} />
+          loading={!!loading}
+          onTabChange={this.handleTabChange}
+          tabs={[{
+            key: 'basicUser',
+            title: '基本信息',
+            main: true,
+            tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+            content: <UserBasicInfoForm
+              ref={(el) => {
+                this.basicUser = el;
+              }}
+              userBasicInfo={userBasicInfo}
+              loading={!!loading} />
+          }, {
+            key: 'roleUser',
+            title: '角色信息',
+            tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+            content: <RoleInfoForm
+              ref={(el) => {
+                this.roleUser = el;
+              }}
+              userRoles={userRoles}
+              userRolesAll={userRolesAll}
+              userAddRoles={this.userAddRoles}
+              loading={!!loading} />
+          }, {
+            key: 'userGroups',
+            title: '用户组信息',
+            content: <UserGroupInfoForm
+              ref={(el) => {
+                this.userGroups = el;
+              }}
+              userGroups={userGroups}
+              userGroupsAll={userGroupsAll}
+              userAddGroups={this.userAddGroups}
+              loading={!!loading} />
+
+          }]}
+        />
         <Modal
           visible={this.state.viewModalVisible}
           destroyOnClose={true}

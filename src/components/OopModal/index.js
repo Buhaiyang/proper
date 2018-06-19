@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import {Modal, Popover, Button, Alert, Icon, Tabs } from 'antd';
+import {Modal, Popover, Button, Alert, Icon, Tabs, Popconfirm } from 'antd';
 import styles from './index.less';
 
 const { TabPane } = Tabs;
@@ -7,51 +7,55 @@ const hLine = (<div style={{height: 1, borderBottom: '1px solid #ddd', margin: '
 export default class OopModal extends PureComponent {
   state = {
   }
-  createModalContent = (tabs)=>{
+  // 编辑的时候不显示蓝色的提示框<Alert />
+  createModalContent = (tabs, isCreate)=>{
     return tabs.map(tab=>(
+      tab.disabled ? null : (
     <div key={tab.key} className={styles.oopTabContainer} name={tab.key}>
       <div style={{fontSize: 16, fontWeight: 'bold'}}>{tab.title}</div>
       {hLine}
-      {tab.tips ? <Alert message={tab.tips} type="info" showIcon /> : null}
+      {isCreate ? (tab.tips ? <Alert message={tab.tips} type="info" showIcon /> : null) : null}
       <div style={{marginTop: 24}}>{tab.content}</div>
-    </div>))
+    </div>)));
   }
   getInitProps = ()=>{
     const { props } = this;
-    const loading = false;
+    const { loading, isCreate } = props;
     const onOk = ()=>{
-      console.log('ok');
       props.onOk && props.onOk()
     }
     const onCancel = ()=>{
       props.onCancel && props.onCancel()
     };
+    const onDelete = ()=>{
+      props.onDelete && props.onDelete()
+    };
     const footer = (
       <Fragment>
+        {isCreate ? null : (
+          <Popconfirm
+          title="确认删除吗？"
+          onConfirm={onDelete}>
+          <Button style={{float: 'left'}}>删除</Button>
+        </Popconfirm>)}
         <Button onClick={onCancel}>取消</Button>
         <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
       </Fragment>);
     const _props = {
       title: 'Title',
       footer,
-      tabs: [
-        {
-          title: '基本信息',
-          content: <div>表单内容</div>,
-          tips: <div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>,
-          main: true
-        },
-        {
-          title: '关联用户',
-          content: <div>关联内容</div>,
-          tips: <div>请选择您要关联的用户，<a>点击用户所在行</a>即可选中</div>
-        }
-      ],
+      tabs: [],
       ...props,
     }
+    // 通过 tab的isCreate属性为tab增加默认的disabled属性
+    _props.tabs.forEach((tab)=>{
+      tab.disabled = tab.disabled === undefined ?
+        (tab.main ? false : _props.isCreate)
+        : tab.disabled
+    })
     const antdTabs = (
     <Tabs tabPosition="right" onTabClick={this.onTabClick} size="small">
-      {_props.tabs.map(tab=>(<TabPane tab={tab.title} key={tab.key} />))}
+      {_props.tabs.map(tab=>(<TabPane tab={tab.title} key={tab.key} disabled={tab.disabled} />))}
     </Tabs>);
     _props.title = (
       <span style={{display: 'flex', alignItems: 'center'}}>
@@ -84,12 +88,13 @@ export default class OopModal extends PureComponent {
     const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === key);
     const scrollHeight = this.calculateScrollHeight(curContainer);
     this.scrollModalBody(curContainer, scrollHeight);
+    this.props.onTabChange && this.props.onTabChange(key);
   }
   render() {
     const props = this.getInitProps()
     const modalStyle = {
       top: 20,
-      height: 'calc(100vh - 40px)',
+      height: 'calc(100vh - 32px)',
       overflow: 'hidden',
       borderRadius: 5
     }
@@ -100,7 +105,7 @@ export default class OopModal extends PureComponent {
           ref={ (el)=>{ this.oopModal = el }}
           {...props}
           style={modalStyle}>
-          {this.createModalContent(props.tabs)}
+          {this.createModalContent(props.tabs, props.isCreate)}
         </Modal>
       </div>)
   }
