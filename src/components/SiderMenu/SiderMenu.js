@@ -53,6 +53,10 @@ export default class SiderMenu extends PureComponent {
     snippets.shift();
     // eg. After the operation is completed, the array should be ['list','search']
     // eg. Forward the array as ['list','list/search']
+    if (this.props.menuData.length === 0) {
+      // return snippets when the menuData in fetching
+      return ['/'.concat(...snippets)]
+    }
     snippets = snippets.map((item, index) => {
       // If the array length > 1
       if (index > 0) {

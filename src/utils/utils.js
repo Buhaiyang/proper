@@ -1,7 +1,7 @@
 import moment from 'moment';
 import pathToRegexp from 'path-to-regexp';
 import { getRouterData } from '../common/frameHelper';
-import { devMode } from '../config';
+import { prefix, devMode } from '../config';
 
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
@@ -165,11 +165,14 @@ export function isUrl(path) {
 function getFlatMenuData(menus) {
   let keys = {};
   menus.forEach((item) => {
+    // hack 后台路径不是以斜线开头
+    if (item.route.charAt(0) !== '/') {
+      item.route = '/'.concat(item.route);
+      item.path = item.route;
+    }
+    keys[item.route] = { ...item };
     if (item.children) {
-      keys[item.route] = { ...item };
-      keys = { ...keys, ...getFlatMenuData(item.children) };
-    } else {
-      keys[item.route] = { ...item };
+      keys = { ...keys, ...getFlatMenuData(item.children) }
     }
   });
   return keys;
@@ -350,9 +353,26 @@ export const getParamObj = (search)=>{
 }
 export const getDownloadUrl = (id) => {
   let url = '/file/'.concat('download/').concat(id);
-  const prefix = window.localStorage.getItem('pea_dynamic_request_prefix');
-  if (devMode === 'development' && prefix) {
-    url = prefix + url;
+  const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix');
+  if (devMode === 'development' && peaDynamicRequestPrefix) {
+    url = peaDynamicRequestPrefix + url;
   }
   return url;
+}
+/**
+ * @desc
+ * 这个方法获取后台url请求的路径 有3处对于此方法的调用
+ * 1.request.js  //统一的http请求接口
+ * 2.OopUpload组件  //上传组件的后台接口
+ * 3.MongoService.js  //mongoDB的后台接口
+ */
+export const getApplicationContextUrl = ()=>{
+  const {protocol, host, pathname} = window.location;
+  const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix');
+  if (devMode === 'development' && peaDynamicRequestPrefix) {
+    if (peaDynamicRequestPrefix.indexOf('http:') === 0 || peaDynamicRequestPrefix.indexOf('https:') === 0) {
+      return peaDynamicRequestPrefix;
+    }
+  }
+  return `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`
 }

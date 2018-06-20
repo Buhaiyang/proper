@@ -508,7 +508,8 @@ export default class User extends React.PureComponent {
       }>
         <Card bordered={false}>
           <OopTable
-            grid={oopSearchGrid}
+            grid={{...oopSearchGrid,
+              list: oopSearchGrid.list.map(item=>({...item, disabled: item.superuser === true}))}}
             columns={column}
             loading={gridLoading}
             onLoad={this.onLoad}

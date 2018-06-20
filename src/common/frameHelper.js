@@ -71,6 +71,11 @@ export const addRoutersData = (routerData)=> {
 }
 export const addMenuData = (menuData)=> {
   if (menuData) {
+    menuData.forEach((item) => {
+      if (item.route.charAt(0) !== '/') {
+        item.route = '/'.concat(item.route);
+      }
+    })
     _menuData = Object.assign(_menuData, menuData)
     return _menuData
   }
