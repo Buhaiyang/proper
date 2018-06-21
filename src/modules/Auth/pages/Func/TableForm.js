@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Table, Button, Input, message, Popconfirm, Divider, Select } from 'antd';
+import { Table, Button, Input, message, Popconfirm, Divider, Select, Tooltip, Icon, Spin } from 'antd';
 import styles from './TableForm.less';
 
 const { Option } = Select;
@@ -27,7 +27,9 @@ export default class TableForm extends PureComponent {
   };
   remove(key) {
     if (key.indexOf('NEW_TEMP_ID_') === 0) {
-      this.props.value.pop()
+      const { value } = this.props;
+      const delIndex = value.map(item=>item.id).indexOf(key);
+      value.splice(delIndex, 1);
       this.forceUpdate();
     } else {
       this.onChange('delete', this.props.value.filter(item => item.id === key)[0]);
@@ -46,7 +48,7 @@ export default class TableForm extends PureComponent {
   }
   newMember = () => {
     const newData = this.props.value
-    newData.push({
+    newData.unshift({
       id: `NEW_TEMP_ID_${this.index}`,
       method: '',
       name: '',
@@ -210,34 +212,46 @@ export default class TableForm extends PureComponent {
         width: 100,
         render: (text, record) => {
           if (!!record.editable && this.state.loading) {
-            return null;
+            return <Spin spinning={true} size="small" />;
           }
           if (record.editable) {
             if (record.isNew) {
               return (
                 <span>
-                  <a onClick={e => this.saveRow(e, record.id)}>添加</a>
+                  <Tooltip placement="bottom" title="添加">
+                    <a onClick={e => this.saveRow(e, record.id)}><Icon type="check" /></a>
+                  </Tooltip>
                   <Divider type="vertical" />
                   <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.id)}>
-                    <a>删除</a>
+                    <Tooltip placement="bottom" title="删除">
+                      <a><Icon type="close" /></a>
+                    </Tooltip>
                   </Popconfirm>
                 </span>
               );
             }
             return (
               <span>
-                <a onClick={e => this.saveRow(e, record.id)}>保存</a>
+                <Tooltip placement="bottom" title="保存">
+                  <a onClick={e => this.saveRow(e, record.id)}><Icon type="check" /></a>
+                </Tooltip>
                 <Divider type="vertical" />
-                <a onClick={e => this.cancel(e, record.id)}>取消</a>
+                <Tooltip placement="bottom" title="取消">
+                  <a onClick={e => this.cancel(e, record.id)}><Icon type="close" /></a>
+                </Tooltip>
               </span>
             );
           }
           return (
             <span>
-              <a onClick={e => this.toggleEditable(e, record.id)}>编辑</a>
+              <Tooltip placement="bottom" title="编辑">
+                <a onClick={e => this.toggleEditable(e, record.id)}><Icon type="edit" /></a>
+              </Tooltip>
               <Divider type="vertical" />
               <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.id)}>
-                <a>删除</a>
+                <Tooltip placement="bottom" title="删除">
+                  <a><Icon type="delete" /></a>
+                </Tooltip>
               </Popconfirm>
             </span>
           );
@@ -246,6 +260,14 @@ export default class TableForm extends PureComponent {
     ]
     return (
       <Fragment>
+        <Button
+          style={{ marginBottom: 8 }}
+          type="primary"
+          onClick={this.newMember}
+          icon="plus"
+        >
+          新建
+        </Button>
         <Table
           {...this.props}
           rowKey={record=>record.id}
@@ -257,14 +279,6 @@ export default class TableForm extends PureComponent {
             return record.editable ? styles.editable : '';
           }}
         />
-        <Button
-          style={{ width: '100%', marginTop: 8 }}
-          type="dashed"
-          onClick={this.newMember}
-          icon="plus"
-        >
-          添加
-        </Button>
       </Fragment>
     );
   }

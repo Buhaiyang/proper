@@ -511,9 +511,11 @@ export default class Func extends PureComponent {
       },
       {title: '前端路径', dataIndex: 'route'},
       {
-        title: '状态', dataIndex: 'enable', render: record=>(
+        title: '状态', dataIndex: 'enable', render: text=>(
           <Fragment>
-            {record === true ? '已启用' : <Badge status="default" text="已停用" />}
+            {text === true ?
+              <Badge status="processing" text="已启用" /> :
+              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
           </Fragment>
         )
       }

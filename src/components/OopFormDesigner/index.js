@@ -134,11 +134,11 @@ const EditPanel = (props) => {
     return (
       <div>
         <div
-           ref={(el)=>{ this.contentEditable = el }}
-           contentEditable={true}
-           className={styles.customRulesContent}
-           dangerouslySetInnerHTML={{__html: divValue}}
-           title="格式例如:require,true,此项不能为空" />
+          ref={(el)=>{ this.contentEditable = el }}
+          contentEditable={true}
+          className={styles.customRulesContent}
+          dangerouslySetInnerHTML={{__html: divValue}}
+          title="格式例如:require,true,此项不能为空" />
         <div style={{marginTop: 8, textAlign: 'right'}}>
           <Button size="small" onClick={()=>setCustomRules(false)}>取消</Button>
           <Button type="primary" size="small" onClick={saveRules} style={{marginLeft: 8}}>保存</Button>
@@ -220,7 +220,7 @@ const EditPanel = (props) => {
       }];
       const childrenArr = children.map((cld, i)=>(
         {
-          name: `${name}${prefix}_${i}_children`,
+          name: `${name}${prefix}_children_${i}`,
           label: '',
           component: {
             name: 'Input',
@@ -459,18 +459,27 @@ export default class OopFormDesigner extends React.PureComponent {
       this.renderCenterPanel(elementId, value);
     }
   }
+
+  /**
+   * id, value 数据格式如下:
+   * BQfwB_edit_label, A1
+   * BQfwB_edit_children_0, A2
+   * BQfwB_edit_rules, [{…}]
+   * BQfwB_edit_props_placeholder, B4
+   * @param id
+   * @param value
+   */
   @Debounce(300)
   renderCenterPanel(id, value) {
-    console.log(this.state.currentRowItem)
     console.log(id, value);
     const idAttr = id.split('_');
-    const attr = idAttr.pop();
+    const attr = idAttr[2];
     // 组件内部props的同步
-    if (idAttr.pop() === 'props') {
+    if (attr === 'props') {
       const { component } = this.state.currentRowItem;
       component.props = {
         ...component.props,
-        [attr]: value
+        [idAttr[3]]: value
       };
       this.forceUpdate();
       return
@@ -554,32 +563,32 @@ export default class OopFormDesigner extends React.PureComponent {
         <Row gutter={16}>
           <Col span={6} >
             <AddPanel
-            selections={this.state.selections}
-            onAddItem={this.onAddItem} />
+              selections={this.state.selections}
+              onAddItem={this.onAddItem} />
           </Col>
           <Col span={12} >
             <CenterPanel
-            rowItems={this.state.rowItems}
-            onRowItemClick={this.onRowItemClick}
-            onRowItemIconCopy={this.onRowItemIconCopy}
-            onRowItemIconDelete={this.onRowItemIconDelete}
-            onRowItemDrag={this.onRowItemDrag}
-            onFormLayoutChange={this.onFormLayoutChange}
-            formTitle={this.state.formTitle}
-            formLayout={this.state.formLayout}
-            onFormTitleClick={this.onFormTitleClick}
-            self={this} />
+              rowItems={this.state.rowItems}
+              onRowItemClick={this.onRowItemClick}
+              onRowItemIconCopy={this.onRowItemIconCopy}
+              onRowItemIconDelete={this.onRowItemIconDelete}
+              onRowItemDrag={this.onRowItemDrag}
+              onFormLayoutChange={this.onFormLayoutChange}
+              formTitle={this.state.formTitle}
+              formLayout={this.state.formLayout}
+              onFormTitleClick={this.onFormTitleClick}
+              self={this} />
           </Col>
           <Col span={6} >
             <EditPanel
-            currentRowItem={this.state.currentRowItem}
-            updateCenterPanel={this.onUpdateCenterPanel}
-            onRowItemIconCopy={this.onRowItemIconCopy}
-            onRowItemIconDelete={this.onRowItemIconDelete}
-            onPlusClick={this.onPlusClick}
-            onRowItemDrag={this.onEditPanelRowItemDrag}
-            customRules={this.state.customRules}
-            setCustomRules={this.setCustomRules}
+              currentRowItem={this.state.currentRowItem}
+              updateCenterPanel={this.onUpdateCenterPanel}
+              onRowItemIconCopy={this.onRowItemIconCopy}
+              onRowItemIconDelete={this.onRowItemIconDelete}
+              onPlusClick={this.onPlusClick}
+              onRowItemDrag={this.onEditPanelRowItemDrag}
+              customRules={this.state.customRules}
+              setCustomRules={this.setCustomRules}
             />
           </Col>
         </Row>

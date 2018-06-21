@@ -460,7 +460,9 @@ export default class User extends React.PureComponent {
       {
         title: '状态', dataIndex: 'enable', render: text => (
           <Fragment>
-            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
+            {text === true ?
+              <Badge status="processing" text="已启用" /> :
+              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
           </Fragment>
         )
       }

@@ -12,8 +12,8 @@ export default class MongoService {
     this.currentUser = JSON.parse(window.atob(token.split('.')[0]));
     this.tableName = tableName;
     this.tableObj = AV.Object.extend(this.tableName);
-    const {protocol, host, pathname} = window.location;
-    const serverURL = url || (devMode === 'development' && window.localStorage.getItem('pea_dynamic_request_prefix')) || `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`;
+    // const {protocol, host, pathname} = window.location;
+    const serverURL = url || (devMode === 'development' && window.localStorage.getItem('pea_dynamic_request_prefix')) || `${prefix}`;
     const context = ctx || '/avdemo';
     AV.initialize(serverURL, context);
     AV.setToken(token);
