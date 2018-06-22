@@ -5,7 +5,8 @@ import styles from './index.less';
 export default class OopTable extends PureComponent {
   state = {
     selectedRowKeys: [],
-    selectedRowItems: []
+    selectedRowItems: [],
+    changeRows: [],
   }
   rowSelectionChange = (selectedRowKeys, selectedRowItems)=>{
     this.setState({
@@ -87,16 +88,76 @@ export default class OopTable extends PureComponent {
     })
     return cols
   }
+  selectRow = (record) => {
+    const selectedRowKeys = [...this.state.selectedRowKeys];
+    const delIndex = selectedRowKeys.indexOf(record.id);
+    if (delIndex >= 0) {
+      selectedRowKeys.splice(delIndex, 1);
+    } else {
+      selectedRowKeys.push(record.id);
+    }
+    this.setState({ selectedRowKeys });
+    this.rowSelectionChange(selectedRowKeys);
+    this.props.onRowSelect(record, selectedRowKeys);
+  }
+  rowClick = (record) => {
+    return {
+      onClick: () => {
+        this.selectRow(record);
+      },
+    }
+  }
+  addSelectRow = (original, modifaction) => {
+    original.map(item => modifaction.push(item))
+  }
+  addSelectRowKeys = (original, modifaction) => {
+    original.map(item => modifaction.push(item.id))
+  }
+  getPreSelectState = () => {
+    const { selectedRows, changeRows } = this.state;
+    const keys = [];
+    const lastCheck = selectedRows.filter(item => !changeRows.some(ele => ele.id === item.id))
+    this.addSelectRowKeys(lastCheck, keys)
+    if (selectedRows.length < changeRows.length) {
+      this.addSelectRow(changeRows, selectedRows)
+      this.addSelectRowKeys(selectedRows, keys)
+      this.rowSelectionChange(keys, selectedRows)
+    }
+    this.rowSelectionChange(keys, lastCheck)
+  }
+  componentWillReceiveProps(props) {
+    if (props.dataDefaultSelectedRowKeys) {
+      this.setState({
+        selectedRowKeys: props.dataDefaultSelectedRowKeys,
+      })
+    }
+  }
   render() {
     const { grid: {list, pagination },
-      columns, loading, topButtons = [], rowButtons = [], checkable = true, size } = this.props
+      columns, loading, topButtons = [], rowButtons = [], checkable = true, size,
+      onRowSelect, selectTriggerOnRowClick = false, onSelectAll } = this.props
     const cols = this.createRowButtons(columns, rowButtons)
     const rowSelectionCfg = checkable ? {
       onChange: this.rowSelectionChange,
       selectedRowKeys: this.state.selectedRowKeys,
       getCheckboxProps: record => ({
         disabled: record.disabled,
-      })
+      }),
+      onSelect: (record) => {
+        if (selectTriggerOnRowClick) {
+          this.selectRow(record);
+        }
+      },
+      onSelectAll: (selected, selectedRows, changeRows) => {
+        // TODO
+        this.setState({
+          changeRows,
+          selectedRows
+        })
+        if (onSelectAll) {
+          onSelectAll(changeRows)
+        }
+      },
     } : undefined
     return (
       <div className={styles.oopTableWrapper}>
@@ -106,6 +167,7 @@ export default class OopTable extends PureComponent {
           }
         </div>
         <Table
+          className={onRowSelect ? styles.rowHover : ''}
           dataSource={list}
           rowKey={record => record.id}
           rowSelection={rowSelectionCfg}
@@ -115,12 +177,13 @@ export default class OopTable extends PureComponent {
             pagination ? {...pagination,
               current: pagination.pageNo, pageSize: pagination.pageSize, total: pagination.count
             } : {
-              showSizeChanger: true,
-              showQuickJumper: true,
-            }
+                showSizeChanger: true,
+                showQuickJumper: true,
+              }
           }
           onChange={this.onChange}
           size={size}
+          onRow={onRowSelect ? this.rowClick : undefined}
         />
       </div>
     )

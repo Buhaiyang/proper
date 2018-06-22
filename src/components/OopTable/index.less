@@ -8,4 +8,16 @@
   .toolbar button {
     margin-left: 10px;
   }
+  .rowHover {
+    :global {
+      .ant-table-selection-column {
+        .ant-table-selection {
+          display: none;
+        }
+      }
+      .ant-table-tbody {
+        cursor: pointer;
+      }
+    }
+  }
 }

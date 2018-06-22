@@ -147,46 +147,37 @@ const UserBasicInfoForm = Form.create()((props) => {
       </Form>
     </Spin>);
 });
-const RoleInfoForm = Form.create()((props) => {
-  const {form, userRoles, userRolesAll, loading, userAddRoles} = props;
-  const {getFieldDecorator} = form;
-  const handleChange = (value) => {
-    userAddRoles(value);
-  };
+const RoleInfoForm = (props) => {
+  const { userRoles, userRolesAll, loading, columns, userAddRoles, size, oopSearchGrid} = props;
+  const handleChange = (record, selectedRowKeys) => {
+    userAddRoles(selectedRowKeys, record.id)
+  }
+  // 默认选中keys
+  const deafultSelectedRowKeys = userRoles.map(item => item.id);
   return (
-    <Form>
-      <FormItem
-        {...formItemLayout}
-        label="角色"
-      >
-        {getFieldDecorator('roles', {
-          initialValue: userRoles && userRoles.map(item => item.id)
-        })(<Select
-            mode="multiple"
-            style={{width: '100%'}}
-            placeholder="请选择角色 "
-            optionFilterProp="children"
-            onChange={handleChange}
-          >
-            {userRolesAll.length ? userRolesAll.map(item =>
-              (
-                <Option key={item.id}>
-                  {item.enable ? item.name :
-                    (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
-                </Option>)
-            ) : userRolesAll}
-          </Select>
-        )
-        }
-        {loading && (
-          <div className={styles.selectLoading}>
-            <Spin size="small" />
-          </div>
-        )}
-      </FormItem>
-    </Form>
+   <div>
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          moduleName="authusers"
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
+        />
+        <Card bordered={false}>
+          <OopTable
+            onLoad={this.onLoad}
+            loading={loading}
+            size={size}
+            grid={{ list: userRolesAll || oopSearchGrid }}
+            columns={columns}
+            onRowSelect={handleChange}
+            selectTriggerOnRowClick={true}
+            dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
+           // onSelectAll={onSelectAll}
+            />
+      </Card>
+    </div>
   );
-});
+}
 const UserGroupInfoForm = Form.create()((props) => {
   const {form, userGroups, userGroupsAll, loading, userAddGroups} = props;
   const {getFieldDecorator} = form;
@@ -379,65 +370,67 @@ export default class User extends React.PureComponent {
     }
     this.oopSearch.load(params)
   }
-  userAddDel = (value, typeAdd, typeDel, typeRoles, data) => {
+  addUserRoles = (typeAdd, id, typeRoles) => {
+    this.props.dispatch({
+      type: typeAdd,
+      payload: {
+        userId: this.props.authUser.userBasicInfo.id,
+        id
+      },
+      callback: (res) => {
+        oopToast(res, '添加用户成功', '添加失败')
+        this.props.dispatch({
+          type: typeRoles,
+          payload: this.props.authUser.userBasicInfo.id
+        })
+      }
+    });
+  }
+  deleteUserRoles =(typeDel, id, typeRoles) => {
+    this.props.dispatch({
+      type: typeDel,
+      payload: {
+        userId: this.props.authUser.userBasicInfo.id,
+        id
+      },
+      callback: (res) => {
+        oopToast(res, '删除用户成功', '删除失败')
+        this.props.dispatch({
+          type: typeRoles,
+          payload: this.props.authUser.userBasicInfo.id
+        })
+      }
+    });
+  }
+  userAddDel = (value, typeAdd, typeDel, typeRoles, data, id) => {
     const userIds = [];
     for (let i = 0; i < data.length; i++) {
       userIds.push(data[i].id);
     }
+    // 添加用户
     if (value.length > userIds.length) {
-      for (let i = 0; i < value.length; i++) {
-        if (userIds.indexOf(value[i]) === -1) {
-          this.props.dispatch({
-            type: typeAdd,
-            payload: {
-              userId: this.props.authUser.userBasicInfo.id,
-              id: value[i]
-            },
-            callback: () => {
-              this.props.dispatch({
-                type: typeRoles,
-                payload: this.props.authUser.userBasicInfo.id
-              })
-            }
-          });
-        }
-      }
+      this.addUserRoles(typeAdd, id, typeRoles);
     }
+    // 删除用户
     if (value.length < userIds.length) {
-      for (let i = 0; i < userIds.length; i++) {
-        if (value.indexOf(userIds[i]) === -1) {
-          this.props.dispatch({
-            type: typeDel,
-            payload: {
-              userId: this.props.authUser.userBasicInfo.id,
-              id: userIds[i]
-            },
-            callback: () => {
-              this.props.dispatch({
-                type: typeRoles,
-                payload: this.props.authUser.userBasicInfo.id
-              })
-            }
-          });
-        }
-      }
+      this.deleteUserRoles(typeDel, id, typeRoles);
     }
   }
   // 用户添加角色
-  userAddRoles = (value) => {
+  userAddRoles = (value, id) => {
     const typeAdd = 'authUser/userAddRole';
     const typeDel = 'authUser/userDelRole';
     const typeRoles = 'authUser/fetchUserRoles';
     const data = this.props.authUser.userRoles;
-    this.userAddDel(value, typeAdd, typeDel, typeRoles, data);
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data, id);
   }
   // 用户添加用户组
-  userAddGroups = (value) => {
+  userAddGroups = (value, id) => {
     const typeAdd = 'authUser/userAddGroup';
     const typeDel = 'authUser/userDelGroup';
     const typeRoles = 'authUser/fetchUserGroups';
     const data = this.props.authUser.userGroups;
-    this.userAddDel(value, typeAdd, typeDel, typeRoles, data);
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data, id);
   }
   render() {
     const {
@@ -466,6 +459,19 @@ export default class User extends React.PureComponent {
           </Fragment>
         )
       }
+    ]
+    const userRolesColumns = [
+      { title: '名称', dataIndex: 'name' },
+      { title: '描述', dataIndex: 'description' },
+      { title: '继承', dataIndex: 'parentName' },
+      { title: '继承编号', dataIndex: 'parentId' },
+      {
+        title: '状态', dataIndex: 'enable', render: text => (
+          <Fragment>
+            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
+          </Fragment>
+        )
+      },
     ]
     const topButtons = [
       {
@@ -548,13 +554,16 @@ export default class User extends React.PureComponent {
             title: '角色信息',
             tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
             content: <RoleInfoForm
-              ref={(el) => {
+            ref={(el) => {
                 this.roleUser = el;
               }}
               userRoles={userRoles}
               userRolesAll={userRolesAll}
               userAddRoles={this.userAddRoles}
-              loading={!!loading} />
+              loading={!!loading}
+              columns={userRolesColumns}
+              oopSearchGrid={oopSearchGrid}
+            />
           }, {
             key: 'userGroups',
             title: '用户组信息',
@@ -566,7 +575,6 @@ export default class User extends React.PureComponent {
               userGroupsAll={userGroupsAll}
               userAddGroups={this.userAddGroups}
               loading={!!loading} />
-
           }]}
         />
         <Modal
