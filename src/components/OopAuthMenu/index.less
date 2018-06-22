@@ -1,0 +1,66 @@
+@import "~antd/lib/style/themes/default.less";
+.oopAuthMenu {
+  width: 100%;
+  margin: 0 0 16px;
+  transition: all .2s;
+  & > li:first-child {
+    padding-top: 18px;
+  }
+  & > li:last-child {
+    padding-bottom: 18px;
+  }
+  .oopAuthMenuFieldset {
+    margin: 24px 0;
+    border: 1px solid #ebedf0;
+    border-radius: 2px;
+    position: relative;
+    padding: 18px 32px;
+    transition: background-color .4s;
+    width: 100%;
+    font-size: 14px;
+    & > span {
+      position: absolute;
+      top: -12px;
+      background: #fff;
+      transition: background-color .4s;
+    }
+
+    & > :global(.ant-tree-switcher) {
+      left: 18px;
+    }
+    & > :global(.ant-tree-checkbox) {
+      left: 40px;
+    }
+    & > :global(.ant-tree-node-content-wrapper) {
+      left: 58px;
+    }
+  }
+  .oopAuthMenuResourceWrapper {
+    & > :global(.ant-tree-child-tree) {
+      white-space: normal;
+      display: flex;
+      flex-flow: row wrap;
+      :global {
+        .inline-block {
+          float: left;
+          flex: 0 0 auto;
+
+          display: block;
+          box-sizing: border-box;
+          width: 33.33333333%;
+
+          & > :global(.ant-tree-node-content-wrapper) {
+            width: calc(~"100% - 40px");
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+    }
+  }
+  .oopAuthMenuMark {
+    color: @primary-color;
+  }
+}

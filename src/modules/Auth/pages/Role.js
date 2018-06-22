@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
-  Form, Tabs, Input, Radio, Select, Tree, Tooltip } from 'antd';
+  Form, Tabs, Input, Radio, Select, Tooltip } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
@@ -8,6 +8,7 @@ import OopSearch from '../../../components/OopSearch';
 import DescriptionList from '../../../components/DescriptionList';
 import OopTable from '../../../components/OopTable';
 import { oopToast } from './../../../common/oopUtils';
+import OopAuthMenu from '../../../components/OopAuthMenu'
 
 const { Description } = DescriptionList;
 const { TabPane } = Tabs;
@@ -15,7 +16,6 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 const { Option } = Select;
-const { TreeNode } = Tree;
 
 const formItemLayout = {
   labelCol: {
@@ -112,23 +112,7 @@ const BasicInfoForm = Form.create()((props) => {
 const ManagerInfoForm = Form.create()((props) => {
   const { loading, roleMenus, checkedMenuKeys, checkedResourceKeys,
     handleMenuKeys, roleInfo, labelText } = props;
-
   const checkedAllKeys = [...checkedMenuKeys, ...checkedResourceKeys];
-
-  const renderTreeNodes = (data) => {
-    return data.map((item) => {
-      if (item.children || (item.resources && item.resources.length > 0)) {
-        return (
-          <TreeNode title={item.name} key={item.id} dataRef={item} disableCheckbox={!item.enable}>
-            {renderTreeNodes(item.children ? item.children : item.resources)}
-          </TreeNode>
-        );
-      }
-      return (
-        <TreeNode title={item.name} key={item.id} dataRef={item} disableCheckbox={!item.enable} />
-      );
-    });
-  }
 
   const onCheck = (checkedKeys, info) => {
     handleMenuKeys(checkedKeys, info, roleInfo.id);
@@ -136,21 +120,11 @@ const ManagerInfoForm = Form.create()((props) => {
 
   return (
     <Spin spinning={loading}>
-      <Form>
+      <Form layout='vertical'>
         <FormItem
-          {...formItemLayout}
           label={labelText}
         >
-          <Tree
-            checkable
-            showLine
-            checkedKeys={checkedAllKeys}
-            onCheck={onCheck}
-          >
-            {
-              renderTreeNodes(roleMenus)
-            }
-          </Tree>
+          <OopAuthMenu data={roleMenus} checkedAllKeys={checkedAllKeys} onCheck={onCheck}/>
         </FormItem>
       </Form>
     </Spin>
@@ -434,20 +408,18 @@ export default class Role extends PureComponent {
 
   // 删除功能
   handleRemove = (ids) => {
-    Modal.confirm({
-      title: '提示',
-      content: `确定删除选中的${ids.length}条数据吗`,
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => {
-        this.props.dispatch({
-          type: 'authRole/removeRoles',
-          payload: { ids: ids.toString() },
-          callback: (res) => {
-            oopToast(res, '删除成功');
-            this.onLoad();
-          }
-        });
+    let idsArray = [];
+    if (ids instanceof Array) {
+      idsArray = ids;
+    } else {
+      idsArray.push(ids.id);
+    }
+    this.props.dispatch({
+      type: 'authRole/removeRoles',
+      payload: { ids: idsArray.toString() },
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败');
+        this.onLoad();
       }
     });
   }
@@ -513,6 +485,7 @@ export default class Role extends PureComponent {
         this.setState({
           checkedMenuKeys: this.props.authRole.roleMenusChecked.map(item => item.id),
           checkedResourceKeys: this.props.authRole.roleResourcesChecked.map(item => item.id),
+          allCheckedMenuKeys: this.props.authRole.allCheckedMenu.map(item => item.id)
         })
       }
     })
@@ -524,10 +497,9 @@ export default class Role extends PureComponent {
     const checkedResource = [];
     const halfCheckedMenus = [];
     for (let i = 0; i < info.checkedNodes.length; i++) {
-      if (info.checkedNodes[i].props.dataRef.resourceType) {
+      if (!info.checkedNodes[i].props.dataRef.hasOwnProperty('parentId')) {
         checkedResource.push(info.checkedNodes[i].props.dataRef.id);
-      }
-      if (info.checkedNodes[i].props.dataRef.menuType) {
+      } else {
         checkedMenus.push(info.checkedNodes[i].props.dataRef.id);
       }
     }

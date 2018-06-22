@@ -20,6 +20,7 @@ export default {
     roleMenus: [],
     roleMenusChecked: [],
     roleResourcesChecked: [],
+    allCheckedMenu: []
   },
 
   effects: {
@@ -102,7 +103,7 @@ export default {
       }
       yield put({
         type: 'saveRoleMenus',
-        payload: {menus, menusChecked, resourcesChecked},
+        payload: {menus, menusChecked, resourcesChecked, allCheckedMenu: checkMenus.result},
       });
       if (callback) callback();
     },
@@ -202,7 +203,8 @@ export default {
         ...state,
         roleMenus: action.payload.menus,
         roleMenusChecked: action.payload.menusChecked,
-        roleResourcesChecked: action.payload.resourcesChecked
+        roleResourcesChecked: action.payload.resourcesChecked,
+        allCheckedMenu: action.payload.allCheckedMenu
       };
     },
     saveAllUsers(state, action) {
