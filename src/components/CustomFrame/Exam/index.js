@@ -21,7 +21,8 @@ export default class Exam extends React.PureComponent {
     btnDisabled: false
   }
   componentWillMount() {
-    this.loadData();
+    window.parent.postMessage('root', '*');
+    // this.loadData();
   }
 
   loadData = () => {
@@ -116,7 +117,8 @@ export default class Exam extends React.PureComponent {
 
     return (
       <div className={styles.examWrapper}>
-        <header className={styles.examName}>{examContent.name}</header>
+        <header className={styles.examName}>this is list page;</header>
+        <a href="#/customframe/exam-details" >去详情页</a>
         <Row>
           <Col span={20} offset={2}>
             {

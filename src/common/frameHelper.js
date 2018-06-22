@@ -37,6 +37,9 @@ let _routerData = {
   '/customframe/exam': {
     component: dynamicWrapper(()=>import('../components/CustomFrame/Exam/index'))
   },
+  '/customframe/exam-details': {
+    component: dynamicWrapper(()=>import('../components/CustomFrame/Exam/examDetails'))
+  },
   '/base': {
     component: dynamicWrapper(()=>import('../layouts/UserLayout'))
   },
