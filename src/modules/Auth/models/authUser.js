@@ -32,10 +32,11 @@ export default {
       })
       if (callback) callback()
     },
-    *fetchUserRoles({ payload }, { call, put }) {
+    *fetchUserRoles({ payload, callback }, { call, put }) {
       // 先查用户所有可选角色 再查用户当前角色
       const resp = yield call(queryUserRoles, payload);
       const resp2 = yield call(queryUserRolesAll, payload);
+      const res = { resp, resp2 }
       yield put({
         type: 'saveUserRoles',
         payload: {
@@ -43,11 +44,13 @@ export default {
           userRolesAll: resp2.result
         }
       })
+      if (callback) callback(res)
     },
-    *fetchUserGroups({ payload }, { call, put}) {
+    *fetchUserGroups({ payload, callback }, { call, put }) {
       // 先查用户所有可选用户组 再查用户当前用户组
       const resp = yield call(queryUserGroups, payload);
       const resp2 = yield call(queryUserGroupsAll, payload);
+      const res = { resp, resp2 }
       yield put({
         type: 'saveUserGroups',
         payload: {
@@ -55,6 +58,7 @@ export default {
           userGroupsAll: resp2.result
         }
       })
+      if (callback) callback(res)
     },
     *fetchAll({ payload, callback }, { call, put}) {
       // 查询用户所有信息 基本信息、角色信息、用户组信息
@@ -127,17 +131,27 @@ export default {
       }
     },
     saveUserRoles(state, { payload }) {
+      const { userRolesAll } = payload;
+      userRolesAll.map((item) => {
+        item.enable === true ? item.enableStatus = '已启用' : item.enableStatus = '已停用'
+        return userRolesAll
+      })
       return {
         ...state,
         userRoles: payload.userRoles,
-        userRolesAll: payload.userRolesAll,
+        userRolesAll,
       }
     },
     saveUserGroups(state, { payload }) {
+      const { userGroupsAll } = payload;
+      userGroupsAll.map((item) => {
+        item.enable === true ? item.enableStatus = '已启用' : item.enableStatus = '已停用'
+        return userGroupsAll
+      })
       return {
         ...state,
         userGroups: payload.userGroups,
-        userGroupsAll: payload.userGroupsAll,
+        userGroupsAll,
       }
     },
     saveAll(state, { payload: {userBasicInfo, userRoles, userGroups} }) {

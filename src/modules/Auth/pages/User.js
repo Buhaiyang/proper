@@ -1,18 +1,16 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Form, Modal, Button, Input, Radio, Select, Badge, Tooltip, Spin} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Badge, Spin} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import OopModal from '../../../components/OopModal';
 import {inject} from '../../../common/inject';
-import styles from './User.less';
 import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const {Option} = Select;
 const {Description} = DescriptionList;
 const formItemLayout = {
   labelCol: {
@@ -147,76 +145,64 @@ const UserBasicInfoForm = Form.create()((props) => {
       </Form>
     </Spin>);
 });
-const RoleInfoForm = (props) => {
-  const { userRoles, userRolesAll, loading, columns, userAddRoles, size, oopSearchGrid} = props;
+const RoleInfoRelevance = (props) => {
+  const { userRoles, userAddRoles, loading, columns, size, userRolesList, filterRolesAll } = props;
   const handleChange = (record, selectedRowKeys) => {
     userAddRoles(selectedRowKeys, record.id)
   }
   // 默认选中keys
-  const deafultSelectedRowKeys = userRoles.map(item => item.id);
+  const deafultSelectedRowKeys = userRoles.map(item => item.id)
   return (
-   <div>
+    <Card bordered={false}>
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="authusers"
-          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
+          onInputChange={filterRolesAll}
+          ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
         />
-        <Card bordered={false}>
-          <OopTable
-            onLoad={this.onLoad}
-            loading={loading}
-            size={size}
-            grid={{ list: userRolesAll || oopSearchGrid }}
-            columns={columns}
-            onRowSelect={handleChange}
-            selectTriggerOnRowClick={true}
-            dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
-           // onSelectAll={onSelectAll}
-            />
+        <OopTable
+          onLoad={this.onLoad}
+          loading={loading}
+          size={size}
+          grid={{ list: userRolesList }}
+          columns={columns}
+          onRowSelect={handleChange}
+          selectTriggerOnRowClick={true}
+          dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
+          // onSelectAll={onSelectAll}
+          />
       </Card>
-    </div>
   );
 }
-const UserGroupInfoForm = Form.create()((props) => {
-  const {form, userGroups, userGroupsAll, loading, userAddGroups} = props;
-  const {getFieldDecorator} = form;
-  const handleChange = (value) => {
-    userAddGroups(value);
-  };
+const UserGroupRelevance = (props) => {
+  const { userGroups, userAddGroups, loading,
+    columns, size, userGroupsList, filterGroupsAll } = props;
+  const handleChange = (record, selectedRowKeys) => {
+    userAddGroups(selectedRowKeys, record.id)
+  }
+  // 默认选中keys
+  const deafultSelectedRowKeysGroups = userGroups.map(item => item.id);
+
   return (
-    <Form>
-      <FormItem
-        {...formItemLayout}
-        label="用户组"
-      >
-        {getFieldDecorator('groups', {
-          initialValue: userGroups && userGroups.map(item => item.id)
-        })(
-          <Select
-            mode="multiple"
-            style={{width: '100%'}}
-            placeholder="请选择用户组"
-            optionFilterProp="children"
-            onChange={handleChange}
-          >
-            {userGroupsAll.length ? userGroupsAll.map(item =>
-              (
-                <Option key={item.id}>
-                  {item.enable ? item.name :
-                    (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
-                </Option>)
-            ) : userGroupsAll}
-          </Select>
-        )}
-        {loading && (
-          <div className={styles.selectLoading}>
-            <Spin size="small" />
-          </div>
-        )}
-      </FormItem>
-    </Form>);
-});
+      <Card bordered={false}>
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          onInputChange={filterGroupsAll}
+          ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
+        />
+        <OopTable
+          onLoad={this.onLoad}
+          loading={loading}
+          grid={{ list: userGroupsList }}
+          columns={columns}
+          size={size}
+          onRowSelect={handleChange}
+          selectTriggerOnRowClick={true}
+          dataDefaultSelectedRowKeys={deafultSelectedRowKeysGroups}
+          />
+      </Card>);
+};
 @inject(['authUser', 'global'])
 @connect(({authUser, global, loading}) => ({
   authUser,
@@ -228,7 +214,9 @@ export default class User extends React.PureComponent {
   state = {
     modalVisible: false,
     viewModalVisible: false,
-    isCreate: !this.props.authUser.userBasicInfo.id
+    isCreate: !this.props.authUser.userBasicInfo.id,
+    userRolesList: [],
+    userGroupsList: [],
   }
 
   componentDidMount() {
@@ -295,19 +283,25 @@ export default class User extends React.PureComponent {
     const me = this;
     me.setState({
       currentTabKey: activeKey
-    });
+    })
     if (activeKey === 'roleUser') {
       if (this.props.authUser.userRolesAll.length === 0) {
         me.props.dispatch({
           type: 'authUser/fetchUserRoles',
-          payload: this.props.authUser.userBasicInfo.id
-        });
+          payload: this.props.authUser.userBasicInfo.id,
+          callback: (res) => {
+            me.operationsData(res, 'roleUser');
+          }
+        })
       }
     } else if (activeKey === 'userGroups') {
       if (this.props.authUser.userGroupsAll.length === 0) {
         me.props.dispatch({
           type: 'authUser/fetchUserGroups',
-          payload: this.props.authUser.userBasicInfo.id
+          payload: this.props.authUser.userBasicInfo.id,
+          callback: (res) => {
+            me.operationsData(res, 'userGroups');
+          }
         });
       }
     }
@@ -378,7 +372,7 @@ export default class User extends React.PureComponent {
         id
       },
       callback: (res) => {
-        oopToast(res, '添加用户成功', '添加失败')
+        oopToast(res, '添加成功', '添加失败')
         this.props.dispatch({
           type: typeRoles,
           payload: this.props.authUser.userBasicInfo.id
@@ -394,7 +388,7 @@ export default class User extends React.PureComponent {
         id
       },
       callback: (res) => {
-        oopToast(res, '删除用户成功', '删除失败')
+        oopToast(res, '删除成功', '删除失败')
         this.props.dispatch({
           type: typeRoles,
           payload: this.props.authUser.userBasicInfo.id
@@ -432,15 +426,48 @@ export default class User extends React.PureComponent {
     const data = this.props.authUser.userGroups;
     this.userAddDel(value, typeAdd, typeDel, typeRoles, data, id);
   }
+  setRolesList = (list) => {
+    this.setState({
+      userRolesList: list
+    })
+  }
+  setGroupsList = (list) => {
+    this.setState({
+      userGroupsList: list
+    })
+  }
+  filterRolesAll = (inputValue, filter) => {
+    const { authUser: { userRolesAll } } = this.props;
+    const rolesList = inputValue ? filter(userRolesAll) : userRolesAll;
+    this.setRolesList(rolesList)
+  }
+  filterGroupsAll = (inputValue, filter) => {
+    const { authUser: { userGroupsAll } } = this.props;
+    const groupsList = inputValue ? filter(userGroupsAll) : userGroupsAll;
+    this.setGroupsList(groupsList)
+  }
+  // 添加字段支持静态搜索（对布尔值会报错）
+  formatAllList = (data) => {
+    data.map((item) => {
+      item.enable === true ? item.enableStatus = '已启用' : item.enableStatus = '已停用'
+      return data
+    })
+  }
+  operationsData = (res, type) => {
+    const { status } = res.resp2;
+    const { userGroupsAll, userRolesAll } = this.props.authUser;
+    if (status === 'ok') {
+      type === 'roleUser' ? this.setRolesList(userRolesAll) : this.setGroupsList(userGroupsAll)
+    }
+  }
   render() {
     const {
-      authUser: {
-        userBasicInfo, userRoles, userRolesAll, userGroups, userGroupsAll
-      },
+      authUser: { userBasicInfo, userRoles, userGroups, },
       loading,
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
+    const { isCreate, modalVisible, viewModalVisible, userRolesList, userGroupsList } = this.state;
     const column = [
       {
         title: '用户名', dataIndex: 'username', render: (text, record) => {
@@ -461,10 +488,21 @@ export default class User extends React.PureComponent {
       }
     ]
     const userRolesColumns = [
-      { title: '名称', dataIndex: 'name' },
-      { title: '描述', dataIndex: 'description' },
+      { title: '角色名称', dataIndex: 'name' },
+      { title: '功能描述说明', dataIndex: 'description' },
       { title: '继承', dataIndex: 'parentName' },
-      { title: '继承编号', dataIndex: 'parentId' },
+      {
+        title: '状态', dataIndex: 'enable', render: text => (
+          <Fragment>
+            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
+          </Fragment>
+        )
+      },
+    ]
+    const userGroupsColumns = [
+      { title: '用户组名称', dataIndex: 'name' },
+      { title: '用户组描述', dataIndex: 'description' },
+      { title: '顺序', dataIndex: 'seq' },
       {
         title: '状态', dataIndex: 'enable', render: text => (
           <Fragment>
@@ -528,14 +566,14 @@ export default class User extends React.PureComponent {
           />
         </Card>
         <OopModal
-          title={this.state.isCreate ? '新建用户' : '编辑用户'}
-          visible={this.state.modalVisible}
+          title={isCreate ? '新建用户' : '编辑用户'}
+          visible={modalVisible}
           destroyOnClose={true}
           width={800}
           onCancel={this.clearModalForms}
           onOk={this.onSubmitForm}
           onDelete={this.handleDelete}
-          isCreate={this.state.isCreate}
+          isCreate={isCreate}
           loading={!!loading}
           onTabChange={this.handleTabChange}
           tabs={[{
@@ -553,32 +591,29 @@ export default class User extends React.PureComponent {
             key: 'roleUser',
             title: '角色信息',
             tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
-            content: <RoleInfoForm
-            ref={(el) => {
-                this.roleUser = el;
-              }}
+            content: <RoleInfoRelevance
               userRoles={userRoles}
-              userRolesAll={userRolesAll}
               userAddRoles={this.userAddRoles}
               loading={!!loading}
               columns={userRolesColumns}
-              oopSearchGrid={oopSearchGrid}
+              userRolesList={userRolesList}
+              filterRolesAll={this.filterRolesAll}
             />
           }, {
             key: 'userGroups',
             title: '用户组信息',
-            content: <UserGroupInfoForm
-              ref={(el) => {
-                this.userGroups = el;
-              }}
+            content: <UserGroupRelevance
               userGroups={userGroups}
-              userGroupsAll={userGroupsAll}
               userAddGroups={this.userAddGroups}
-              loading={!!loading} />
+              loading={!!loading}
+              columns={userGroupsColumns}
+              userGroupsList={userGroupsList}
+              filterGroupsAll={this.filterGroupsAll}
+            />
           }]}
         />
         <Modal
-          visible={this.state.viewModalVisible}
+          visible={viewModalVisible}
           destroyOnClose={true}
           width={600}
           footer={<Button type="primary" onClick={() => this.handleViewModalVisible(false)}>确定</Button>}

@@ -4,9 +4,86 @@ import styles from './index.less';
 
 const { TabPane } = Tabs;
 const hLine = (<div style={{height: 1, borderBottom: '1px solid #ddd', margin: '24px 0'}} />)
+
+function getOffsetTop(element, container) {
+  if (!element) {
+    return 0;
+  }
+
+  if (!element.getClientRects().length) {
+    return 0;
+  }
+
+  const rect = element.getBoundingClientRect();
+
+  if (rect.width || rect.height) {
+    return rect.top - container.getBoundingClientRect().top;
+  }
+
+  return rect.top;
+}
+
 export default class OopModal extends PureComponent {
   state = {
   }
+
+  componentDidUpdate = () => {
+    const containers = document.getElementsByClassName(styles.oopTabContainer);
+    if (containers.length > 0) {
+      if (!this.state.activeKey) {
+        this.setState({
+          activeKey: containers[0].getAttribute('name')
+        });
+      }
+      this.modalbody = containers[0].parentNode;
+      if (this.modalbody.getAttribute('scrollEvent') !== '1') {
+        this.modalbody.addEventListener('scroll', this.handleScroll, false);
+        this.modalbody.setAttribute('scrollEvent', '1');
+      }
+    }
+  }
+
+  handleScroll = () => {
+    const key = this.state.activeKey ? this.state.activeKey : this.props.tabs.find(it => 'main' in it).key;
+    const activeKey = this.getCurrentAnchor(50, 0);
+    if (activeKey !== key) {
+      this.setState({
+        activeKey
+      });
+      this.props.onTabChange && this.props.onTabChange(activeKey);
+    }
+  }
+
+  getCurrentAnchor(offsetTop = 0, bounds = 5) {
+    if (typeof document === 'undefined') {
+      return this.state.activeKey;
+    }
+
+    const linkSections = [];
+    const container = this.modalbody;
+    const doms = document.getElementsByClassName(styles.oopTabContainer);
+    for (let i = 0; i < doms.length; i++) {
+      const target = doms[i];
+      if (target) {
+        const top = getOffsetTop(target, container);
+        if (top < offsetTop + bounds) {
+          linkSections.push({
+            link: target.getAttribute('name'),
+            top
+          });
+        }
+      }
+    }
+
+    if (linkSections.length) {
+      const maxSection = linkSections.reduce((prev, curr) => {
+        return curr.top > prev.top ? curr : prev;
+      });
+      return maxSection.link;
+    }
+    return doms.length > 0 ? doms[0].getAttribute('name') : '';
+  }
+
   // 编辑的时候不显示蓝色的提示框<Alert />
   createModalContent = (tabs, isCreate)=>{
     return tabs.map(tab=>(
@@ -51,10 +128,10 @@ export default class OopModal extends PureComponent {
     _props.tabs.forEach((tab)=>{
       tab.disabled = tab.disabled === undefined ?
         (tab.main ? false : _props.isCreate)
-        : tab.disabled
+        : tab.disabled;
     })
     const antdTabs = (
-    <Tabs tabPosition="right" onTabClick={this.onTabClick} size="small">
+    <Tabs tabPosition="right" onTabClick={this.onTabClick} size="small" activeKey={this.state.activeKey}>
       {_props.tabs.map(tab=>(<TabPane tab={tab.title} key={tab.key} disabled={tab.disabled} />))}
     </Tabs>);
     _props.title = (
@@ -84,6 +161,9 @@ export default class OopModal extends PureComponent {
     }
   }
   onTabClick = (key)=>{
+    this.setState({
+      activeKey: key
+    });
     const containers = document.getElementsByClassName(styles.oopTabContainer);
     const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === key);
     const scrollHeight = this.calculateScrollHeight(curContainer);
@@ -97,14 +177,15 @@ export default class OopModal extends PureComponent {
       height: 'calc(100vh - 32px)',
       overflow: 'hidden',
       borderRadius: 5
-    }
+    };
     return (
       <div className={styles.oopModalContainer}>
         <Modal
           getContainer={()=>document.getElementsByClassName(styles.oopModalContainer)[0]}
           ref={ (el)=>{ this.oopModal = el }}
           {...props}
-          style={modalStyle}>
+          style={modalStyle}
+          >
           {this.createModalContent(props.tabs, props.isCreate)}
         </Modal>
       </div>)

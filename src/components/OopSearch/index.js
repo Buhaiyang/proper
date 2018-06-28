@@ -75,7 +75,7 @@ const filterTableList = (searchValue, tableList)=>{
       return false;
     }
     const row = item;
-    const sValue = value.toString();
+    const sValue = value != null ? value.toString() : '';
     const sIndex = sValue.indexOf(searchValue);
     const flag = sIndex > -1;
     if (flag) {
@@ -437,4 +437,3 @@ export default class OopSearch extends React.Component {
     );
   }
 }
-

@@ -1,17 +1,16 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Card, Button, Divider, Spin, Transfer,
-  Form, Modal, Input, Tabs, Radio, Badge, InputNumber } from 'antd';
+import { Card, Button, Divider, Spin,
+  Form, Modal, Input, Radio, Badge, InputNumber } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
+import OopModal from '../../../components/OopModal';
 import DescriptionList from '../../../components/DescriptionList';
 import { oopToast } from './../../../common/oopUtils';
-import styles from './Group.less';
 
 const FormItem = Form.Item;
-const { TabPane } = Tabs;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 // const { Option } = Select;
@@ -93,132 +92,33 @@ const BasicInfoForm = Form.create()((props) => {
   )
 });
 
-const UserInfoForm = Form.create()((props) => {
-  const { form, allUsers, userTargetKeys, handleUserTrans, groupsBasicInfo } = props;
-
-  for (const item of allUsers) {
-    item.key = item.id;
+const UserRelevance = (props) => {
+  const { loading, columns, size,
+    userList, filterUserAll, deafultSelected, handleUserTrans, groupsBasicInfo } = props;
+  const handleChange = (record, selectedRowKeys) => {
+    handleUserTrans(groupsBasicInfo.id, selectedRowKeys)
   }
 
-  const handleChange = (tKeys) => {
-    handleUserTrans(groupsBasicInfo.id, tKeys);
-  }
-  console.log('userTargetKeys', userTargetKeys)
   return (
-    <Form>
-      <FormItem>
-        {form.getFieldDecorator('id', {
-          initialValue: groupsBasicInfo.id,
-        })(
-          <Input type="hidden" />
-        )}
-      </FormItem>
-      <FormItem>
-        <Transfer
-          dataSource={allUsers}
-          showSearch
-          listStyle={{
-            width: '40%',
-            height: 300,
-          }}
-          operations={['添加', '删除']}
-          targetKeys={userTargetKeys}
-          onChange={handleChange}
-          render={item => `${item.username}-${item.name}`}
+      <Card bordered={false}>
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          onInputChange={filterUserAll}
+          ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
         />
-      </FormItem>
-    </Form>
-  )
-});
-
-const CreateForm = connect()((props) => {
-  const { modalVisible, handleFormSubmit, closeForm, groupUsers,
-    allUsers, userTargetKeys, isCreate, loading,
-    groupsBasicInfo, currentTabKey, handleTabChange, handleUserTrans } = props;
-
-  // 取消
-  const handleCancel = () => {
-    const customForm = this[currentTabKey].getForm();
-    closeForm(customForm);
-  }
-
-  const okHandle = () => {
-    const customForm = this[currentTabKey].getForm();
-    customForm.validateFields((err, fieldsValue) => {
-      if (err) return;
-      handleFormSubmit(customForm, fieldsValue);
-    });
-  };
-
-  const onTabChange = (activeKey) => {
-    handleTabChange(activeKey);
-  }
-
-  const tabList = [
-    {
-      key: 'basic',
-      tab: '基本信息',
-      disabled: false,
-      content: <BasicInfoForm
-        ref = {(el) => { this.basic = el; }}
-        groupsBasicInfo = {groupsBasicInfo}
-        loading = {loading}
-      />
-    },
-    {
-      key: 'user',
-      tab: '用户信息',
-      disabled: isCreate,
-      content: <UserInfoForm
-        ref = {(el) => { this.user = el; }}
-        groupsBasicInfo = {groupsBasicInfo}
-        groupUsers = {groupUsers}
-        allUsers = {allUsers}
-        handleUserTrans = {handleUserTrans}
-        userTargetKeys = {userTargetKeys}
-        loading = {loading}
-      />
-    },
-    // {
-    //   key: 'group',
-    //   tab: '用户组信息',
-    //   disabled: isCreate,
-    //   content: <GroupInfoForm
-    //     ref = {(el) => { this.group = el; }}
-    //     userGroups = {userGroups}
-    //     allUsers = {allUsers}
-    //     groupAll = {groupAll}
-    //     loading = {loading}
-    //   />
-    // }
-  ];
-  const footer = (
-    <Fragment>
-      <Button onClick={handleCancel}>取消</Button>
-      {currentTabKey === 'basic' && <Button type="primary" onClick={okHandle} loading={loading}>保存</Button>}
-    </Fragment>);
-  return (
-    <Modal
-      visible={modalVisible}
-      onCancel={handleCancel}
-      footer={footer}
-      className={styles.anthGroupStyles}
-      destroyOnClose={true}
-    >
-      <Tabs
-        onChange={onTabChange}
-        activeKey={currentTabKey}
-      >
-        {
-          tabList.map(item => (
-            <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
-          ))
-        }
-      </Tabs>
-    </Modal>
-  );
-});
-
+        <OopTable
+          onLoad={this.onLoad}
+          loading={loading}
+          grid={{ list: userList }}
+          columns={columns}
+          size={size}
+          onRowSelect={handleChange}
+          selectTriggerOnRowClick={true}
+          dataDefaultSelectedRowKeys={deafultSelected}
+          />
+      </Card>);
+};
 
 @inject(['authGroups', 'global'])
 @connect(({ authGroups, global, loading }) => ({
@@ -320,11 +220,36 @@ export default class Group extends PureComponent {
     });
   }
 
+  onDelete = () => {
+    const self = this;
+    const {authGroups: {groupsBasicInfo: {id}}} = this.props
+    this.props.dispatch({
+      type: 'authGroups/remove',
+      payload: {
+        ids: id
+      },
+      callback: (res) => {
+        oopToast(res, '删除成功');
+        if (self.oopTable) {
+          self.oopTable.clearSelection();
+          self.refresh();
+        }
+        self.setState({
+          modalVisible: false
+        });
+      }
+    });
+  }
+
   // 打开新建层
   handleCreate = (flag) => {
     this.setState({
       modalVisible: flag
     });
+  }
+
+  clearModalForms = () => {
+    this.closeForm(this.basic.getForm());
   }
 
   // 关闭form
@@ -343,6 +268,14 @@ export default class Group extends PureComponent {
         type: 'authGroups/clear'
       });
     }, 300);
+  }
+
+  onSubmitForm = () => {
+    const customForm = this[this.state.currentTabKey].getForm();
+    customForm.validateFields((err, fieldsValue) => {
+      if (err) return;
+      this.handleFormSubmit(customForm, fieldsValue);
+    });
   }
 
   // form确认按钮
@@ -369,10 +302,14 @@ export default class Group extends PureComponent {
     this.setState({
       currentTabKey: activeKey
     });
-    console.log(activeKey)
     if (activeKey === 'user') {
       this.props.dispatch({
         type: 'authGroups/fetchUserAll',
+        callback: () => {
+          this.setState({
+            userList: this.props.authGroups.allUsers
+          })
+        }
       });
       if (this.props.authGroups.groupsBasicInfo.id) {
         this.props.dispatch({
@@ -515,11 +452,18 @@ export default class Group extends PureComponent {
     });
   }
 
+  filterUserAll = (inputValue, filter) => {
+    const { authGroups: { allUsers } } = this.props;
+    const userList = inputValue ? filter(allUsers) : allUsers;
+    this.setState({
+      userList
+    });
+  }
+
   render() {
     const { loading, global: { size, oopSearchGrid}, gridLoading } = this.props;
-    const { modalVisible, currentTabKey, userTargetKeys, viewVisible, userInfoView,
-      groupUsers, userGroups, isCreate } = this.state;
-
+    const { currentTabKey, userTargetKeys, viewVisible, userInfoView,
+      groupUsers, userGroups, isCreate, userList } = this.state;
     const parentMethods = {
       handleFormSubmit: this.handleFormSubmit,
       closeForm: this.closeForm,
@@ -535,7 +479,6 @@ export default class Group extends PureComponent {
       currentTabKey,
       userTargetKeys
     };
-
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
         render: (text, record) => (
@@ -546,12 +489,33 @@ export default class Group extends PureComponent {
       },
       { title: '描述说明', dataIndex: 'description', key: 'description', },
       { title: '顺序', dataIndex: 'seq', key: 'seq', },
-      { title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
-        <Fragment>
-          {text === true ? '已启用' : <Badge status="default" text="已停用" />}
-        </Fragment>
-      )},
+      {
+        title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
+          <Fragment>
+            {text === true ?
+              <Badge status="processing" text="已启用" /> :
+              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
+          </Fragment>
+        )
+      }
     ];
+
+    const userColumns = [
+      { title: '用户名', dataIndex: 'username' },
+      { title: '显示名', dataIndex: 'name' },
+      { title: '邮箱', dataIndex: 'email' },
+      { title: '手机号', dataIndex: 'phone' },
+      {
+        title: '状态', dataIndex: 'enable', render: text => (
+          <Fragment>
+            {text === true ?
+              <Badge status="processing" text="已启用" /> :
+              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
+          </Fragment>
+        )
+      }
+    ];
+
     const topButtons = [
       {
         text: '新建',
@@ -603,10 +567,49 @@ export default class Group extends PureComponent {
             ref={(el)=>{ this.oopTable = el }}
           />
         </Card>
-        <CreateForm
+        <OopModal
+          title={this.state.isCreate ? '新建用户组' : '编辑用户组'}
+          visible={this.state.modalVisible}
+          destroyOnClose={true}
+          width={800}
+          onCancel={this.clearModalForms}
+          onOk={this.onSubmitForm}
+          onDelete={this.onDelete}
+          isCreate={this.state.isCreate}
+          loading={!!loading}
+          onTabChange={this.handleTabChange}
+          tabs={[
+            {
+              key: 'basic',
+              title: '基本信息',
+              main: true,
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <BasicInfoForm
+                ref = {(el) => { this.basic = el; }}
+                groupsBasicInfo = {parentMethods.groupsBasicInfo}
+                loading = {!!loading}
+              />
+            },
+            {
+              key: 'user',
+              title: '用户信息',
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <UserRelevance
+                groupsBasicInfo = {parentMethods.groupsBasicInfo}
+                deafultSelected={userTargetKeys}
+                userAddGroups={this.userAddGroups}
+                loading={!!loading}
+                columns={userColumns}
+                userList={userList}
+                filterUserAll={this.filterUserAll}
+                handleUserTrans={parentMethods.handleUserTrans}
+              />
+            }]}
+        />
+        {/* <CreateForm
           {...parentMethods}
           modalVisible={modalVisible}
-        />
+        /> */}
         <Modal
           title="用户组信息"
           visible={viewVisible}

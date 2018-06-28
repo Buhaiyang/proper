@@ -1,17 +1,17 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
-  Form, Tabs, Input, Radio, Select, Tooltip } from 'antd';
+  Form, Input, Radio, Select, Tooltip } from 'antd';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
 import DescriptionList from '../../../components/DescriptionList';
 import OopTable from '../../../components/OopTable';
+import OopModal from '../../../components/OopModal';
 import { oopToast } from './../../../common/oopUtils';
 import OopAuthMenu from '../../../components/OopAuthMenu'
 
 const { Description } = DescriptionList;
-const { TabPane } = Tabs;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
@@ -113,217 +113,85 @@ const ManagerInfoForm = Form.create()((props) => {
   const { loading, roleMenus, checkedMenuKeys, checkedResourceKeys,
     handleMenuKeys, roleInfo, labelText } = props;
   const checkedAllKeys = [...checkedMenuKeys, ...checkedResourceKeys];
-
+  const formItemProps = {};
+  if (labelText) {
+    formItemProps.label = labelText;
+  }
   const onCheck = (checkedKeys, info) => {
     handleMenuKeys(checkedKeys, info, roleInfo.id);
   }
 
   return (
     <Spin spinning={loading}>
-      <Form layout='vertical'>
+      <Form layout="vertical">
         <FormItem
-          label={labelText}
+          {...formItemProps}
         >
-          <OopAuthMenu data={roleMenus} checkedAllKeys={checkedAllKeys} onCheck={onCheck}/>
+          <OopAuthMenu data={roleMenus} checkedAllKeys={checkedAllKeys} onCheck={onCheck} />
         </FormItem>
       </Form>
     </Spin>
   )
 });
 
-const UserInfoForm = Form.create()((props) => {
-  const { loading, form, roleUsers, allUsers, roleInfo, handleUserChange } = props;
-
-  const handleChange = (value, id) => {
-    handleUserChange(value, id);
+const UserInfoForm = (props) => {
+  const { loading, size, columns, roleUsers,
+    handleUserChange, roleUsersList, filterRolesAll } = props;
+  const handleChange = (record, selectedRowKeys) => {
+    handleUserChange(selectedRowKeys, record.id)
   }
-
+  const deafultSelectedRowKeys = roleUsers.map(item => item.id)
   return (
-    <Spin spinning={loading}>
-      <Form>
-        <FormItem
-          {...formItemLayout}
-          label="用户"
-        >
-          {form.getFieldDecorator('user', {
-            initialValue: roleUsers && roleUsers.map(item => item.id)
-          })(<Select
-              mode="multiple"
-              style={{width: '100%'}}
-              placeholder="请选择用户 "
-              onChange={value => handleChange(value, roleInfo.id)}
-            >
-              {allUsers.length ? allUsers.map(item =>
-                (
-                  <Option key={item.id}>
-              {item.enable ? item.name :
-                (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
-                </Option>)
-              ) : allUsers}
-            </Select>
-          )
-          }
-        </FormItem>
-      </Form>
-    </Spin>
+    <Card bordered={false}>
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          onInputChange={filterRolesAll}
+          ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
+        />
+        <OopTable
+          onLoad={this.onLoad}
+          loading={loading}
+          size={size}
+          grid={{ list: roleUsersList }}
+          columns={columns}
+          onRowSelect={handleChange}
+          selectTriggerOnRowClick={true}
+          dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
+          // onSelectAll={onSelectAll}
+          />
+      </Card>
   )
-});
-
-const GroupInfoForm = Form.create()((props) => {
-  const { loading, form, allGroups, roleGroups, roleInfo, handleGroupChange } = props;
-
-  const handleChange = (value, id) => {
-    handleGroupChange(value, id);
+}
+const GroupInfoForm = (props) => {
+  const { loading, roleGroups, handleGroupChange,
+    size, columns, filterGroupsAll, groupUsersList } = props;
+  const handleChange = (record, selectedRowKeys) => {
+    handleGroupChange(selectedRowKeys, record.id)
   }
-
+  const deafultSelectedRowKeys = roleGroups.map(item => item.id)
   return (
-    <Spin spinning={loading}>
-      <Form>
-        <FormItem
-          {...formItemLayout}
-          label="用户组"
-        >
-          {form.getFieldDecorator('group', {
-            initialValue: roleGroups && roleGroups.map(item => item.id)
-          })(<Select
-              mode="multiple"
-              style={{width: '100%'}}
-              placeholder="请选择用户组 "
-              onChange={value => handleChange(value, roleInfo.id)}
-            >
-              {allGroups.length ? allGroups.map(item =>
-                (
-                  <Option key={item.id}>
-                    {item.enable ? item.name :
-                      (<Tooltip title="已停用"><Badge status="default" />{item.name}</Tooltip>)}
-                  </Option>)
-              ) : allGroups}
-            </Select>
-          )
-          }
-        </FormItem>
-      </Form>
-    </Spin>
+    <Card bordered={false}>
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          onInputChange={filterGroupsAll}
+          ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
+        />
+        <OopTable
+          onLoad={this.onLoad}
+          loading={loading}
+          size={size}
+          grid={{ list: groupUsersList }}
+          columns={columns}
+          onRowSelect={handleChange}
+          selectTriggerOnRowClick={true}
+          dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
+          // onSelectAll={onSelectAll}
+          />
+      </Card>
   )
-});
-
-const CreateForm = connect()((props) => {
-  const { formVisible, loading, currentTabKey, closeForm, isCreate, submitForm,
-    roleInfo, roleList, roleMenus, checkedMenuKeys, checkedResourceKeys,
-    handleTabChange, handleMenuKeys, allUsers, roleUsers, allGroups, roleGroups,
-    handleUserChange, handleGroupChange } = props;
-
-  // 取消
-  const handleCancel = () => {
-    const customForm = this[currentTabKey].getForm();
-    closeForm(customForm);
-  }
-
-  const okHandle = () => {
-    const customForm = this[currentTabKey].getForm();
-    customForm.validateFields((err, fieldsValue) => {
-      if (err) return;
-      submitForm(customForm, fieldsValue);
-    });
-  };
-
-  const onTabChange = (activeKey, id) => {
-    handleTabChange(activeKey, id);
-  }
-
-  const customFooter = {
-    basic: [
-        <Button key="back" onClick={handleCancel}>取消</Button>,
-        <Button key="submit" type="primary" loading={loading} onClick={okHandle}>
-          保存
-        </Button>,
-    ],
-    manager: [
-      <Button key="back" onClick={handleCancel}>取消</Button>
-    ],
-    user: [
-      <Button key="back" onClick={handleCancel}>取消</Button>
-    ],
-    group: [
-      <Button key="back" onClick={handleCancel}>取消</Button>
-    ]
-  };
-
-  const tabList = [
-    {
-      key: 'basic',
-      tab: '基本信息',
-      disabled: false,
-      content: <BasicInfoForm
-        ref = {(el) => { this.basic = el; }}
-        roleInfo = {roleInfo}
-        roleList = {roleList}
-        loading = {loading}
-      />
-    },
-    {
-      key: 'manager',
-      tab: '权限管理',
-      disabled: isCreate,
-      content: <ManagerInfoForm
-        ref = {(el) => { this.manager = el; }}
-        roleInfo = {roleInfo}
-        checkedMenuKeys = {checkedMenuKeys}
-        checkedResourceKeys={checkedResourceKeys}
-        handleMenuKeys = {handleMenuKeys}
-        roleMenus = {roleMenus}
-        loading = {loading}
-        labelText = "权限管理"
-      />
-    },
-    {
-      key: 'user',
-      tab: '关联用户',
-      disabled: isCreate,
-      content: <UserInfoForm
-        ref = {(el) => { this.user = el; }}
-        loading = {loading}
-        roleInfo = {roleInfo}
-        allUsers = {allUsers}
-        roleUsers = {roleUsers}
-        handleUserChange = {handleUserChange}
-      />
-    },
-    {
-      key: 'group',
-      tab: '关联用户组',
-      disabled: isCreate,
-      content: <GroupInfoForm
-        ref = {(el) => { this.group = el; }}
-        loading = {loading}
-        roleInfo = {roleInfo}
-        allGroups = {allGroups}
-        roleGroups = {roleGroups}
-        handleGroupChange = {handleGroupChange}
-      />
-    }
-  ];
-  return (
-    <Modal
-      visible={formVisible}
-      onOk={okHandle}
-      onCancel={handleCancel}
-      footer={customFooter[currentTabKey]}
-      destroyOnClose={true}
-    >
-      <Tabs
-        onChange={value => onTabChange(value, roleInfo.id)}
-        activeKey={currentTabKey}
-      >
-        {
-          tabList.map(item => (
-            <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
-          ))
-        }
-      </Tabs>
-    </Modal>
-  );
-});
+}
 
 @inject(['authRole', 'global'])
 @connect(({ authRole, global, loading }) => ({
@@ -337,9 +205,9 @@ export default class Role extends PureComponent {
     // 是否显示个人信息
     viewVisible: false,
     // 是否显示form表单
-    formVisible: false,
+    modalVisible: false,
     // 当前tab页面
-    currentTabKey: 'basic',
+    // currentTabKey: 'basic',
     // 是否是新建，新建为true，编辑为false
     isCreate: !this.props.authRole.roleInfo.id,
     // 菜单被选择的项
@@ -348,10 +216,10 @@ export default class Role extends PureComponent {
     checkedResourceKeys: [],
     // 菜单被选择的项（all）
     allCheckedMenuKeys: [],
-    // 当前角色保存的用户
-    userKey: [],
-    // 当前角色保存的用户组
-    groupKey: [],
+    // 当前角色所有的用户
+    roleUsersList: [],
+    // 当前角色所有的用户组
+    groupUsersList: [],
   };
 
   componentDidMount() {
@@ -424,6 +292,23 @@ export default class Role extends PureComponent {
     });
   }
 
+  onDelete = () => {
+    const self = this;
+    const {authRole: {roleInfo: {id}}} = this.props;
+
+    this.props.dispatch({
+      type: 'authRole/removeRoles',
+      payload: { ids: ([id]).toString() },
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败');
+        this.onLoad();
+        self.setState({
+          modalVisible: false
+        });
+      }
+    });
+  }
+
   // 切换状态功能
   handleSwitchOnChange = (value, record) => {
     const self = this;
@@ -453,7 +338,7 @@ export default class Role extends PureComponent {
           payload: res
         });
         self.setState({
-          formVisible: true,
+          modalVisible: true,
           isCreate: !res.id
         });
       }
@@ -465,7 +350,7 @@ export default class Role extends PureComponent {
   handleCreate = (flag) => {
     this.getAllRoles();
     this.setState({
-      formVisible: flag
+      modalVisible: flag
     });
   }
 
@@ -497,7 +382,7 @@ export default class Role extends PureComponent {
     const checkedResource = [];
     const halfCheckedMenus = [];
     for (let i = 0; i < info.checkedNodes.length; i++) {
-      if (!info.checkedNodes[i].props.dataRef.hasOwnProperty('parentId')) {
+      if (!('parentId' in info.checkedNodes[i].props.dataRef)) {
         checkedResource.push(info.checkedNodes[i].props.dataRef.id);
       } else {
         checkedMenus.push(info.checkedNodes[i].props.dataRef.id);
@@ -570,55 +455,78 @@ export default class Role extends PureComponent {
     }
   }
 
+  handleModalVisible = (flag) => {
+    this.setState({
+      modalVisible: flag
+    });
+  }
+
   // 显示层的菜单
   handleMenuKeysView = () => {}
 
   // tab切换
-  handleTabChange = (activeKey, id) => {
-    const self = this;
-    this.setState({
-      currentTabKey: activeKey
-    });
+  handleTabChange = (activeKey) => {
+    const {authRole: {roleInfo: {id}}} = this.props;
     if (activeKey === 'manager') {
       this.getMenus(id);
     } else if (activeKey === 'user') {
       this.props.dispatch({
-        type: 'authRole/fetchAllUsers'
+        type: 'authRole/fetchAllUsers',
+        callback: (res) => {
+          this.operationsData(res, 'rolesUser');
+        }
       })
       this.props.dispatch({
         type: 'authRole/fetchRoleUsersById',
         payload: id,
-        callback: (res) => {
-          self.setState({
-            userKey: res.map(item => item.id)
-          })
-        }
       });
     } else if (activeKey === 'group') {
       this.props.dispatch({
-        type: 'authRole/fetchAllGroups'
+        type: 'authRole/fetchAllGroups',
+        callback: (res) => {
+          this.operationsData(res, 'groupsUser');
+        }
       })
       this.props.dispatch({
         type: 'authRole/fetchRoleGroupsById',
         payload: id,
-        callback: (res) => {
-          self.setState({
-            groupKey: res.map(item => item.id)
-          })
+      });
+    }
+  }
+
+  onSubmitForm = () => {
+    const self = this;
+    const basicUserForm = this.basic.getForm();
+    if (basicUserForm) {
+      basicUserForm.validateFields((err, data) => {
+        if (err) return;
+
+        const params = data;
+        if (data.parentId === 'role_no_select') {
+          params.parentId = null;
         }
+        this.props.dispatch({
+          type: 'authRole/createOrUpdate',
+          payload: params,
+          callback: (res) => {
+            oopToast(res, '保存成功');
+            this.getAllRoles();
+            this.onLoad();
+            self.setState({
+              isCreate: false
+            });
+          }
+        });
       });
     }
   }
 
   // 关闭form
-  closeForm = (customForm) => {
-    this.setState({
-      formVisible: false
-    });
+  clearModalForms = () => {
+    this.handleModalVisible(false);
     setTimeout(() => {
-      customForm.resetFields();
       this.setState({
-        currentTabKey: 'basic',
+        // currentTabKey: 'basic',
         isCreate: true
       });
       this.props.dispatch({
@@ -628,87 +536,126 @@ export default class Role extends PureComponent {
   }
 
   // 提交form
-  submitForm = (customForm, fields) => {
-    const activeKey = this.state.currentTabKey;
-    const self = this;
-    const params = fields;
-    if (fields.parentId === 'role_no_select') {
-      params.parentId = null;
-    }
-    if (activeKey === 'basic') {
-      this.props.dispatch({
-        type: 'authRole/createOrUpdate',
-        payload: params,
-        callback: (res) => {
-          oopToast(res, '保存成功');
-          this.getAllRoles();
-          this.onLoad();
-          self.setState({
-            isCreate: false
-          });
-        }
-      });
-    }
-  }
+  // submitForm = (customForm, fields) => {
+  //   const activeKey = this.state.currentTabKey;
+  //   const self = this;
+  //   const params = fields;
+  //   if (fields.parentId === 'role_no_select') {
+  //     params.parentId = null;
+  //   }
+  //   if (activeKey === 'basic') {
+  //     this.props.dispatch({
+  //       type: 'authRole/createOrUpdate',
+  //       payload: params,
+  //       callback: (res) => {
+  //         oopToast(res, '保存成功');
+  //         this.getAllRoles();
+  //         this.onLoad();
+  //         self.setState({
+  //           isCreate: false
+  //         });
+  //       }
+  //     });
+  //   }
+  // }
 
-  // 添加删除公用函数
-  addAndDel(roleId, newKeys, oldKeys, typeAdd, typeDel, stateName) {
-    this.setState({
-      [stateName]: newKeys
+  // 添加关联用户
+  addRolesUser = (typeAdd, id, typeRoles) => {
+    this.props.dispatch({
+      type: typeAdd,
+      payload: {
+        roleId: this.props.authRole.roleInfo.id,
+        userOrGroupId: id
+      },
+      callback: (res) => {
+        oopToast(res, '添加成功', '添加失败')
+        this.props.dispatch({
+          type: typeRoles,
+          payload: this.props.authRole.roleInfo.id,
+        })
+      }
     });
-    if (oldKeys.length < newKeys.length) {
-      for (let i = 0; i < newKeys.length; i++) {
-        if (oldKeys.indexOf(newKeys[i]) === -1) {
-          this.props.dispatch({
-            type: typeAdd,
-            payload: {
-              userOrGroupId: newKeys[i],
-              roleId
-            },
-            callback: (res) => {
-              oopToast(res, '添加成功', '添加失败');
-            }
-          });
-        }
+  }
+  deleteRolesUser = (typeDel, id, typeRoles) => {
+    this.props.dispatch({
+      type: typeDel,
+      payload: {
+        roleId: this.props.authRole.roleInfo.id,
+        userOrGroupId: id
+      },
+      callback: (res) => {
+        oopToast(res, '删除成功', '删除失败')
+        this.props.dispatch({
+          type: typeRoles,
+          payload: this.props.authRole.roleInfo.id,
+        })
       }
+    });
+  }
+  // 添加删除公用函数
+  userAddDel = (value, typeAdd, typeDel, typeRoles, data, id) => {
+    const userIds = [];
+    for (let i = 0; i < data.length; i++) {
+      userIds.push(data[i].id);
     }
-    if (oldKeys.length > newKeys.length) {
-      for (let i = 0; i < oldKeys.length; i++) {
-        if (newKeys.indexOf(oldKeys[i]) === -1) {
-          this.props.dispatch({
-            type: typeDel,
-            payload: {
-              userOrGroupId: oldKeys[i],
-              roleId
-            },
-            callback: (res) => {
-              oopToast(res, '删除成功', '删除失败');
-            }
-          });
-        }
-      }
+    // 添加用户
+    if (value.length > userIds.length) {
+      this.addRolesUser(typeAdd, id, typeRoles);
+    }
+    // 删除用户
+    if (value.length < userIds.length) {
+      this.deleteRolesUser(typeDel, id, typeRoles);
     }
   }
-
+  operationsData = (res, type) => {
+    const { status } = res;
+    const { allUsers, allGroups } = this.props.authRole;
+    if (status === 'ok') {
+      type === 'rolesUser' ? this.setRolesList(allUsers) : this.setGroupsList(allGroups)
+    }
+  }
+  setRolesList = (list) => {
+    this.setState({
+      roleUsersList: list
+    })
+  }
+  setGroupsList = (list) => {
+    this.setState({
+      groupUsersList: list
+    })
+  }
   // 角色添加删除用户
   handleUserChange = (value, id) => {
-    this.addAndDel(id, value, this.state.userKey, 'authRole/roleAddUsers', 'authRole/roleDelUsers', 'userKey');
+    const typeAdd = 'authRole/roleAddUsers';
+    const typeDel = 'authRole/roleDelUsers';
+    const typeRoles = 'authRole/fetchRoleUsersById';
+    const data = this.props.authRole.roleUsers;
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data, id);
   }
-
   // 角色添加删除用户组
   handleGroupChange = (value, id) => {
-    this.addAndDel(id, value, this.state.groupKey, 'authRole/roleAddGroups', 'authRole/userDelGroups', 'groupKey');
+    const typeAdd = 'authRole/roleAddGroups';
+    const typeDel = 'authRole/userDelGroups';
+    const typeRoles = 'authRole/fetchRoleGroupsById';
+    const data = this.props.authRole.roleGroups;
+    this.userAddDel(value, typeAdd, typeDel, typeRoles, data, id);
   }
-
+  filterRolesAll = (inputValue, filter) => {
+    const { authRole: { allUsers }} = this.props;
+    const rolesList = inputValue ? filter(allUsers) : allUsers;
+    this.setRolesList(rolesList)
+  }
+  filterGroupsAll = (inputValue, filter) => {
+    const { authRole: { allGroups } } = this.props;
+    const groupsList = inputValue ? filter(allGroups) : allGroups;
+    this.setGroupsList(groupsList)
+  }
   render() {
     const { loading, gridLoading,
       global: { size, oopSearchGrid },
-      authRole: { roleInfo, roleUsers, roleGroups, roleList,
-        roleMenus, allUsers, allGroups } } = this.props;
-
-    const { viewVisible, formVisible, currentTabKey, isCreate,
-      checkedMenuKeys, checkedResourceKeys } = this.state;
-
+      authRole: { roleInfo, roleUsers, roleGroups, roleList, roleMenus } } = this.props;
+    const { viewVisible, checkedMenuKeys, checkedResourceKeys,
+      roleUsersList, groupUsersList } = this.state;
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
         render: (text, record) => (
@@ -722,12 +669,37 @@ export default class Role extends PureComponent {
       { title: '功能描述说明', dataIndex: 'description', key: 'description', },
       { title: '继承', dataIndex: 'parentName', key: 'parentName', },
       { title: '状态', dataIndex: 'enable', key: 'enable', render: text => (
-          <Fragment>
-            {text === true ? '已启用' : <Badge status="default" text="已停用" />}
+           <Fragment>
+            {text === true ?
+              <Badge status="processing" text="已启用" /> :
+              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
           </Fragment>
       )}
     ];
-
+    const userRolesColumns = [
+      { title: '用户名', dataIndex: 'name' },
+      { title: '显示名', dataIndex: 'description' },
+      { title: '邮箱', dataIndex: 'parentName' },
+      {
+        title: '状态', dataIndex: 'enable', render: text => (
+          <Fragment>
+            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
+          </Fragment>
+        )
+      },
+    ]
+    const userGroupsColumns = [
+      { title: '用户组名称', dataIndex: 'name' },
+      { title: '用户组描述', dataIndex: 'description' },
+      { title: '顺序', dataIndex: 'seq' },
+      {
+        title: '状态', dataIndex: 'enable', render: text => (
+          <Fragment>
+            {text === true ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已停用" />}
+          </Fragment>
+        )
+      },
+    ]
     const topButtons = [
       {
         text: '新建',
@@ -779,7 +751,74 @@ export default class Role extends PureComponent {
             ref={(el)=>{ this.oopTable = el }}
           />
         </Card>
-        <CreateForm
+        <OopModal
+          title={this.state.isCreate ? '新建角色' : '编辑角色'}
+          visible={this.state.modalVisible}
+          destroyOnClose={true}
+          width={800}
+          onCancel={this.clearModalForms}
+          onOk={this.onSubmitForm}
+          onDelete={this.onDelete}
+          isCreate={this.state.isCreate}
+          loading={!!loading}
+          onTabChange={this.handleTabChange}
+          tabs={[
+            {
+              key: 'basic',
+              title: '基本信息',
+              main: true,
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <BasicInfoForm
+                ref = {(el) => { this.basic = el; }}
+                roleInfo = {roleInfo}
+                roleList = {roleList}
+                loading = {loading}
+              />
+            },
+            {
+              key: 'manager',
+              title: '权限管理',
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <ManagerInfoForm
+                ref = {(el) => { this.manager = el; }}
+                roleInfo = {roleInfo}
+                checkedMenuKeys = {checkedMenuKeys}
+                checkedResourceKeys={checkedResourceKeys}
+                handleMenuKeys = {this.handleMenuKeys}
+                roleMenus = {roleMenus}
+                loading = {loading}
+              />
+            },
+            {
+              key: 'user',
+              title: '关联用户',
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <UserInfoForm
+                size={size}
+                loading = {!!loading}
+                roleUsers= {roleUsers}
+                columns= {userRolesColumns}
+                handleUserChange= {this.handleUserChange}
+                roleUsersList= {roleUsersList}
+                filterRolesAll= {this.filterRolesAll}
+              />
+            },
+            {
+              key: 'group',
+              title: '关联用户组',
+              content: <GroupInfoForm
+                size={size}
+                loading = {!!loading}
+                roleGroups={roleGroups}
+                columns={userGroupsColumns}
+                handleGroupChange={this.handleGroupChange}
+                groupUsersList={groupUsersList}
+                filterGroupsAll={this.filterGroupsAll}
+              />
+            }
+          ]}
+        />
+        {/* <CreateForm
           formVisible={formVisible}
           loading={loading}
           currentTabKey={currentTabKey}
@@ -799,7 +838,7 @@ export default class Role extends PureComponent {
           roleGroups={roleGroups}
           handleUserChange={this.handleUserChange}
           handleGroupChange={this.handleGroupChange}
-        />
+        /> */}
         <Modal
           title="角色信息"
           visible={viewVisible}

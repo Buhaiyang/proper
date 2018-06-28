@@ -4,20 +4,20 @@
  */
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Tree, Form, Modal, Button, Input, Radio, Tabs, Spin, InputNumber, Select, TreeSelect, Badge } from 'antd';
+import { Tree, Form, Modal, Input, Radio, Spin, InputNumber, Select, TreeSelect, Badge } from 'antd';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopTreeTable from '../../../../components/OopTreeTable';
 import TableForm from './TableForm';
 import styles from './index.less';
 import { oopToast } from './../../../../common/oopUtils';
+import OopModal from '../../../../components/OopModal';
 
 const { TreeNode } = Tree;
 const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const {TabPane} = Tabs;
 const formItemLayout = {
   labelCol: {
     xs: {span: 24},
@@ -195,79 +195,7 @@ const ResourceInfoForm = Form.create()((props) => {
       size="small"
   />)
 });
-const ModalForm = connect()((props) => {
-  const {
-    visible, size, handleTabChange, currentTabKey, onSubmitForm, funcBasicInfo = {},
-    parentTreeData, clearModalForms, isCreate, loading, resourceList, handleResourceListChange,
-    parentNode
-  } = props;
-  const onCancel = () => {
-    // 隐藏窗口时
-    const form = this[currentTabKey].getForm();
-    clearModalForms(form);
-  };
-  const onOk = () => {
-    const form = this[currentTabKey].getForm();
-    const {validateFields} = form;
-    validateFields((err, fieldsValue) => {
-      if (err) return;
-      const data = {
-        ...fieldsValue,
-        menuCode: fieldsValue.menuType
-      }
-      delete data.menuType
-      onSubmitForm(data);
-    });
-  };
-  const onTabChange = (activeKey) => {
-    handleTabChange(activeKey);
-  };
-  const tabList = [{
-    key: 'basic',
-    tab: '基本信息',
-    disabled: false,
-    content: <FuncBasicInfoForm
-      ref={(el) => {
-        this.basic = el;
-      }}
-      funcBasicInfo={funcBasicInfo}
-      parentTreeData={parentTreeData}
-      parentNode={parentNode}
-      loading={loading} />
-  }, {
-    key: 'resource',
-    tab: '资源信息',
-    disabled: isCreate,
-    content: <ResourceInfoForm
-      ref={(el) => {
-        this.resource = el;
-      }}
-      loading={loading}
-      resourceList={resourceList}
-      handleResourceListChange={handleResourceListChange} />
-  }];
-  const footer = (
-    <Fragment>
-      <Button onClick={onCancel}>取消</Button>
-      {currentTabKey === 'basic' && <Button type="primary" onClick={onOk} loading={loading}>保存</Button>}
-    </Fragment>);
-  return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      onOk={onOk}
-      footer={footer}
-      width={800}
-      destroyOnClose={true}
-      className={styles.anthFuncStyles}>
-      <Tabs size={size} animated={false} onChange={onTabChange} activeKey={currentTabKey}>
-        {tabList.map(item =>
-          <TabPane tab={item.tab} key={item.key} disabled={item.disabled}>{item.content}</TabPane>
-        )}
-      </Tabs>
-    </Modal>
-  );
-});
+
 @inject(['authFunc', 'global', 'baseUser'])
 @connect(({authFunc, global, loading}) => ({
   authFunc,
@@ -306,6 +234,12 @@ export default class Func extends PureComponent {
       modalVisible: flag
     });
   }
+
+  onCancel = () => {
+    const form = this[this.state.currentTabKey].getForm();
+    this.handleClearModalForms(form);
+  };
+
   handleClearModalForms = (form)=>{
     this.setModalVisible(false)
     setTimeout(() => {
@@ -318,8 +252,23 @@ export default class Func extends PureComponent {
       });
     }, 300);
   }
+
+  onOk = () => {
+    const form = this[this.state.currentTabKey].getForm();
+    const {validateFields} = form;
+    validateFields((err, fieldsValue) => {
+      if (err) return;
+      const data = {
+        ...fieldsValue,
+        menuCode: fieldsValue.menuType
+      }
+      delete data.menuType
+      this.handleOnSubmitForm(data);
+    });
+  };
+
   handleOnSubmitForm = (data)=>{
-    const me = this
+    const me = this;
     me.props.dispatch({
       type: 'authFunc/saveOrUpdateFunc',
       payload: data,
@@ -333,6 +282,7 @@ export default class Func extends PureComponent {
       }
     })
   }
+
   handleTabChange = (activeKey)=>{
     const {dispatch, authFunc: {resourceList, funcBasicInfo} } = this.props
     this.setState({
@@ -467,6 +417,24 @@ export default class Func extends PureComponent {
       }
     })
   }
+
+  onDeleteFromEdit = () => {
+    const self = this;
+    const {authFunc: {funcBasicInfo: {id}}} = this.props;
+    this.props.dispatch({
+      type: 'authFunc/deleteFunc',
+      payload: {ids: id},
+      callback(res) {
+        oopToast(res, '删除成功', '删除失败');
+        self.onLoad();
+        self.refreshMenusAndLeftTree();
+        self.setState({
+          modalVisible: false
+        });
+      }
+    });
+  }
+
   onEdit = (record)=>{
     const me = this;
     me.setState({
@@ -583,7 +551,45 @@ export default class Func extends PureComponent {
           size={size}
           onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
         />
-        <ModalForm
+        <OopModal
+          title={this.state.isCreate ? '新建功能' : '编辑功能'}
+          visible={this.state.modalVisible}
+          destroyOnClose={true}
+          width={800}
+          onCancel={this.onCancel}
+          onOk={this.onOk}
+          onDelete={this.onDeleteFromEdit}
+          isCreate={this.state.isCreate}
+          loading={!!loading}
+          onTabChange={this.handleTabChange}
+          tabs={[
+            {
+              key: 'basic',
+              title: '基本信息',
+              main: true,
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              content: <FuncBasicInfoForm
+                ref={(el) => {
+                  this.basic = el;
+                }}
+                funcBasicInfo={funcBasicInfo}
+                parentTreeData={parentTreeData}
+                parentNode={parentNode}
+                loading={loading} />
+            },
+            {
+              key: 'resource',
+              title: '资源信息',
+              content: <ResourceInfoForm
+                ref={(el) => {
+                  this.resource = el;
+                }}
+                loading={loading}
+                resourceList={resourceList}
+                handleResourceListChange={this.handleResourceListChange} />
+            }]}
+        />
+        {/* <ModalForm
           resourceList={resourceList}
           funcBasicInfo={funcBasicInfo}
           parentTreeData={parentTreeData}
@@ -596,7 +602,7 @@ export default class Func extends PureComponent {
           isCreate={this.state.isCreate}
           size={size}
           loading={!!loading}
-          handleResourceListChange={this.handleResourceListChange} />
+          handleResourceListChange={this.handleResourceListChange} /> */}
       </PageHeaderLayout>);
   }
 }

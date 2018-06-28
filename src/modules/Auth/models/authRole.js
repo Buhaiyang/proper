@@ -134,7 +134,7 @@ export default {
         type: 'saveAllUsers',
         payload: response.result.data,
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 取得所有用户组
     *fetchAllGroups({ payload, callback }, { call, put }) {
@@ -143,7 +143,7 @@ export default {
         type: 'saveAllGroups',
         payload: response.result,
       });
-      if (callback) callback();
+      if (callback) callback(response);
     },
     // 角色添加用户
     *roleAddUsers({ payload, callback }, { call }) {
@@ -208,15 +208,25 @@ export default {
       };
     },
     saveAllUsers(state, action) {
+      const allUsers = action.payload;
+      allUsers.map((item) => {
+        item.enable === true ? item.enableStatus = '已启用' : item.enableStatus = '已停用'
+        return allUsers
+      })
       return {
         ...state,
-        allUsers: action.payload
+        allUsers
       };
     },
     saveAllGroups(state, action) {
+      const allGroups = action.payload;
+      allGroups.map((item) => {
+        item.enable === true ? item.enableStatus = '已启用' : item.enableStatus = '已停用';
+        return allGroups
+      })
       return {
         ...state,
-        allGroups: action.payload
+        allGroups
       };
     },
     clear(state) {

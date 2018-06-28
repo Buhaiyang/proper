@@ -128,9 +128,13 @@ export default {
       }
     },
     saveGroupUserAll(state, { payload }) {
+      const { allUsers } = payload;
       return {
         ...state,
-        allUsers: payload.allUsers
+        allUsers: allUsers.map((it) => {
+          it.enable === true ? it.enableStatus = '已启用' : it.enableStatus = '已停用';
+          return it
+        })
       }
     },
     clear(state) {
