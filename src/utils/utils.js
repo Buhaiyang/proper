@@ -352,7 +352,7 @@ export const getParamObj = (search)=>{
   return param;
 }
 export const getDownloadUrl = (id) => {
-  let url = '/file/'.concat('download/').concat(id);
+  let url = '/file/'.concat(id);
   const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix');
   if (devMode === 'development' && peaDynamicRequestPrefix) {
     url = peaDynamicRequestPrefix + url;

@@ -37,15 +37,13 @@ const PersonalInfoForm = Form.create()((props) => {
       <div style={{ fontSize: 12 }}>点击上传</div>
     </div>
   );
-  // const imageUrl = entity.avatar;
   const extra = (imageUrl ? <img src={imageUrl} alt="头像" /> : uploadButton);
   const submit = (e) => {
     e.preventDefault();
     validateFields((err, values) => {
       const id = values.avatar
         && values.avatar.file
-        && values.avatar.file.response
-        && values.avatar.file.response.id;
+        && values.avatar.file.response;
       if (id) {
         values.avatar = id;
       }

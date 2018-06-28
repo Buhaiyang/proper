@@ -19,7 +19,8 @@ export default {
       if (response && response.status === 'ok') {
         window.localStorage.setItem('proper-auth-login-token', response.result);
         // yield put(routerRedux.push('/main'));
-        window.location.href = `${window.location.origin}${window.location.pathname}`
+        window.location.href = `${window.location.origin}${window.location.pathname}`;
+        document.cookie = `X-PEP-TOKEN=${response.result}`;
         yield put({
           type: 'toggleShowError',
           payload: false
