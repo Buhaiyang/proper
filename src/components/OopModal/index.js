@@ -50,7 +50,14 @@ export default class OopModal extends PureComponent {
       this.setState({
         activeKey
       });
-      this.props.onTabChange && this.props.onTabChange(activeKey);
+
+      if (this.props.onTabChange) {
+        if (!this.checkedBatch ||
+          (this.checkedBatch && this.checkedBatch.indexOf(activeKey) === -1)) {
+          this.props.onTabChange(activeKey);
+          this.onBatchAnchorCheck(activeKey);
+        }
+      }
     }
   }
 
@@ -107,6 +114,7 @@ export default class OopModal extends PureComponent {
     const onDelete = ()=>{
       props.onDelete && props.onDelete()
     };
+
     const footer = (
       <Fragment>
         {isCreate ? null : (
@@ -122,7 +130,19 @@ export default class OopModal extends PureComponent {
       title: 'Title',
       footer,
       tabs: [],
-      ...props,
+      destroyOnClose: true,
+      ...props
+    }
+
+    if (!_props.afterClose) {
+      _props.afterClose = () => {
+        _props.onCancel && _props.onCancel();
+        this.checkedBatch = null;
+        if (this.modalbody) {
+          this.modalbody.removeEventListener('scroll', this.handleScroll, false);
+          this.modalbody.removeAttribute('scrollEvent')
+        }
+      }
     }
     // 通过 tab的isCreate属性为tab增加默认的disabled属性
     _props.tabs.forEach((tab)=>{
@@ -168,8 +188,28 @@ export default class OopModal extends PureComponent {
     const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === key);
     const scrollHeight = this.calculateScrollHeight(curContainer);
     this.scrollModalBody(curContainer, scrollHeight);
-    this.props.onTabChange && this.props.onTabChange(key);
+    // if (this.props.onTabChange && this.checkedBatch
+    //   && this.checkedBatch.indexOf(key) === -1) {
+    //   this.props.onTabChange(key);
+    //   this.onBatchAnchorCheck(key);
+    // }
+
+    if (this.props.onTabChange) {
+      if (!this.checkedBatch ||
+        (this.checkedBatch && this.checkedBatch.indexOf(key) === -1)) {
+        this.props.onTabChange(key);
+        this.onBatchAnchorCheck(key);
+      }
+    }
   }
+
+  onBatchAnchorCheck = (key) => {
+    if (!this.checkedBatch) {
+      this.checkedBatch = [];
+    }
+    this.checkedBatch.push(key);
+  }
+
   render() {
     const props = this.getInitProps()
     const modalStyle = {

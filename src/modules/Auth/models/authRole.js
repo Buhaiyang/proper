@@ -236,7 +236,8 @@ export default {
         roleUsers: [],
         roleGroups: [],
         allUsers: [],
-        allGroups: []
+        allGroups: [],
+        roleMenus: []
       }
     },
   },

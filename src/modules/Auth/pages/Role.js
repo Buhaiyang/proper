@@ -521,12 +521,42 @@ export default class Role extends PureComponent {
     }
   }
 
+  onSubmitForm = () => {
+    const self = this;
+    const basicUserForm = this.basic.getForm();
+    if (basicUserForm) {
+      basicUserForm.validateFields((err, data) => {
+        if (err) return;
+
+        const params = data;
+        if (data.parentId === 'role_no_select') {
+          params.parentId = null;
+        }
+        this.props.dispatch({
+          type: 'authRole/createOrUpdate',
+          payload: params,
+          callback: (res) => {
+            oopToast(res, '保存成功');
+            this.getAllRoles();
+            this.onLoad();
+            self.setState({
+              isCreate: false
+            });
+          }
+        });
+      });
+    }
+  }
+
   // 关闭form
   clearModalForms = () => {
     this.handleModalVisible(false);
     setTimeout(() => {
       this.setState({
         // currentTabKey: 'basic',
+        checkedMenuKeys: [],
+        checkedResourceKeys: [],
+        allCheckedMenuKeys: [],
         isCreate: true
       });
       this.props.dispatch({
