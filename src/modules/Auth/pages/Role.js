@@ -64,7 +64,7 @@ const BasicInfoForm = Form.create()((props) => {
               optionFilterProp="children"
               allowClear={true}
               filterOption={(input, option) =>
-                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
             >
               {
                 roleList ? roleList.map(item => (
@@ -127,7 +127,9 @@ const ManagerInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemProps}
         >
-          <OopAuthMenu data={roleMenus} checkedAllKeys={checkedAllKeys} onCheck={onCheck} />
+          <Card bordered={false}>
+            <OopAuthMenu data={roleMenus} checkedAllKeys={checkedAllKeys} onCheck={onCheck} />
+          </Card>
         </FormItem>
       </Form>
     </Spin>
@@ -135,7 +137,7 @@ const ManagerInfoForm = Form.create()((props) => {
 });
 
 const UserInfoForm = (props) => {
-  const { loading, size, columns, roleUsers,
+  const { loading, columns, roleUsers,
     handleUserChange, roleUsersList, filterRolesAll } = props;
   const handleChange = (record, selectedRowKeys) => {
     handleUserChange(selectedRowKeys, record.id)
@@ -152,7 +154,7 @@ const UserInfoForm = (props) => {
         <OopTable
           onLoad={this.onLoad}
           loading={loading}
-          size={size}
+          size="small"
           grid={{ list: roleUsersList }}
           columns={columns}
           onRowSelect={handleChange}
@@ -165,7 +167,7 @@ const UserInfoForm = (props) => {
 }
 const GroupInfoForm = (props) => {
   const { loading, roleGroups, handleGroupChange,
-    size, columns, filterGroupsAll, groupUsersList } = props;
+    columns, filterGroupsAll, groupUsersList } = props;
   const handleChange = (record, selectedRowKeys) => {
     handleGroupChange(selectedRowKeys, record.id)
   }
@@ -181,7 +183,7 @@ const GroupInfoForm = (props) => {
         <OopTable
           onLoad={this.onLoad}
           loading={loading}
-          size={size}
+          size="small"
           grid={{ list: groupUsersList }}
           columns={columns}
           onRowSelect={handleChange}
@@ -498,7 +500,7 @@ export default class Role extends PureComponent {
     const self = this;
     const basicUserForm = this.basic.getForm();
     if (basicUserForm) {
-      basicUserForm.validateFields((err, data) => {
+      basicUserForm.validateFieldsAndScroll((err, data) => {
         if (err) return;
 
         const params = data;

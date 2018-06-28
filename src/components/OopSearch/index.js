@@ -108,9 +108,11 @@ export default class OopSearch extends React.Component {
     defaultValue: ''
   }
   componentWillUnmount() {
-    this.props.dispatch({
-      type: 'global/clearOopSearchGrid'
-    })
+    if (this.props.moduleName) {
+      this.props.dispatch({
+        type: 'global/clearOopSearchGrid'
+      })
+    }
   }
   // 获取下拉菜单
   getSearchOptions = (query)=>{

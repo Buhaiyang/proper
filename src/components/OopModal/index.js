@@ -25,16 +25,26 @@ function getOffsetTop(element, container) {
 
 export default class OopModal extends PureComponent {
   state = {
+    activeKey: null,
+    naviTabsVisible: false
   }
-
+  componentWillReceiveProps(props) {
+    // TODO 修改TAB的位置问题
+    // setTimeout(()=>{
+    //
+    // }, 300);
+    this.setState({
+      naviTabsVisible: !props.isCreate
+    })
+    if (!this.state.activeKey && props.tabs.length > 0) {
+      this.setState({
+        activeKey: props.tabs[0].key
+      });
+    }
+  }
   componentDidUpdate = () => {
     const containers = document.getElementsByClassName(styles.oopTabContainer);
     if (containers.length > 0) {
-      if (!this.state.activeKey) {
-        this.setState({
-          activeKey: containers[0].getAttribute('name')
-        });
-      }
       this.modalbody = containers[0].parentNode;
       if (this.modalbody.getAttribute('scrollEvent') !== '1') {
         this.modalbody.addEventListener('scroll', this.handleScroll, false);
@@ -42,7 +52,6 @@ export default class OopModal extends PureComponent {
       }
     }
   }
-
   handleScroll = () => {
     const key = this.state.activeKey ? this.state.activeKey : this.props.tabs.find(it => 'main' in it).key;
     const activeKey = this.getCurrentAnchor(50, 0);
@@ -99,12 +108,13 @@ export default class OopModal extends PureComponent {
       <div style={{fontSize: 16, fontWeight: 'bold'}}>{tab.title}</div>
       {hLine}
       {isCreate ? (tab.tips ? <Alert message={tab.tips} type="info" showIcon /> : null) : null}
-      <div style={{marginTop: 24}}>{tab.content}</div>
+      <div>{tab.content}</div>
     </div>)));
   }
   getInitProps = ()=>{
-    const { props } = this;
+    const { props, state } = this;
     const { loading, isCreate } = props;
+    const { naviTabsVisible } = state;
     const onOk = ()=>{
       props.onOk && props.onOk()
     }
@@ -114,7 +124,11 @@ export default class OopModal extends PureComponent {
     const onDelete = ()=>{
       props.onDelete && props.onDelete()
     };
-
+    const toggleTabsShow = ()=>{
+      this.setState({
+        naviTabsVisible: !naviTabsVisible
+      })
+    }
     const footer = (
       <Fragment>
         {isCreate ? null : (
@@ -142,6 +156,9 @@ export default class OopModal extends PureComponent {
           this.modalbody.removeEventListener('scroll', this.handleScroll, false);
           this.modalbody.removeAttribute('scrollEvent')
         }
+        this.setState({
+          activeKey: null
+        })
       }
     }
     // 通过 tab的isCreate属性为tab增加默认的disabled属性
@@ -156,8 +173,12 @@ export default class OopModal extends PureComponent {
     </Tabs>);
     _props.title = (
       <span style={{display: 'flex', alignItems: 'center'}}>
-      <Popover placement="left" content={antdTabs} trigger="click" getPopupContainer={()=>document.getElementsByClassName(styles.oopModalContainer)[0]}>
-        <Icon type="bars" style={{fontSize: 24, cursor: 'pointer'}} />
+      <Popover
+        placement="left"
+        content={antdTabs}
+        getPopupContainer={()=>document.getElementsByClassName(styles.oopModalContainer)[0]}
+        visible={this.state.naviTabsVisible}>
+        <Icon type="bars" style={{fontSize: 24, cursor: 'pointer'}} onClick={toggleTabsShow} />
       </Popover>
       <span style={{marginLeft: 8}}>{_props.title}</span>
     </span>);
@@ -219,15 +240,15 @@ export default class OopModal extends PureComponent {
       borderRadius: 5
     };
     return (
-      <div className={styles.oopModalContainer}>
         <Modal
-          getContainer={()=>document.getElementsByClassName(styles.oopModalContainer)[0]}
           ref={ (el)=>{ this.oopModal = el }}
           {...props}
+          width={1000}
           style={modalStyle}
+          className={styles.oopModalContainer}
+          destroyOnClose={true}
           >
           {this.createModalContent(props.tabs, props.isCreate)}
-        </Modal>
-      </div>)
+        </Modal>)
   }
 }

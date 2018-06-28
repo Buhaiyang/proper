@@ -93,7 +93,7 @@ const BasicInfoForm = Form.create()((props) => {
 });
 
 const UserRelevance = (props) => {
-  const { loading, columns, size,
+  const { loading, columns,
     userList, filterUserAll, deafultSelected, handleUserTrans, groupsBasicInfo } = props;
   const handleChange = (record, selectedRowKeys) => {
     handleUserTrans(groupsBasicInfo.id, selectedRowKeys)
@@ -112,7 +112,7 @@ const UserRelevance = (props) => {
           loading={loading}
           grid={{ list: userList }}
           columns={columns}
-          size={size}
+          size="small"
           onRowSelect={handleChange}
           selectTriggerOnRowClick={true}
           dataDefaultSelectedRowKeys={deafultSelected}
@@ -249,7 +249,10 @@ export default class Group extends PureComponent {
   }
 
   clearModalForms = () => {
-    this.closeForm(this.basic.getForm());
+    const el = this[this.state.currentTabKey];
+    if (el && el.getForm) {
+      this.closeForm(el.getForm());
+    }
   }
 
   // 关闭form
@@ -271,8 +274,8 @@ export default class Group extends PureComponent {
   }
 
   onSubmitForm = () => {
-    const customForm = this[this.state.currentTabKey].getForm();
-    customForm.validateFields((err, fieldsValue) => {
+    const customForm = this.basic.getForm();
+    customForm.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
       this.handleFormSubmit(customForm, fieldsValue);
     });
@@ -280,7 +283,8 @@ export default class Group extends PureComponent {
 
   // form确认按钮
   handleFormSubmit = (customForm, fields) => {
-    const activeKey = this.state.currentTabKey;
+    // const activeKey = this.state.currentTabKey;
+    const activeKey = 'basic';
     const self = this;
     if (activeKey === 'basic') {
       this.props.dispatch({

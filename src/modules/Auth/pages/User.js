@@ -37,7 +37,7 @@ const UserBasicInfoForm = Form.create()((props) => {
   };
   return (
     <Spin spinning={loading}>
-      <Form>
+      <Form style={{marginTop: 24}}>
         <div>
           {getFieldDecorator('id', {
             initialValue: userBasicInfo.id,
@@ -146,7 +146,7 @@ const UserBasicInfoForm = Form.create()((props) => {
     </Spin>);
 });
 const RoleInfoRelevance = (props) => {
-  const { userRoles, userAddRoles, loading, columns, size, userRolesList, filterRolesAll } = props;
+  const { userRoles, userAddRoles, loading, columns, userRolesList, filterRolesAll } = props;
   const handleChange = (record, selectedRowKeys) => {
     userAddRoles(selectedRowKeys, record.id)
   }
@@ -163,7 +163,7 @@ const RoleInfoRelevance = (props) => {
         <OopTable
           onLoad={this.onLoad}
           loading={loading}
-          size={size}
+          size="small"
           grid={{ list: userRolesList }}
           columns={columns}
           onRowSelect={handleChange}
@@ -176,7 +176,7 @@ const RoleInfoRelevance = (props) => {
 }
 const UserGroupRelevance = (props) => {
   const { userGroups, userAddGroups, loading,
-    columns, size, userGroupsList, filterGroupsAll } = props;
+    columns, userGroupsList, filterGroupsAll } = props;
   const handleChange = (record, selectedRowKeys) => {
     userAddGroups(selectedRowKeys, record.id)
   }
@@ -196,7 +196,7 @@ const UserGroupRelevance = (props) => {
           loading={loading}
           grid={{ list: userGroupsList }}
           columns={columns}
-          size={size}
+          size="small"
           onRowSelect={handleChange}
           selectTriggerOnRowClick={true}
           dataDefaultSelectedRowKeys={deafultSelectedRowKeysGroups}

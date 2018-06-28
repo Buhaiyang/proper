@@ -182,7 +182,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
       </Form>
     </Spin>);
 });
-const ResourceInfoForm = Form.create()((props) => {
+const ResourceInfoForm = (props) => {
   const {resourceList, loading, handleResourceListChange} = props;
   const onChange = (type, item)=>{
     handleResourceListChange(type, item)
@@ -194,7 +194,7 @@ const ResourceInfoForm = Form.create()((props) => {
       loading={loading}
       size="small"
   />)
-});
+};
 
 @inject(['authFunc', 'global', 'baseUser'])
 @connect(({authFunc, global, loading}) => ({
@@ -236,14 +236,18 @@ export default class Func extends PureComponent {
   }
 
   onCancel = () => {
-    const form = this[this.state.currentTabKey].getForm();
-    this.handleClearModalForms(form);
+    const el = this[this.state.currentTabKey];
+    if (el && el.getForm) {
+      this.handleClearModalForms(el.getForm());
+    } else {
+      this.handleClearModalForms({});
+    }
   };
 
   handleClearModalForms = (form)=>{
     this.setModalVisible(false)
     setTimeout(() => {
-      form.resetFields();
+      form.resetFields && form.resetFields();
       this.setState({
         currentTabKey: 'basic'
       });
@@ -254,9 +258,9 @@ export default class Func extends PureComponent {
   }
 
   onOk = () => {
-    const form = this[this.state.currentTabKey].getForm();
-    const {validateFields} = form;
-    validateFields((err, fieldsValue) => {
+    const form = this.basic.getForm();
+    const {validateFieldsAndScroll} = form;
+    validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
       const data = {
         ...fieldsValue,
@@ -581,9 +585,6 @@ export default class Func extends PureComponent {
               key: 'resource',
               title: '资源信息',
               content: <ResourceInfoForm
-                ref={(el) => {
-                  this.resource = el;
-                }}
                 loading={loading}
                 resourceList={resourceList}
                 handleResourceListChange={this.handleResourceListChange} />
