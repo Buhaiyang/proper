@@ -29,13 +29,13 @@ export default class OopModal extends PureComponent {
     naviTabsVisible: false
   }
   componentWillReceiveProps(props) {
-    // TODO 修改TAB的位置问题
-    // setTimeout(()=>{
-    //
-    // }, 300);
-    this.setState({
-      naviTabsVisible: !props.isCreate
-    })
+    setTimeout(()=>{
+      if (!props.isCreate && props.visible) {
+        this.setState({
+          naviTabsVisible: true
+        })
+      }
+    }, 300);
     if (!this.state.activeKey && props.tabs.length > 0) {
       this.setState({
         activeKey: props.tabs[0].key
@@ -147,18 +147,21 @@ export default class OopModal extends PureComponent {
       destroyOnClose: true,
       ...props
     }
-
-    if (!_props.afterClose) {
-      _props.afterClose = () => {
-        _props.onCancel && _props.onCancel();
-        this.checkedBatch = null;
-        if (this.modalbody) {
-          this.modalbody.removeEventListener('scroll', this.handleScroll, false);
-          this.modalbody.removeAttribute('scrollEvent')
-        }
-        this.setState({
-          activeKey: null
-        })
+    const afterClose = () => {
+      this.checkedBatch = null;
+      if (this.modalbody) {
+        this.modalbody.removeEventListener('scroll', this.handleScroll, false);
+        this.modalbody.removeAttribute('scrollEvent')
+      }
+      this.setState({
+        naviTabsVisible: false,
+        activeKey: null
+      })
+    }
+    _props.afterClose = () => {
+      afterClose();
+      if (props.afterClose) {
+        props.afterClose();
       }
     }
     // 通过 tab的isCreate属性为tab增加默认的disabled属性
@@ -167,10 +170,10 @@ export default class OopModal extends PureComponent {
         (tab.main ? false : _props.isCreate)
         : tab.disabled;
     })
-    const antdTabs = (
+    const antdTabs = this.state.naviTabsVisible ? (
     <Tabs tabPosition="right" onTabClick={this.onTabClick} size="small" activeKey={this.state.activeKey}>
       {_props.tabs.map(tab=>(<TabPane tab={tab.title} key={tab.key} disabled={tab.disabled} />))}
-    </Tabs>);
+    </Tabs>) : null;
     _props.title = (
       <span style={{display: 'flex', alignItems: 'center'}}>
       <Popover
@@ -230,7 +233,6 @@ export default class OopModal extends PureComponent {
     }
     this.checkedBatch.push(key);
   }
-
   render() {
     const props = this.getInitProps()
     const modalStyle = {
