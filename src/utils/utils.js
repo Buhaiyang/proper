@@ -351,14 +351,7 @@ export const getParamObj = (search)=>{
     .forEach((jsonStr)=>{ Object.assign(param, JSON.parse(jsonStr)) });
   return param;
 }
-export const getDownloadUrl = (id) => {
-  let url = '/file/'.concat(id);
-  const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix');
-  if (devMode === 'development' && peaDynamicRequestPrefix) {
-    url = peaDynamicRequestPrefix + url;
-  }
-  return url;
-}
+
 /**
  * @desc
  * 这个方法获取后台url请求的路径 有3处对于此方法的调用
@@ -367,12 +360,13 @@ export const getDownloadUrl = (id) => {
  * 3.MongoService.js  //mongoDB的后台接口
  */
 export const getApplicationContextUrl = ()=>{
-  const {protocol, host, pathname} = window.location;
+  // const {protocol, host, pathname} = window.location;
   const peaDynamicRequestPrefix = window.localStorage.getItem('pea_dynamic_request_prefix');
   if (devMode === 'development' && peaDynamicRequestPrefix) {
     if (peaDynamicRequestPrefix.indexOf('http:') === 0 || peaDynamicRequestPrefix.indexOf('https:') === 0) {
       return peaDynamicRequestPrefix;
     }
   }
-  return `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`
+  // return `${protocol}//${host}${pathname.substr(0, pathname.lastIndexOf('/'))}${prefix}`;
+  return prefix;
 }

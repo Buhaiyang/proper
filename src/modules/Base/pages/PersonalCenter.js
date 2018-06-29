@@ -5,7 +5,7 @@ import {connect} from 'dva';
 import {inject} from '../../../common/inject';
 import OopUpload from '../../../components/OopUpload/index';
 import { oopToast } from './../../../common/oopUtils';
-import { getDownloadUrl } from '../../../utils/utils';
+import { getApplicationContextUrl } from '../../../utils/utils';
 import styles from './PersonalCenter.less'
 
 const { TabPane } = Tabs;
@@ -367,8 +367,10 @@ export default class PersonalCenter extends React.PureComponent {
       type: 'basePersonalCenter/fetchById',
       payload: id,
       callback: (res) => {
+        const {result: {avatar}} = res;
         this.setState({
-          imageUrl: getDownloadUrl(res.result.avatar)
+          imageUrl: (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
+            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`,
         });
       }
     });
@@ -387,8 +389,10 @@ export default class PersonalCenter extends React.PureComponent {
       callback: (res) => {
         oopToast(res, '更新个人信息成功', '更新失败，请填写正确的信息');
         cb();
+        const {result: {avatar}} = res;
         this.setState({
-          imageUrl: getDownloadUrl(res.result.avatar),
+          imageUrl: (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
+            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`,
           whenName: false,
           whenEmail: false,
           whenPhone: false,

@@ -1,21 +1,10 @@
 import React from 'react';
 import { Upload, Button, Icon, message} from 'antd';
-import { devMode } from '../../config';
+import { getApplicationContextUrl } from '../../utils/utils';
 
 
-const getUploadUrl = (modelName = '')=>{
-  if (!modelName) {
-    console.error('OopUpload: upload file required a variable called \'modelName \'');
-  }
-  let url = '/file';
-  const prefix = window.localStorage.getItem('pea_dynamic_request_prefix');
-  if (devMode === 'development' && prefix) {
-    url = prefix + url;
-  }
-  return url;
-}
 export default class OopUpload extends React.PureComponent {
-  uploadUrl = getUploadUrl(this.props.modelName);
+  uploadUrl = `${getApplicationContextUrl()}/file`;
   getInitProps = ()=>{
     const props = {
       name: 'file',

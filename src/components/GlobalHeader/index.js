@@ -6,7 +6,7 @@ import Debounce from 'lodash-decorators/debounce';
 import { Link } from 'dva/router';
 import NoticeIcon from '../NoticeIcon';
 import HeaderSearch from '../HeaderSearch';
-import { getDownloadUrl } from '../../utils/utils';
+import { getApplicationContextUrl } from '../../utils/utils';
 import styles from './index.less';
 
 const { Header } = Layout;
@@ -51,8 +51,8 @@ export default class GlobalHeader extends PureComponent {
     if (!avatar) {
       avatar = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
     }
-    const index = avatar.indexOf('http');
-    return index > -1 ? avatar : getDownloadUrl(avatar);
+    return (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
+      avatar : `${getApplicationContextUrl()}/file/${avatar}`;
   }
   @Debounce(600)
   triggerResizeEvent() { // eslint-disable-line

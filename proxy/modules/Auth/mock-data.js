@@ -456,8 +456,8 @@ module.exports = {
       enable:true,
   },
   'DELETE:/auth/resources/:id':{type:'ok'},
-  'POST:/file/:id': {
-    id: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
+  'POST:/file': (req , res)=>{
+    res.send('https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png')
   },
   'PUT:/auth/users/password': (req , res)=>{
     res.send({})

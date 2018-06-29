@@ -34,10 +34,6 @@
     "/pep": {
       "target": "http://localhost:8080",
       "pathRewrite": {"^/pep/workflow/service" : "/pep/workflow/service"}
-    },
-    "/file": {
-      "target": "http://localhost:8080",
-      "pathRewrite": {"^/file" : "/pep/file"}
     }
   }
 }
