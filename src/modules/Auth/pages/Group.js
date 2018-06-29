@@ -379,7 +379,8 @@ export default class Group extends PureComponent {
           id: groupId,
           ids: data.toString()
         },
-        callback: () => {
+        callback: (res) => {
+          oopToast(res, '添加成功', '添加失败');
           me.props.dispatch({
             type: 'authGroups/fetchGroupUsers',
             payload: groupId,
@@ -404,7 +405,8 @@ export default class Group extends PureComponent {
           id: groupId,
           ids: data.toString()
         },
-        callback: () => {
+        callback: (res) => {
+          oopToast(res, '删除成功', '删除失败');
           me.props.dispatch({
             type: 'authGroups/fetchGroupUsers',
             payload: groupId,
