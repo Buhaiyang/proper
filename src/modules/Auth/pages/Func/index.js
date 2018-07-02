@@ -206,8 +206,9 @@ const ResourceInfoForm = (props) => {
 export default class Func extends PureComponent {
   state = {
     tableTitle: '所有',
+    addOrEditModalTitle: null, // 新建编辑模态窗口 title
     modalVisible: false,
-    currentTabKey: 'basic',
+    // currentTabKey: 'basic',
     isCreate: true,
     parentNode: null
   }
@@ -235,22 +236,12 @@ export default class Func extends PureComponent {
     });
   }
 
-  onCancel = () => {
-    const el = this[this.state.currentTabKey];
-    if (el && el.getForm) {
-      this.handleClearModalForms(el.getForm());
-    } else {
-      this.handleClearModalForms({});
-    }
-  };
-
-  handleClearModalForms = (form)=>{
+  handleAddOrEditModalCancel = () =>{
     this.setModalVisible(false)
     setTimeout(() => {
-      form.resetFields && form.resetFields();
-      this.setState({
-        currentTabKey: 'basic'
-      });
+      // this.setState({
+      //   currentTabKey: 'basic'
+      // });
       this.props.dispatch({
         type: 'authFunc/clear'
       });
@@ -289,9 +280,9 @@ export default class Func extends PureComponent {
 
   handleTabChange = (activeKey)=>{
     const {dispatch, authFunc: {resourceList, funcBasicInfo} } = this.props
-    this.setState({
-      currentTabKey: activeKey
-    });
+    // this.setState({
+    //   currentTabKey: activeKey
+    // });
     if (activeKey === 'resource' && resourceList.length === 0) {
       dispatch({
         type: 'authFunc/fetchResourceList',
@@ -393,6 +384,7 @@ export default class Func extends PureComponent {
   onCreate = ()=>{
     this.refreshMenusAndLeftTree()
     this.setState({
+      addOrEditModalTitle: '新建',
       modalVisible: true,
       isCreate: true
     });
@@ -442,6 +434,7 @@ export default class Func extends PureComponent {
   onEdit = (record)=>{
     const me = this;
     me.setState({
+      addOrEditModalTitle: '编辑',
       modalVisible: true,
       isCreate: false
     });
@@ -476,7 +469,7 @@ export default class Func extends PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
-    const { parentNode, tableTitle } = this.state;
+    const { parentNode, tableTitle, addOrEditModalTitle } = this.state;
     const columns = [
       {
         title: '菜单名称', dataIndex: 'name'
@@ -556,11 +549,11 @@ export default class Func extends PureComponent {
           onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
         />
         <OopModal
-          title={this.state.isCreate ? '新建功能' : '编辑功能'}
+          title={`${addOrEditModalTitle}功能`}
           visible={this.state.modalVisible}
           destroyOnClose={true}
           width={800}
-          onCancel={this.onCancel}
+          onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onOk}
           onDelete={this.onDeleteFromEdit}
           isCreate={this.state.isCreate}

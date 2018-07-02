@@ -22,6 +22,21 @@ const formItemLayout = {
     sm: {span: 16},
   },
 };
+
+// function onFieldsChange(props, fields) {
+//   const { userBasicInfo, conductFieldsChange } = props;
+//   let hasFieldsChanged = false;
+//   for (const k in fields) {
+//     if (fields[k] !== userBasicInfo[k]) {
+//       hasFieldsChanged = true;
+//       break;
+//     }
+//   }
+//   if (hasFieldsChanged) {
+//     conductFieldsChange(hasFieldsChanged);
+//   }
+// }
+
 const UserBasicInfoForm = Form.create()((props) => {
   const {form, userBasicInfo, loading} = props;
   const {getFieldDecorator} = form;
@@ -212,6 +227,8 @@ const UserGroupRelevance = (props) => {
 }))
 export default class User extends React.PureComponent {
   state = {
+    // isBasicFormFieldsChange: true,
+    addOrEditModalTitle: null, // 新建编辑模态窗口 title
     modalVisible: false,
     viewModalVisible: false,
     isCreate: !this.props.authUser.userBasicInfo.id,
@@ -224,6 +241,7 @@ export default class User extends React.PureComponent {
   }
   onEdit = (record) => {
     this.setState({
+      addOrEditModalTitle: '编辑',
       modalVisible: true,
       isCreate: false
     });
@@ -262,6 +280,7 @@ export default class User extends React.PureComponent {
   }
   onCreate = () => {
     this.setState({
+      addOrEditModalTitle: '新建',
       modalVisible: true,
       isCreate: true
     });
@@ -325,10 +344,16 @@ export default class User extends React.PureComponent {
       });
     }
   }
-  // 隐藏窗口时重置form 清空 userBasicInfo、userRoles
-  clearModalForms = () => {
+
+  handleAddOrEditModalCancel = () => {
     this.handleModalVisible(false);
     setTimeout(() => {
+      this.setState({
+        userRolesList: [],
+        userGroupsList: [],
+        isCreate: true
+      });
+
       this.props.dispatch({
         type: 'authUser/clear'
       });
@@ -460,6 +485,13 @@ export default class User extends React.PureComponent {
       type === 'roleUser' ? this.setRolesList(userRolesAll) : this.setGroupsList(userGroupsAll)
     }
   }
+
+  handleUserInfoFormChange = () => {
+    this.setState({
+
+    });
+  }
+
   render() {
     const {
       authUser: { userBasicInfo, userRoles, userGroups, },
@@ -467,7 +499,8 @@ export default class User extends React.PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
-    const { isCreate, modalVisible, viewModalVisible, userRolesList, userGroupsList } = this.state;
+    const { isCreate, modalVisible, viewModalVisible,
+      userRolesList, userGroupsList, addOrEditModalTitle } = this.state;
     const column = [
       {
         title: '用户名', dataIndex: 'username', render: (text, record) => {
@@ -566,11 +599,11 @@ export default class User extends React.PureComponent {
           />
         </Card>
         <OopModal
-          title={isCreate ? '新建用户' : '编辑用户'}
+          title={`${addOrEditModalTitle}用户`}
           visible={modalVisible}
           destroyOnClose={true}
           width={800}
-          onCancel={this.clearModalForms}
+          onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.handleDelete}
           isCreate={isCreate}
@@ -586,7 +619,8 @@ export default class User extends React.PureComponent {
                 this.basicUser = el;
               }}
               userBasicInfo={userBasicInfo}
-              loading={!!loading} />
+              loading={!!loading}
+              conductFieldsChange={this.handleUserInfoFormChange} />
           }, {
             key: 'roleUser',
             title: '角色信息',

@@ -37,12 +37,15 @@ export default class OopModal extends PureComponent {
       }
     }, 300);
     if (!this.state.activeKey && props.tabs.length > 0) {
+      const defaultTab = props.tabs.find(it => 'main' in it);
       this.setState({
-        activeKey: props.tabs[0].key
+        activeKey: props.tabs[0].key,
+        defaultActiveKey: defaultTab ? defaultTab.key : props.tabs[0].key
       });
     }
   }
-  componentDidUpdate = () => {
+
+  componentDidUpdate() {
     const containers = document.getElementsByClassName(styles.oopTabContainer);
     if (containers.length > 0) {
       this.modalbody = containers[0].parentNode;
@@ -52,6 +55,7 @@ export default class OopModal extends PureComponent {
       }
     }
   }
+
   handleScroll = () => {
     const key = this.state.activeKey ? this.state.activeKey : this.props.tabs.find(it => 'main' in it).key;
     const activeKey = this.getCurrentAnchor(50, 0);
@@ -114,7 +118,7 @@ export default class OopModal extends PureComponent {
   getInitProps = ()=>{
     const { props, state } = this;
     const { loading, isCreate } = props;
-    const { naviTabsVisible } = state;
+    const { naviTabsVisible, defaultActiveKey, activeKey } = state;
     const onOk = ()=>{
       props.onOk && props.onOk()
     }
@@ -129,6 +133,25 @@ export default class OopModal extends PureComponent {
         naviTabsVisible: !naviTabsVisible
       })
     }
+
+    // const footer = (
+    //   <Fragment>
+    //     {isCreate ? null : (
+    //       <Popconfirm
+    //       title="确认删除吗？"
+    //       onConfirm={onDelete}>
+    //       <Button style={{float: 'left'}}>删除</Button>
+    //     </Popconfirm>)}
+    //     {defaultActiveKey === activeKey ? (
+    //         <Fragment>
+    //           <Button onClick={onCancel}>取消</Button>
+    //           <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
+    //         </Fragment>
+    //       ) :
+    //      <Popconfirm title="确认关闭吗？" onConfirm={onCancel}><Button>关闭</Button></Popconfirm>}
+    //   </Fragment>
+    // )
+
     const footer = (
       <Fragment>
         {isCreate ? null : (
@@ -137,9 +160,16 @@ export default class OopModal extends PureComponent {
           onConfirm={onDelete}>
           <Button style={{float: 'left'}}>删除</Button>
         </Popconfirm>)}
-        <Button onClick={onCancel}>取消</Button>
-        <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
-      </Fragment>);
+        {defaultActiveKey === activeKey ? (
+            <Fragment>
+              <Button onClick={onCancel}>取消</Button>
+              <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
+            </Fragment>
+          ) :
+          <Button onClick={onCancel}>关闭</Button>}
+      </Fragment>
+    )
+
     const _props = {
       title: 'Title',
       footer,
@@ -164,8 +194,17 @@ export default class OopModal extends PureComponent {
         props.afterClose();
       }
     }
+
     // 通过 tab的isCreate属性为tab增加默认的disabled属性
     _props.tabs.forEach((tab)=>{
+      // if (tab.disabled === undefined) {
+      //   if (tab.main) {
+      //     tab.disabled = false;
+      //   } else {
+      //     tab.disabled = _props.isCreate;
+      //   }
+      // }
+
       tab.disabled = tab.disabled === undefined ?
         (tab.main ? false : _props.isCreate)
         : tab.disabled;
@@ -212,11 +251,6 @@ export default class OopModal extends PureComponent {
     const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === key);
     const scrollHeight = this.calculateScrollHeight(curContainer);
     this.scrollModalBody(curContainer, scrollHeight);
-    // if (this.props.onTabChange && this.checkedBatch
-    //   && this.checkedBatch.indexOf(key) === -1) {
-    //   this.props.onTabChange(key);
-    //   this.onBatchAnchorCheck(key);
-    // }
 
     if (this.props.onTabChange) {
       if (!this.checkedBatch ||

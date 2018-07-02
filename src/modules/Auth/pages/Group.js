@@ -129,6 +129,7 @@ const UserRelevance = (props) => {
 }))
 export default class Group extends PureComponent {
   state = {
+    addOrEditModalTitle: null, // 新建编辑模态窗口 title
     modalVisible: false,
     currentTabKey: 'basic',
     userTargetKeys: [],
@@ -244,27 +245,21 @@ export default class Group extends PureComponent {
   // 打开新建层
   handleCreate = (flag) => {
     this.setState({
+      addOrEditModalTitle: '新建',
       modalVisible: flag
     });
   }
 
-  clearModalForms = () => {
-    const el = this[this.state.currentTabKey];
-    if (el && el.getForm) {
-      this.closeForm(el.getForm());
-    }
-  }
-
-  // 关闭form
-  closeForm = (customForm) => {
+  handleAddOrEditModalCancel = () => {
     this.setState({
       modalVisible: false
     });
+
     setTimeout(() => {
-      customForm.resetFields();
       this.setState({
         currentTabKey: 'basic',
         userTargetKeys: [],
+        userList: [],
         isCreate: true
       });
       this.props.dispatch({
@@ -350,6 +345,7 @@ export default class Group extends PureComponent {
   // 点击编辑按钮
   handleEdit = (record) => {
     this.setState({
+      addOrEditModalTitle: '编辑',
       modalVisible: true,
       isCreate: !record.id
     });
@@ -469,7 +465,7 @@ export default class Group extends PureComponent {
   render() {
     const { loading, global: { size, oopSearchGrid}, gridLoading } = this.props;
     const { currentTabKey, userTargetKeys, viewVisible, userInfoView,
-      groupUsers, userGroups, isCreate, userList } = this.state;
+      groupUsers, userGroups, isCreate, userList, addOrEditModalTitle } = this.state;
     const parentMethods = {
       handleFormSubmit: this.handleFormSubmit,
       closeForm: this.closeForm,
@@ -574,11 +570,11 @@ export default class Group extends PureComponent {
           />
         </Card>
         <OopModal
-          title={this.state.isCreate ? '新建用户组' : '编辑用户组'}
+          title={`${addOrEditModalTitle}用户组`}
           visible={this.state.modalVisible}
           destroyOnClose={true}
           width={800}
-          onCancel={this.clearModalForms}
+          onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.onDelete}
           isCreate={this.state.isCreate}
@@ -636,9 +632,7 @@ export default class Group extends PureComponent {
               <Description term="描述">
                 {userInfoView.description}
               </Description>
-              <p>
-                <Badge status={userInfoView.badge} text={userInfoView.enableLabel} />
-              </p>
+              <Description term="状态">{userInfoView.enable ? '已启用' : '已停用'}</Description>
             </DescriptionList>
             <Divider style={{ marginBottom: 16 }} />
             <DescriptionList size={size} col="1" title="包含的用户信息">

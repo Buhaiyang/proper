@@ -160,7 +160,6 @@ const UserInfoForm = (props) => {
           onRowSelect={handleChange}
           selectTriggerOnRowClick={true}
           dataDefaultSelectedRowKeys={deafultSelectedRowKeys}
-          // onSelectAll={onSelectAll}
           />
       </Card>
   )
@@ -204,6 +203,7 @@ const GroupInfoForm = (props) => {
 }))
 export default class Role extends PureComponent {
   state = {
+    addOrEditModalTitle: null, // 新建编辑模态窗口 title
     // 是否显示个人信息
     viewVisible: false,
     // 是否显示form表单
@@ -340,6 +340,7 @@ export default class Role extends PureComponent {
           payload: res
         });
         self.setState({
+          addOrEditModalTitle: '编辑',
           modalVisible: true,
           isCreate: !res.id
         });
@@ -352,6 +353,7 @@ export default class Role extends PureComponent {
   handleCreate = (flag) => {
     this.getAllRoles();
     this.setState({
+      addOrEditModalTitle: '新建',
       modalVisible: flag
     });
   }
@@ -550,15 +552,15 @@ export default class Role extends PureComponent {
     }
   }
 
-  // 关闭form
-  clearModalForms = () => {
+  handleAddOrEditModalCancel = () => {
     this.handleModalVisible(false);
     setTimeout(() => {
       this.setState({
-        // currentTabKey: 'basic',
         checkedMenuKeys: [],
         checkedResourceKeys: [],
         allCheckedMenuKeys: [],
+        roleUsersList: [],
+        groupUsersList: [],
         isCreate: true
       });
       this.props.dispatch({
@@ -687,7 +689,7 @@ export default class Role extends PureComponent {
       global: { size, oopSearchGrid },
       authRole: { roleInfo, roleUsers, roleGroups, roleList, roleMenus } } = this.props;
     const { viewVisible, checkedMenuKeys, checkedResourceKeys,
-      roleUsersList, groupUsersList } = this.state;
+      roleUsersList, groupUsersList, addOrEditModalTitle } = this.state;
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
         render: (text, record) => (
@@ -784,11 +786,11 @@ export default class Role extends PureComponent {
           />
         </Card>
         <OopModal
-          title={this.state.isCreate ? '新建角色' : '编辑角色'}
+          title={`${addOrEditModalTitle}角色`}
           visible={this.state.modalVisible}
           destroyOnClose={true}
           width={800}
-          onCancel={this.clearModalForms}
+          onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.onDelete}
           isCreate={this.state.isCreate}
@@ -873,6 +875,7 @@ export default class Role extends PureComponent {
         /> */}
         <Modal
           title="角色信息"
+          width={800}
           visible={viewVisible}
           userInfoView={roleInfo}
           roleUsers={roleUsers}
@@ -901,9 +904,7 @@ export default class Role extends PureComponent {
                 labelText = ""
               />
             </Description>
-            <p>
-              <Badge status={roleInfo.badge} text={roleInfo.enableLabel} />
-            </p>
+            <Description term="状态">{roleInfo.enable ? '已启用' : '已停用'}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 16 }} />
           <DescriptionList size={size} col="1" title="包含的用户信息">
