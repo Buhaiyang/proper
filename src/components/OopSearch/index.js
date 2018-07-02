@@ -66,12 +66,19 @@ const calculateLetterWidth = (letter, size)=>{
 //     return arr[index]
 //   }
 // }
-const filterTableList = (searchValue, tableList)=>{
+const filterTableList = (searchValue, tableList, columns)=>{
   const copyList = cloneDeep(tableList);
   const filter = (value, index, item)=>{
+    if (!value) {
+      return false
+    }
     const itemName = Object.keys(item)[index];
-    // 不对数据中的id和key做过滤
+    // 不对数据中的id、key、_开头 做过滤
     if (itemName === 'id' || itemName === 'key' || itemName.indexOf('_') > -1) {
+      return false;
+    }
+    // 不对未在columns中设置的列过滤
+    if (columns && !columns.includes(itemName)) {
       return false;
     }
     const row = item;
@@ -79,6 +86,7 @@ const filterTableList = (searchValue, tableList)=>{
     const sIndex = sValue.indexOf(searchValue);
     const flag = sIndex > -1;
     if (flag) {
+      // console.log(itemName, ' : ', value)
       row[itemName] = (
         <span>
             {sValue.substr(0, sIndex)}
@@ -96,6 +104,7 @@ const filterTableList = (searchValue, tableList)=>{
 }
 
 const { Search } = Input;
+const { Group } = Input;
 @connect(({global})=>({
   global
 }), null, null, {withRef: true})
@@ -368,16 +377,54 @@ export default class OopSearch extends React.Component {
   }
 
   staticRetrievalData(inputValue) {
-    this.props.onInputChange && this.props.onInputChange(inputValue, (tableList)=>{
+    this.props.onInputChange && this.props.onInputChange(inputValue, (tableList, columns)=>{
       if (tableList === undefined) {
-        console.error('error: source list not be undefined');
+        console.error('error: source list cannot be undefined');
         return [];
       }
-      return filterTableList(inputValue, tableList);
+      if (!columns || columns.length === 0) {
+        console.error('warn: It is possible to get inaccurate filtering results if \'columns\' is not set');
+      }
+      return filterTableList(inputValue, tableList, columns);
     })
   }
+  // 获取Search组件的长度
+  getSearchCmt = (props)=>{
+    let searchWith = '90%';
+    if (props.extra && props.extra.props) {
+      const {style = {}} = props.extra.props;
+      // 默认给百分之90的宽度
+      if (style.width) {
+        searchWith = (100 - parseFloat(style.width)).toString().concat('%');
+      }
+    } else {
+      searchWith = '100%';
+    }
+    const search = (
+      <Search
+        style={{width: searchWith}}
+        placeholder={props.placeholder}
+        enterButton={props.enterButtonText}
+        ref={(el)=>{ this.inputOSearch = el }}
+        defaultValue={this.state.defaultValue}
+        value={this.state.inputValue}
+        onSearch={this.handleButtonClick}
+        onClick={this.inputClick}
+        onChange={this.inputChange}
+        onKeyDown={this.inputKeyDown}
+        onBlur={this.inputBlur} />);
+    if (props.extra) {
+      return (
+        <Group compact>
+        {props.extra}
+        {search}
+      </Group>);
+    } else {
+      return search;
+    }
+  }
   render() {
-    const {global: {searchOptions}, placeholder, enterButtonText} = this.props;
+    const {global: {searchOptions}} = this.props;
     return (
       <div className={styles.globalSearchWrapper}>
         <div className={styles.searchContainer}>
@@ -397,17 +444,7 @@ export default class OopSearch extends React.Component {
               )}
             </ul>
           </div>
-          <Search
-            placeholder={placeholder}
-            enterButton={enterButtonText}
-            ref={(el)=>{ this.inputOSearch = el }}
-            defaultValue={this.state.defaultValue}
-            value={this.state.inputValue}
-            onSearch={this.handleButtonClick}
-            onClick={this.inputClick}
-            onChange={this.inputChange}
-            onKeyDown={this.inputKeyDown}
-            onBlur={this.inputBlur} />
+          { this.getSearchCmt(this.props) }
           {this.state.showDropMenu && (
             <div className={styles.dropDown}>
               <ul className="ant-menu ant-menu-light ant-menu-root ant-menu-vertical">

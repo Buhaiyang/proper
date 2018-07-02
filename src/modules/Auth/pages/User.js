@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Card, Divider, Form, Modal, Button, Input, Radio, Badge, Spin} from 'antd';
+import { Card, Divider, Form, Modal, Button, Input, Radio, Badge, Spin, Select} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/OopSearch';
@@ -11,6 +11,7 @@ import { oopToast } from './../../../common/oopUtils';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+const { Option } = Select;
 const {Description} = DescriptionList;
 const formItemLayout = {
   labelCol: {
@@ -165,6 +166,9 @@ const RoleInfoRelevance = (props) => {
   const handleChange = (record, selectedRowKeys) => {
     userAddRoles(selectedRowKeys, record.id)
   }
+  const changeSearchType = (value)=>{
+    console.log(value)
+  }
   // 默认选中keys
   const deafultSelectedRowKeys = userRoles.map(item => item.id)
   return (
@@ -173,6 +177,16 @@ const RoleInfoRelevance = (props) => {
           placeholder="请输入"
           enterButtonText="搜索"
           onInputChange={filterRolesAll}
+          extra={
+            <Select
+              defaultValue="ALL"
+              style={{ width: '10%' }}
+              onSelect={value => changeSearchType(value)} >
+              <Option value="ALL">全部</Option>
+              <Option value="checked">已绑定</Option>
+              <Option value="unchecked">未绑定</Option>
+            </Select>
+          }
           ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
         />
         <OopTable
@@ -463,12 +477,12 @@ export default class User extends React.PureComponent {
   }
   filterRolesAll = (inputValue, filter) => {
     const { authUser: { userRolesAll } } = this.props;
-    const rolesList = inputValue ? filter(userRolesAll) : userRolesAll;
+    const rolesList = inputValue ? filter(userRolesAll, ['name', 'description', 'parentName', 'enableStatus']) : userRolesAll;
     this.setRolesList(rolesList)
   }
   filterGroupsAll = (inputValue, filter) => {
     const { authUser: { userGroupsAll } } = this.props;
-    const groupsList = inputValue ? filter(userGroupsAll) : userGroupsAll;
+    const groupsList = inputValue ? filter(userGroupsAll, ['name', 'description', 'seq', 'enableStatus']) : userGroupsAll;
     this.setGroupsList(groupsList)
   }
   // 添加字段支持静态搜索（对布尔值会报错）
@@ -491,7 +505,9 @@ export default class User extends React.PureComponent {
 
     });
   }
-
+  changeSearchType = (value)=>{
+    console.log(value)
+  }
   render() {
     const {
       authUser: { userBasicInfo, userRoles, userGroups, },
