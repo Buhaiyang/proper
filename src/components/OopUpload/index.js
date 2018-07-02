@@ -29,12 +29,12 @@ export default class OopUpload extends React.PureComponent {
       //   console.log(info.file, info.fileList);
       // }
       if (info.file.status === 'done') {
-        message.success(`${info.file.name} 上传成功！`);
+        message.success('上传成功!');
       } else if (info.file.status === 'error') {
         if (info.file.error && info.file.error.status === 401) {
           // TODO 处理401
         }
-        message.error(`${info.file.name} 上传失败！.${info.file.response}`);
+        message.error('上传失败!');
       }
       callbackOnChange && callbackOnChange(info);
     }
