@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Modal, Spin, Badge,
   Form, Input, Radio, Select, Tooltip } from 'antd';
+import classNames from 'classnames';
 import { connect } from 'dva';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
@@ -10,6 +11,7 @@ import OopTable from '../../../components/OopTable';
 import OopModal from '../../../components/OopModal';
 import { oopToast } from './../../../common/oopUtils';
 import OopAuthMenu from '../../../components/OopAuthMenu'
+import styles from './Role.less';
 
 const { Description } = DescriptionList;
 const FormItem = Form.Item;
@@ -28,12 +30,26 @@ const formItemLayout = {
   },
 };
 
-const BasicInfoForm = Form.create()((props) => {
-  const { form, roleInfo, roleList, loading } = props;
+function onValuesChange(props, changedValues, allValues) {
+  const { roleInfo, conductValuesChange } = props;
+  if (conductValuesChange) {
+    const warningField = {};
+    for (const k in allValues) {
+      if (Object.prototype.hasOwnProperty.call(roleInfo, k) &&
+        allValues[k] !== roleInfo[k]) {
+        warningField[k] = {hasChanged: true, prevValue: roleInfo[k]};
+      }
+    }
+    conductValuesChange(warningField);
+  }
+}
+
+const BasicInfoForm = Form.create({onValuesChange})((props) => {
+  const { form, roleInfo, roleList, loading, warningField, warningWrapper } = props;
 
   return (
     <Spin spinning={loading}>
-      <Form>
+      <Form className={classNames({[styles.warningWrapper]: warningWrapper})}>
         <FormItem>
           {form.getFieldDecorator('id', {
             initialValue: roleInfo.id,
@@ -44,6 +60,7 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="名称"
+          className={warningField && warningField.name && styles.hasWarning}
         >
           {form.getFieldDecorator('name', {
             initialValue: roleInfo.name,
@@ -55,6 +72,7 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="继承"
+          className={warningField && warningField.parentId && styles.hasWarning}
         >
           {form.getFieldDecorator('parentId', {
             initialValue: roleList ? roleInfo.parentId : null,
@@ -84,6 +102,7 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="描述"
+          className={warningField && warningField.description && styles.hasWarning}
         >
           {form.getFieldDecorator('description', {
             initialValue: roleInfo.description
@@ -94,13 +113,24 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="状态"
+          className={warningField && warningField.enable && styles.hasWarning}
         >
           {form.getFieldDecorator('enable', {
             initialValue: roleInfo.enable == null ? true : roleInfo.enable
           })(
             <RadioGroup>
-              <Radio value={true}>启用</Radio>
-              <Radio value={false}>停用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  warningField.enable.prevValue && styles.hasWarning}
+                value={true}>启用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  !warningField.enable.prevValue && styles.hasWarning}
+                value={false}>停用</Radio>
             </RadioGroup>
           )}
         </FormItem>
@@ -222,6 +252,11 @@ export default class Role extends PureComponent {
     roleUsersList: [],
     // 当前角色所有的用户组
     groupUsersList: [],
+    closeConfirmConfig: {
+      visible: false
+    },
+    warningWrapper: false, // from 是否记录修改状态
+    warningField: {} // from 字段变化
   };
 
   componentDidMount() {
@@ -544,12 +579,23 @@ export default class Role extends PureComponent {
             this.getAllRoles();
             this.onLoad();
             self.setState({
-              isCreate: false
+              isCreate: false,
+              closeConfirmConfig: {
+                visible: false
+              },
+              warningWrapper: false,
+              warningField: {},
             });
           }
         });
       });
     }
+  }
+
+  handleCloseConfirmCancel = (warningWrapper) => {
+    this.setState({
+      warningWrapper
+    })
   }
 
   handleAddOrEditModalCancel = () => {
@@ -561,7 +607,12 @@ export default class Role extends PureComponent {
         allCheckedMenuKeys: [],
         roleUsersList: [],
         groupUsersList: [],
-        isCreate: true
+        isCreate: true,
+        closeConfirmConfig: {
+          visible: false
+        },
+        warningWrapper: false,
+        warningField: {},
       });
       this.props.dispatch({
         type: 'authRole/clear'
@@ -684,12 +735,27 @@ export default class Role extends PureComponent {
     const groupsList = inputValue ? filter(allGroups) : allGroups;
     this.setGroupsList(groupsList)
   }
+
+  handleBasicChange = (warningField) => {
+    const visible = Object.keys(warningField).length > 0;
+    this.setState((prevState) => {
+      return {
+        closeConfirmConfig: {
+          ...prevState.closeConfirmConfig,
+          visible
+        },
+        warningField
+      }
+    });
+  };
+
   render() {
     const { loading, gridLoading,
       global: { size, oopSearchGrid },
       authRole: { roleInfo, roleUsers, roleGroups, roleList, roleMenus } } = this.props;
     const { viewVisible, checkedMenuKeys, checkedResourceKeys,
-      roleUsersList, groupUsersList, addOrEditModalTitle } = this.state;
+      roleUsersList, groupUsersList, addOrEditModalTitle,
+      closeConfirmConfig, warningField, warningWrapper } = this.state;
     const columns = [
       { title: '名称', dataIndex: 'name', key: 'name',
         render: (text, record) => (
@@ -790,6 +856,8 @@ export default class Role extends PureComponent {
           visible={this.state.modalVisible}
           destroyOnClose={true}
           width={800}
+          closeConfirm={closeConfirmConfig}
+          closeConfirmCancel={this.handleCloseConfirmCancel}
           onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.onDelete}
@@ -804,9 +872,12 @@ export default class Role extends PureComponent {
               tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
               content: <BasicInfoForm
                 ref = {(el) => { this.basic = el; }}
+                warningWrapper={warningWrapper}
                 roleInfo = {roleInfo}
                 roleList = {roleList}
                 loading = {loading}
+                warningField={warningField}
+                conductValuesChange={this.handleBasicChange}
               />
             },
             {

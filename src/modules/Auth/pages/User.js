@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
 import { Card, Divider, Form, Modal, Button, Input, Radio, Badge, Spin, Select} from 'antd';
+import classNames from 'classnames';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/DescriptionList';
 import OopSearch from '../../../components/OopSearch';
@@ -8,6 +9,7 @@ import OopTable from '../../../components/OopTable';
 import OopModal from '../../../components/OopModal';
 import {inject} from '../../../common/inject';
 import { oopToast } from './../../../common/oopUtils';
+import styles from './User.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -24,26 +26,24 @@ const formItemLayout = {
   },
 };
 
-// function onFieldsChange(props, fields) {
-//   const { userBasicInfo, conductFieldsChange } = props;
-//   let hasFieldsChanged = false;
-//   for (const k in fields) {
-//     if (fields[k] !== userBasicInfo[k]) {
-//       hasFieldsChanged = true;
-//       break;
-//     }
-//   }
-//   if (hasFieldsChanged) {
-//     conductFieldsChange(hasFieldsChanged);
-//   }
-// }
+function onValuesChange(props, changedValues, allValues) {
+  const { userBasicInfo, conductValuesChange } = props;
+  if (conductValuesChange) {
+    const warningField = {};
+    for (const k in allValues) {
+      if (Object.prototype.hasOwnProperty.call(userBasicInfo, k) &&
+        allValues[k] !== userBasicInfo[k]) {
+        warningField[k] = {hasChanged: true, prevValue: userBasicInfo[k]};
+      }
+    }
+    conductValuesChange(warningField);
+  }
+}
 
-const UserBasicInfoForm = Form.create()((props) => {
-  const {form, userBasicInfo, loading} = props;
+const UserBasicInfoForm = Form.create({onValuesChange})((props) => {
+  const {form, userBasicInfo, loading, warningField, warningWrapper} = props;
   const {getFieldDecorator} = form;
-  const handleConfirmBlur = (e) => {
-    console.log(e);
-  };
+
   const checkPassword = (rule, value, callback) => {
     if (value && value !== form.getFieldValue('password')) {
       callback('两次密码输入不一致');
@@ -53,7 +53,9 @@ const UserBasicInfoForm = Form.create()((props) => {
   };
   return (
     <Spin spinning={loading}>
-      <Form style={{marginTop: 24}}>
+      <Form
+        style={{marginTop: 24}}
+        className={classNames({[styles.warningWrapper]: warningWrapper})}>
         <div>
           {getFieldDecorator('id', {
             initialValue: userBasicInfo.id,
@@ -64,6 +66,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="用户名"
+          className={warningField && warningField.username && styles.hasWarning}
         >
           {getFieldDecorator('username', {
             initialValue: userBasicInfo.username,
@@ -77,6 +80,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="显示名"
+          className={warningField && warningField.name && styles.hasWarning}
         >
           {getFieldDecorator('name', {
             initialValue: userBasicInfo.name,
@@ -90,6 +94,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="密码"
+          className={warningField && warningField.password && styles.hasWarning}
         >
           {getFieldDecorator('password', {
             initialValue: userBasicInfo.password,
@@ -103,6 +108,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="确认密码"
+          className={warningField && warningField.confirm && styles.hasWarning}
         >
           {getFieldDecorator('confirm', {
             initialValue: userBasicInfo.password,
@@ -112,12 +118,13 @@ const UserBasicInfoForm = Form.create()((props) => {
               validator: checkPassword,
             }],
           })(
-            <Input type="password" placeholder="请确认密码" onBlur={handleConfirmBlur} />
+            <Input type="password" placeholder="请确认密码" />
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="电子邮件"
+          className={warningField && warningField.email && styles.hasWarning}
         >
           {getFieldDecorator('email', {
             initialValue: userBasicInfo.email,
@@ -133,6 +140,7 @@ const UserBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="手机号码"
+          className={warningField && warningField.phone && styles.hasWarning}
         >
           {getFieldDecorator('phone', {
             initialValue: userBasicInfo.phone,
@@ -153,8 +161,18 @@ const UserBasicInfoForm = Form.create()((props) => {
             initialValue: userBasicInfo.enable == null ? true : userBasicInfo.enable
           })(
             <RadioGroup>
-              <Radio value={true}>启用</Radio>
-              <Radio value={false}>停用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  warningField.enable.prevValue && styles.hasWarning}
+                value={true}>启用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  !warningField.enable.prevValue && styles.hasWarning}
+                value={false}>停用</Radio>
             </RadioGroup>
           )}
         </FormItem>
@@ -166,9 +184,7 @@ const RoleInfoRelevance = (props) => {
   const handleChange = (record, selectedRowKeys) => {
     userAddRoles(selectedRowKeys, record.id)
   }
-  const changeSearchType = (value)=>{
-    console.log(value)
-  }
+
   // 默认选中keys
   const deafultSelectedRowKeys = userRoles.map(item => item.id)
   return (
@@ -180,8 +196,7 @@ const RoleInfoRelevance = (props) => {
           extra={
             <Select
               defaultValue="ALL"
-              style={{ width: '10%' }}
-              onSelect={value => changeSearchType(value)} >
+              style={{ width: '10%' }} >
               <Option value="ALL">全部</Option>
               <Option value="checked">已绑定</Option>
               <Option value="unchecked">未绑定</Option>
@@ -248,6 +263,11 @@ export default class User extends React.PureComponent {
     isCreate: !this.props.authUser.userBasicInfo.id,
     userRolesList: [],
     userGroupsList: [],
+    closeConfirmConfig: {
+      visible: false
+    },
+    warningWrapper: false, // from 是否记录修改状态
+    warningField: {} // from 字段变化
   }
 
   componentDidMount() {
@@ -349,7 +369,12 @@ export default class User extends React.PureComponent {
           payload: data,
           callback: (res)=>{
             this.setState({
-              isCreate: false
+              isCreate: false,
+              closeConfirmConfig: {
+                visible: false
+              },
+              warningWrapper: false,
+              warningField: {},
             });
             oopToast(res, '保存成功', '保存失败');
             this.onLoad();
@@ -359,13 +384,24 @@ export default class User extends React.PureComponent {
     }
   }
 
+  handleCloseConfirmCancel = (warningWrapper) => {
+    this.setState({
+      warningWrapper
+    })
+  }
+
   handleAddOrEditModalCancel = () => {
     this.handleModalVisible(false);
     setTimeout(() => {
       this.setState({
         userRolesList: [],
         userGroupsList: [],
-        isCreate: true
+        isCreate: true,
+        closeConfirmConfig: {
+          visible: false
+        },
+        warningWrapper: false,
+        warningField: {},
       });
 
       this.props.dispatch({
@@ -500,14 +536,19 @@ export default class User extends React.PureComponent {
     }
   }
 
-  handleUserInfoFormChange = () => {
-    this.setState({
-
+  handleUserInfoFormChange = (warningField) => {
+    const visible = Object.keys(warningField).length > 0;
+    this.setState((prevState) => {
+      return {
+        closeConfirmConfig: {
+          ...prevState.closeConfirmConfig,
+          visible
+        },
+        warningField
+      }
     });
-  }
-  changeSearchType = (value)=>{
-    console.log(value)
-  }
+  };
+
   render() {
     const {
       authUser: { userBasicInfo, userRoles, userGroups, },
@@ -515,8 +556,9 @@ export default class User extends React.PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
-    const { isCreate, modalVisible, viewModalVisible,
-      userRolesList, userGroupsList, addOrEditModalTitle } = this.state;
+    const { isCreate, modalVisible, viewModalVisible, userRolesList,
+      userGroupsList, addOrEditModalTitle, closeConfirmConfig,
+      warningField, warningWrapper } = this.state;
     const column = [
       {
         title: '用户名', dataIndex: 'username', render: (text, record) => {
@@ -592,6 +634,7 @@ export default class User extends React.PureComponent {
         display: record=>(!record.superuser)
       },
     ]
+
     return (
       <PageHeaderLayout content={
         <OopSearch
@@ -617,8 +660,9 @@ export default class User extends React.PureComponent {
         <OopModal
           title={`${addOrEditModalTitle}用户`}
           visible={modalVisible}
-          destroyOnClose={true}
           width={800}
+          closeConfirm={closeConfirmConfig}
+          closeConfirmCancel={this.handleCloseConfirmCancel}
           onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.handleDelete}
@@ -634,9 +678,12 @@ export default class User extends React.PureComponent {
               ref={(el) => {
                 this.basicUser = el;
               }}
+              warningWrapper={warningWrapper}
+              formItemLayout={formItemLayout}
               userBasicInfo={userBasicInfo}
+              warningField={warningField}
               loading={!!loading}
-              conductFieldsChange={this.handleUserInfoFormChange} />
+              conductValuesChange={this.handleUserInfoFormChange} />
           }, {
             key: 'roleUser',
             title: '角色信息',

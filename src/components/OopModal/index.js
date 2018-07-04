@@ -56,6 +56,19 @@ export default class OopModal extends PureComponent {
     }
   }
 
+  handleCloseConfirmCancel = () => {
+    const {closeConfirmCancel} = this.props;
+    closeConfirmCancel(true);
+    const activeKey = this.props.tabs.find(it => 'main' in it).key;
+    this.setState({
+      activeKey
+    });
+    const containers = document.getElementsByClassName(styles.oopTabContainer);
+    const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === activeKey);
+    const scrollHeight = this.calculateScrollHeight(curContainer);
+    this.scrollModalBody(curContainer, scrollHeight);
+  }
+
   handleScroll = () => {
     const key = this.state.activeKey ? this.state.activeKey : this.props.tabs.find(it => 'main' in it).key;
     const activeKey = this.getCurrentAnchor(50, 0);
@@ -117,7 +130,7 @@ export default class OopModal extends PureComponent {
   }
   getInitProps = ()=>{
     const { props, state } = this;
-    const { loading, isCreate } = props;
+    const { loading, isCreate, closeConfirm } = props;
     const { naviTabsVisible, defaultActiveKey, activeKey } = state;
     const onOk = ()=>{
       props.onOk && props.onOk()
@@ -134,24 +147,6 @@ export default class OopModal extends PureComponent {
       })
     }
 
-    // const footer = (
-    //   <Fragment>
-    //     {isCreate ? null : (
-    //       <Popconfirm
-    //       title="确认删除吗？"
-    //       onConfirm={onDelete}>
-    //       <Button style={{float: 'left'}}>删除</Button>
-    //     </Popconfirm>)}
-    //     {defaultActiveKey === activeKey ? (
-    //         <Fragment>
-    //           <Button onClick={onCancel}>取消</Button>
-    //           <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
-    //         </Fragment>
-    //       ) :
-    //      <Popconfirm title="确认关闭吗？" onConfirm={onCancel}><Button>关闭</Button></Popconfirm>}
-    //   </Fragment>
-    // )
-
     const footer = (
       <Fragment>
         {isCreate ? null : (
@@ -166,9 +161,29 @@ export default class OopModal extends PureComponent {
               <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
             </Fragment>
           ) :
-          <Button onClick={onCancel}>关闭</Button>}
+          closeConfirm && closeConfirm.visible ? <Popconfirm title="信息存在改动，是否关闭？" onConfirm={onCancel} onCancel={this.handleCloseConfirmCancel}><Button>关闭</Button></Popconfirm> :
+          <Button onClick={onCancel}>关闭</Button>
+         }
       </Fragment>
     )
+
+    // const footer = (
+    //   <Fragment>
+    //     {isCreate ? null : (
+    //       <Popconfirm
+    //       title="确认删除吗？"
+    //       onConfirm={onDelete}>
+    //       <Button style={{float: 'left'}}>删除</Button>
+    //     </Popconfirm>)}
+    //     {defaultActiveKey === activeKey ? (
+    //         <Fragment>
+    //           <Button onClick={onCancel}>取消</Button>
+    //           <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
+    //         </Fragment>
+    //       ) :
+    //       <Button onClick={onCancel}>关闭</Button>}
+    //   </Fragment>
+    // )
 
     const _props = {
       title: 'Title',

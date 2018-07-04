@@ -5,6 +5,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
 import { Tree, Form, Modal, Input, Radio, Spin, InputNumber, Select, TreeSelect, Badge } from 'antd';
+import classNames from 'classnames';
 import {inject} from '../../../../common/inject';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import OopTreeTable from '../../../../components/OopTreeTable';
@@ -46,16 +47,28 @@ const formatter = (data, id) => {
   });
 }
 
-const FuncBasicInfoForm = Form.create()((props) => {
-  const {form, funcBasicInfo, parentTreeData, loading, parentNode} = props;
-  const {getFieldDecorator} = form;
-  const onChange = (value)=>{
-    console.log(value)
+function onValuesChange(props, changedValues, allValues) {
+  const { funcBasicInfo, conductValuesChange } = props;
+  if (conductValuesChange) {
+    const warningField = {};
+    for (const k in allValues) {
+      if (Object.prototype.hasOwnProperty.call(funcBasicInfo, k) &&
+        allValues[k] !== funcBasicInfo[k]) {
+        warningField[k] = {hasChanged: true, prevValue: funcBasicInfo[k]};
+      }
+    }
+    conductValuesChange(warningField);
   }
+}
+
+const FuncBasicInfoForm = Form.create({onValuesChange})((props) => {
+  const {form, funcBasicInfo, parentTreeData, loading, parentNode,
+    warningField, warningWrapper} = props;
+  const {getFieldDecorator} = form;
   const data = formatter(parentTreeData, funcBasicInfo.id);
   return (
     <Spin spinning={loading}>
-      <Form>
+      <Form className={classNames({[styles.warningWrapper]: warningWrapper})}>
         <div>
           {getFieldDecorator('id', {
             initialValue: funcBasicInfo.id,
@@ -66,6 +79,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="菜单名称"
+          className={warningField && warningField.name && styles.hasWarning}
         >
           {getFieldDecorator('name', {
             initialValue: funcBasicInfo.name,
@@ -79,6 +93,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="前端路径"
+          className={warningField && warningField.route && styles.hasWarning}
         >
           {getFieldDecorator('route', {
             initialValue: funcBasicInfo.route,
@@ -92,6 +107,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="图标"
+          className={warningField && warningField.icon && styles.hasWarning}
         >
           {getFieldDecorator('icon', {
             initialValue: funcBasicInfo.icon,
@@ -105,6 +121,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="同级排序"
+          className={warningField && warningField.sequenceNumber && styles.hasWarning}
         >
           {getFieldDecorator('sequenceNumber', {
             initialValue: funcBasicInfo.sequenceNumber,
@@ -118,6 +135,7 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="父节点"
+          className={warningField && warningField.parentId && styles.hasWarning}
         >
           {getFieldDecorator('parentId', {
             initialValue: (funcBasicInfo.parentId ? funcBasicInfo.parentId : parentNode),
@@ -130,7 +148,6 @@ const FuncBasicInfoForm = Form.create()((props) => {
               treeData={data}
               placeholder="请选择父节点"
               treeDefaultExpandAll
-              onChange={onChange}
             />
           )}
           {loading && (
@@ -142,8 +159,9 @@ const FuncBasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="菜单类别"
+          className={warningField && warningField.menuCode && styles.hasWarning}
         >
-          {getFieldDecorator('menuType', {
+          {getFieldDecorator('menuCode', {
             initialValue: funcBasicInfo.menuCode,
             rules: [{
               required: true, message: '菜单类别不能为空',
@@ -164,14 +182,25 @@ const FuncBasicInfoForm = Form.create()((props) => {
             initialValue: funcBasicInfo.enable == null ? true : funcBasicInfo.enable
           })(
             <RadioGroup>
-              <Radio value={true}>启用</Radio>
-              <Radio value={false}>停用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  warningField.enable.prevValue && styles.hasWarning}
+                value={true}>启用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  !warningField.enable.prevValue && styles.hasWarning}
+                value={false}>停用</Radio>
             </RadioGroup>
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="功能描述"
+          className={warningField && warningField.description && styles.hasWarning}
         >
           {getFieldDecorator('description', {
             initialValue: funcBasicInfo.description
@@ -210,7 +239,9 @@ export default class Func extends PureComponent {
     modalVisible: false,
     // currentTabKey: 'basic',
     isCreate: true,
-    parentNode: null
+    parentNode: null,
+    warningWrapper: false, // from 是否记录修改状态
+    warningField: {} // from 字段变化
   }
   componentDidMount() {
     this.props.dispatch({
@@ -236,12 +267,22 @@ export default class Func extends PureComponent {
     });
   }
 
+  handleCloseConfirmCancel = (warningWrapper) => {
+    this.setState({
+      warningWrapper
+    })
+  }
+
   handleAddOrEditModalCancel = () =>{
     this.setModalVisible(false)
     setTimeout(() => {
-      // this.setState({
-      //   currentTabKey: 'basic'
-      // });
+      this.setState({
+        closeConfirmConfig: {
+          visible: false
+        },
+        warningWrapper: false,
+        warningField: {},
+      });
       this.props.dispatch({
         type: 'authFunc/clear'
       });
@@ -253,12 +294,13 @@ export default class Func extends PureComponent {
     const {validateFieldsAndScroll} = form;
     validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
-      const data = {
-        ...fieldsValue,
-        menuCode: fieldsValue.menuType
-      }
-      delete data.menuType
-      this.handleOnSubmitForm(data);
+      // const data = {
+      //   ...fieldsValue,
+      //   menuCode: fieldsValue.menuType
+      // }
+      // delete data.menuType
+      // this.handleOnSubmitForm(data);
+      this.handleOnSubmitForm(fieldsValue);
     });
   };
 
@@ -270,6 +312,11 @@ export default class Func extends PureComponent {
       callback(res) {
         me.setState({
           isCreate: false,
+          closeConfirmConfig: {
+            visible: false
+          },
+          warningWrapper: false,
+          warningField: {},
         });
         oopToast(res, '保存成功', '保存失败');
         me.onLoad();
@@ -462,6 +509,20 @@ export default class Func extends PureComponent {
       type: 'baseUser/fetchMenus'
     });
   }
+
+  handleBasicChange = (warningField) => {
+    const visible = Object.keys(warningField).length > 0;
+    this.setState((prevState) => {
+      return {
+        closeConfirmConfig: {
+          ...prevState.closeConfirmConfig,
+          visible
+        },
+        warningField
+      }
+    });
+  };
+
   render() {
     const {
       loading,
@@ -469,7 +530,8 @@ export default class Func extends PureComponent {
       gridLoading,
       global: { size, oopSearchGrid }
     } = this.props;
-    const { parentNode, tableTitle, addOrEditModalTitle } = this.state;
+    const { parentNode, tableTitle, addOrEditModalTitle, closeConfirmConfig,
+      warningField, warningWrapper } = this.state;
     const columns = [
       {
         title: '菜单名称', dataIndex: 'name'
@@ -553,6 +615,8 @@ export default class Func extends PureComponent {
           visible={this.state.modalVisible}
           destroyOnClose={true}
           width={800}
+          closeConfirm={closeConfirmConfig}
+          closeConfirmCancel={this.handleCloseConfirmCancel}
           onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onOk}
           onDelete={this.onDeleteFromEdit}
@@ -569,10 +633,13 @@ export default class Func extends PureComponent {
                 ref={(el) => {
                   this.basic = el;
                 }}
+                warningWrapper={warningWrapper}
                 funcBasicInfo={funcBasicInfo}
                 parentTreeData={parentTreeData}
                 parentNode={parentNode}
-                loading={loading} />
+                loading={loading}
+                warningField={warningField}
+                conductValuesChange={this.handleBasicChange} />
             },
             {
               key: 'resource',

@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { Card, Button, Divider, Spin,
   Form, Modal, Input, Radio, Badge, InputNumber } from 'antd';
 import { connect } from 'dva';
+import classNames from 'classnames';
 import { inject } from './../../../common/inject';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
@@ -9,6 +10,7 @@ import OopTable from '../../../components/OopTable';
 import OopModal from '../../../components/OopModal';
 import DescriptionList from '../../../components/DescriptionList';
 import { oopToast } from './../../../common/oopUtils';
+import styles from './Group.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -26,12 +28,26 @@ const formItemLayout = {
   },
 };
 
-const BasicInfoForm = Form.create()((props) => {
-  const { form, groupsBasicInfo, loading } = props;
+function onValuesChange(props, changedValues, allValues) {
+  const { groupsBasicInfo, conductValuesChange } = props;
+  if (conductValuesChange) {
+    const warningField = {};
+    for (const k in allValues) {
+      if (Object.prototype.hasOwnProperty.call(groupsBasicInfo, k) &&
+        allValues[k] !== groupsBasicInfo[k]) {
+        warningField[k] = {hasChanged: true, prevValue: groupsBasicInfo[k]};
+      }
+    }
+    conductValuesChange(warningField);
+  }
+}
+
+const BasicInfoForm = Form.create({onValuesChange})((props) => {
+  const { form, groupsBasicInfo, loading, warningField, warningWrapper } = props;
 
   return (
     <Spin spinning={loading}>
-      <Form>
+      <Form className={classNames({[styles.warningWrapper]: warningWrapper})}>
         <FormItem>
           {form.getFieldDecorator('id', {
             initialValue: groupsBasicInfo.id,
@@ -42,6 +58,7 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="名称"
+          className={warningField && warningField.name && styles.hasWarning}
         >
           {form.getFieldDecorator('name', {
             initialValue: groupsBasicInfo.name,
@@ -53,6 +70,7 @@ const BasicInfoForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="顺序"
+          className={warningField && warningField.seq && styles.hasWarning}
         >
           {form.getFieldDecorator('seq', {
             initialValue: groupsBasicInfo.seq,
@@ -72,14 +90,25 @@ const BasicInfoForm = Form.create()((props) => {
             initialValue: groupsBasicInfo.enable == null ? true : groupsBasicInfo.enable
           })(
             <RadioGroup>
-              <Radio value={true}>启用</Radio>
-              <Radio value={false}>停用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  warningField.enable.prevValue && styles.hasWarning}
+                value={true}>启用</Radio>
+              <Radio
+                className={
+                  warningField &&
+                  warningField.enable &&
+                  !warningField.enable.prevValue && styles.hasWarning}
+                value={false}>停用</Radio>
             </RadioGroup>
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="描述"
+          className={warningField && warningField.description && styles.hasWarning}
         >
           {form.getFieldDecorator('description', {
             initialValue: groupsBasicInfo.description
@@ -137,7 +166,12 @@ export default class Group extends PureComponent {
     userInfoView: {},
     groupUsers: [],
     userGroups: [],
-    isCreate: !this.props.authGroups.groupsBasicInfo.id
+    isCreate: !this.props.authGroups.groupsBasicInfo.id,
+    closeConfirmConfig: {
+      visible: false
+    },
+    warningWrapper: false, // from 是否记录修改状态
+    warningField: {} // from 字段变化
   };
 
   componentDidMount() {
@@ -250,6 +284,12 @@ export default class Group extends PureComponent {
     });
   }
 
+  handleCloseConfirmCancel = (warningWrapper) => {
+    this.setState({
+      warningWrapper
+    })
+  }
+
   handleAddOrEditModalCancel = () => {
     this.setState({
       modalVisible: false
@@ -260,7 +300,11 @@ export default class Group extends PureComponent {
         currentTabKey: 'basic',
         userTargetKeys: [],
         userList: [],
-        isCreate: true
+        isCreate: true,
+        closeConfirmConfig: {
+          visible: false
+        },
+        warningField: {},
       });
       this.props.dispatch({
         type: 'authGroups/clear'
@@ -289,7 +333,12 @@ export default class Group extends PureComponent {
           oopToast(res, '保存成功');
           this.refresh();
           self.setState({
-            isCreate: false
+            isCreate: false,
+            closeConfirmConfig: {
+              visible: false
+            },
+            warningWrapper: false,
+            warningField: {},
           });
         }
       });
@@ -462,10 +511,24 @@ export default class Group extends PureComponent {
     });
   }
 
+  handleBasicChange = (warningField) => {
+    const visible = Object.keys(warningField).length > 0;
+    this.setState((prevState) => {
+      return {
+        closeConfirmConfig: {
+          ...prevState.closeConfirmConfig,
+          visible
+        },
+        warningField
+      }
+    });
+  };
+
   render() {
     const { loading, global: { size, oopSearchGrid}, gridLoading } = this.props;
     const { currentTabKey, userTargetKeys, viewVisible, userInfoView,
-      groupUsers, userGroups, isCreate, userList, addOrEditModalTitle } = this.state;
+      groupUsers, userGroups, isCreate, userList, addOrEditModalTitle,
+      closeConfirmConfig, warningField, warningWrapper} = this.state;
     const parentMethods = {
       handleFormSubmit: this.handleFormSubmit,
       closeForm: this.closeForm,
@@ -572,8 +635,9 @@ export default class Group extends PureComponent {
         <OopModal
           title={`${addOrEditModalTitle}用户组`}
           visible={this.state.modalVisible}
-          destroyOnClose={true}
           width={800}
+          closeConfirm={closeConfirmConfig}
+          closeConfirmCancel={this.handleCloseConfirmCancel}
           onCancel={this.handleAddOrEditModalCancel}
           onOk={this.onSubmitForm}
           onDelete={this.onDelete}
@@ -588,8 +652,12 @@ export default class Group extends PureComponent {
               tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
               content: <BasicInfoForm
                 ref = {(el) => { this.basic = el; }}
+                warningWrapper={warningWrapper}
+                className={styles.base}
                 groupsBasicInfo = {parentMethods.groupsBasicInfo}
                 loading = {!!loading}
+                warningField={warningField}
+                conductValuesChange={this.handleBasicChange}
               />
             },
             {
