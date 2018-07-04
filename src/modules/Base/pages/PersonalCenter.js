@@ -1,6 +1,6 @@
 import React from 'react';
 import { Prompt } from 'dva/router';
-import { Breadcrumb, Tabs, Form, Input, Button, Spin, Icon, message } from 'antd';
+import { Breadcrumb, Tabs, Form, Input, Button, Spin, Icon } from 'antd';
 import {connect} from 'dva';
 import {inject} from '../../../common/inject';
 import OopUpload from '../../../components/OopUpload/index';
@@ -28,9 +28,8 @@ const formItemLayoutWithOutLabel = {
 };
 const PersonalInfoForm = Form.create()((props) => {
   const { form, entity, loading, avatarLoading, imageUrl, handleSubmit, nameChange,
-    emailChange, phoneChange, avatarChange, beforeUpload, handleChange } = props;
+    emailChange, phoneChange, avatarChange, handleChange } = props;
   const { validateFields, resetFields } = form;
-  const defaultFileList = [{ id: entity.avatar }];
   const uploadButton = (
     <div style={{ color: '#08c' }}>
       <Icon type={avatarLoading ? 'loading' : 'plus'} style={{ fontSize: 24, marginBottom: 10 }} />
@@ -166,9 +165,9 @@ const PersonalInfoForm = Form.create()((props) => {
               listType="picture-card"
               extra={extra}
               showUploadList={false}
-              defaultFileList={defaultFileList}
-              beforeUpload={beforeUpload}
               onChange={handleChange}
+              type={['.jpeg', '.png']}
+              size={200 / 1024}
             />
           )}
         </FormItem>
@@ -287,7 +286,7 @@ const ChangePasswordForm = Form.create()((props) => {
 const TabsForm = (props) => {
   const { entity, loading, avatarLoading, imageUrl, submitPersonalInfo, submitPassword,
     nameChange, emailChange, phoneChange, avatarChange, oldPasswordChange,
-    prePasswordChange, passwordChange, beforeUpload, handleChange } = props;
+    prePasswordChange, passwordChange, handleChange } = props;
   const tabList = [
     {
       key: 'info',
@@ -302,7 +301,6 @@ const TabsForm = (props) => {
         emailChange={emailChange}
         phoneChange={phoneChange}
         avatarChange={avatarChange}
-        beforeUpload={beforeUpload}
         handleChange={handleChange}
       />
     },
@@ -518,21 +516,6 @@ export default class PersonalCenter extends React.PureComponent {
     }
   }
 
-  // 上传头像钩子
-  beforeUpload = (file) => {
-    const isJPG = file.type === 'image/jpeg' || 'image/png';
-    if (!isJPG) {
-      message.error('图片只能是.jpg或.png格式!');
-      return isJPG;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('图片必须小于2MB!');
-      return isLt2M;
-    }
-    return true;
-  }
-
   // 图片转Base64编码
   getBase64 = (img, callback) => {
     const reader = new FileReader();
@@ -581,7 +564,6 @@ export default class PersonalCenter extends React.PureComponent {
           oldPasswordChange={this.oldPasswordChange}
           prePasswordChange={this.prePasswordChange}
           passwordChange={this.passwordChange}
-          beforeUpload={this.beforeUpload}
           handleChange={this.handleChange} />
       </div>)
   }

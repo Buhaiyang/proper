@@ -2,7 +2,7 @@ module.exports = {
   "POST:/oopsearch/config":(req , res)=>{
     res.status(200).send('');
   },
-  "PUT:/oopsearch/config":(req , res)=>{
+  "PUT:/oopsearch/config/:id":(req , res)=>{
     res.status(200).send('');
   },
   "DELETE:/oopsearch/config":(req , res)=>{

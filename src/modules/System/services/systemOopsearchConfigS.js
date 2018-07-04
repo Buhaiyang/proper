@@ -1,7 +1,7 @@
 import request from '../../../utils/request';
 
 export async function saveOrUpdate(param) {
-  return param.id ? request('/oopsearch/config', {
+  return param.id ? request(`/oopsearch/config/${param.id}`, {
     method: 'PUT',
     body: param
   }) : request('/oopsearch/config', {
