@@ -1,0 +1,42 @@
+
+.feedbackInfiniteContainer {
+
+  :global {
+    .ant-card-body {
+      height: 120px;
+    }
+
+    .ant-card {
+      position: relative;
+      .ant-badge-status {
+        vertical-align: top;
+        line-height: 21px;
+      }
+    }
+  }
+}
+:global {
+  .feedbackModal {
+    .ant-modal-footer {
+      border: none;
+    }
+  }
+}
+
+.preViewModal {
+  display: flex;
+  justify-content: center;
+  width: 0 !important;
+  transform-origin: 50% 50% 0 !important;
+  padding-bottom: 0;
+  :global {
+    .ant-modal-content {
+      display: inline-block;
+      box-shadow: none;
+      .ant-modal-footer,
+      .ant-modal-body {
+        padding: 0;
+      }
+    }
+  }
+}

@@ -367,8 +367,8 @@ export default class PersonalCenter extends React.PureComponent {
       callback: (res) => {
         const {result: {avatar}} = res;
         this.setState({
-          imageUrl: (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
-            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`,
+          imageUrl: avatar ? ((avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
+            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`) : '',
         });
       }
     });
@@ -389,8 +389,8 @@ export default class PersonalCenter extends React.PureComponent {
         cb();
         const {result: {avatar}} = res;
         this.setState({
-          imageUrl: (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
-            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`,
+          imageUrl: avatar ? ((avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
+            avatar : `${getApplicationContextUrl()}/file/${res.result.avatar}`) : '',
           whenName: false,
           whenEmail: false,
           whenPhone: false,

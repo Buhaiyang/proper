@@ -92,7 +92,7 @@ export default class PageHeader extends PureComponent {
           }
           return null;
         })
-        extraBreadcrumbItems.unshift(
+        menuParent && extraBreadcrumbItems.unshift(
           <Breadcrumb.Item key="parent">
             {createElement('span', {to: '/' }, menuParent.name)}
           </Breadcrumb.Item>

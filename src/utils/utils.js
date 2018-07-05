@@ -245,6 +245,10 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
               component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
             };
           }
+        } else if (moduleName && !pathName) {
+          routerConfig[`${k}`] = {
+            component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages`))
+          };
         }
       }
     }
