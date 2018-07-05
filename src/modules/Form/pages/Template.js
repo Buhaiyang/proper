@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
+import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, DatePicker, message } from 'antd';
 import {connect} from 'dva';
+import moment from 'moment';
 import OopFormDesigner from '../../../components/OopFormDesigner';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopTable from '../../../components/OopTable';
@@ -31,6 +32,7 @@ const ModalFormBasic = Form.create()((props) => {
   const submitForm = ()=>{
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      console.log(fieldsValue)
       onModalSubmit(fieldsValue, form);
     });
   }
@@ -132,6 +134,16 @@ const ModalFormBasic = Form.create()((props) => {
               </RadioGroup>
             )}
           </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="时间"
+          >
+            {form.getFieldDecorator('dateTime', {
+              initialValue: moment(formBasic.dateTime)
+            })(
+              <DatePicker showTime format="YYYY-MM-DD" />
+            )}
+          </FormItem>
         </Form>
       </Spin>
     </Modal>
@@ -229,6 +241,14 @@ export default class Template extends React.PureComponent {
     const formDetails = this.oopFormDesigner.getFormConfig();
     if (formDetails.formJson.length) {
       const { formJson, ...otherProps } = formDetails;
+      formJson.forEach((item)=>{
+        if (item.initialValue && typeof item.initialValue === 'object') {
+          if (item.initialValue.constructor.name === 'Moment') {
+            const format = (item.component.props && item.component.props.format) || 'YYYY-MM-DD';
+            item.initialValue = item.initialValue.format(format);
+          }
+        }
+      });
       this.props.dispatch({
         type: 'formTemplate/updateFormDetails',
         payload: {

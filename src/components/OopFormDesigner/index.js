@@ -169,7 +169,7 @@ const EditPanel = (props) => {
       formJson: []
     }
     // 输入框 文本域 数字输入框
-    if ('Input,TextArea,InputNumber'.includes(cName)) {
+    if ('Input,TextArea,InputNumber,DatePicker'.includes(cName)) {
       formConfig.formJson = [{
         name: `${name}${prefix}_label`,
         label: '标题',
@@ -177,7 +177,7 @@ const EditPanel = (props) => {
           name: 'Input',
           props: {placeholder: label, onChange}
         },
-        initialValue: initialValue || label
+        initialValue: label
       }, {
         name: `${name}${prefix}_props_placeholder`,
         label: '占位符',
@@ -195,6 +195,30 @@ const EditPanel = (props) => {
         },
         initialValue: name
       }];
+      // 为DatePicker增加props showTime
+      if (cName === 'DatePicker') {
+        const showTimeChange = (event)=>{
+          console.log(event);
+          // 刷新showTime
+          updateCenterPanel(event.target.name, event.target.value);
+          // TODO 350延时躲过节流函数
+          setTimeout(()=>{
+            // 刷新format
+            updateCenterPanel(`${name}${prefix}_props_format`, event.target.value ? 'YYYY-MM-DD hh:mm:ss' : 'YYYY-MM-DD');
+          }, 350);
+        }
+        const toggleShowTime = (
+          <RadioGroup onChange={showTimeChange} size="small" name={`${name}${prefix}_props_showTime`} >
+            <RadioButton value={false}>不显示时间</RadioButton>
+            <RadioButton value={true}>显示时间</RadioButton>
+          </RadioGroup>)
+        formConfig.formJson.push({
+          name: `${name}${prefix}_props_showTime`,
+          label: '是否显示时间',
+          component: toggleShowTime,
+          initialValue: (component.props && component.props.showTime === true) || false
+        })
+      }
       formConfig = {...formConfig, formLayout: 'vertical'}
     } else if ('RadioGroup,CheckboxGroup,Select'.includes(cName)) {
       formConfig.formJson = [{
@@ -334,6 +358,7 @@ export default class OopFormDesigner extends React.PureComponent {
       {label: '单选框', key: 'RadioGroup', component: {name: 'RadioGroup', children: componentData}},
       {label: '多选框', key: 'CheckboxGroup', component: {name: 'CheckboxGroup', children: componentData}, initialValue: []},
       {label: '选择器', key: 'Select', component: {name: 'Select', children: componentData}},
+      {label: '日期选择', key: 'DatePicker', component: {name: 'DatePicker'}},
       {label: '数字输入框', key: 'InputNumber', component: {name: 'InputNumber'}}
     ],
     rowItems: this.props.formDetails.formJson,
@@ -387,7 +412,7 @@ export default class OopFormDesigner extends React.PureComponent {
       const copy = cloneDeep(item);
       const newItem = {
         ...copy,
-        name: getUuid(5),
+        name: getUuid(10),
         active: false
       }
       this.state.rowItems.push(newItem);
@@ -398,7 +423,6 @@ export default class OopFormDesigner extends React.PureComponent {
       const item = this.state.currentRowItem;
       const {children} = item.component
       const arr = name.split('_');
-      arr.pop();
       const index = arr.pop();
       children.splice(index, 1);
       console.log(children)
@@ -421,7 +445,7 @@ export default class OopFormDesigner extends React.PureComponent {
     const copy = cloneDeep(item);
     const newItem = {
       ...copy,
-      name: getUuid(5)
+      name: getUuid(10)
     }
     this.state.rowItems.push(newItem);
     this.forceUpdate()
@@ -502,16 +526,16 @@ export default class OopFormDesigner extends React.PureComponent {
   }
   getFormConfig = ()=>{
     const {rowItems, formLayout, formTitle} = this.state;
-    console.log('getFormConfig', this)
     const form = this.oopForm.getForm();
     const fieldsValue = form.getFieldsValue();
+    console.log(fieldsValue)
     // 设置默认值
     rowItems.forEach((item)=>{
       const {name} = item;
       const value = fieldsValue[name];
-      if (value) {
-        item.initialValue = value
-      }
+      // if (value) {
+      item.initialValue = value
+      // }
     })
     return {
       formJson: rowItems,

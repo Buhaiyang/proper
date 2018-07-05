@@ -1,20 +1,12 @@
 import React from 'react';
 import { Form } from 'antd';
+import moment from 'moment';
 import {formGenerator} from './utils';
 
 @Form.create()
 export default class OopForm extends React.PureComponent {
-  state = {
-    form: this.props.form
-  }
-  componentDidMount() {
-  }
-  getForm = ()=>{
-    return this.state.form
-  }
   render() {
-    const { disabled = false, formJson = [], defaultValue = {} } = this.props;
-    const { form } = this.state;
+    const { disabled = false, formJson = [], defaultValue = {}, form } = this.props;
     formJson.forEach((item)=>{
       const {initialValue, component} = item;
       // initialValue是数组但是长度为0 或者 没有initialValue
@@ -23,6 +15,13 @@ export default class OopForm extends React.PureComponent {
         item.initialValue = defaultValue[item.name]
       } else {
         item.initialValue = defaultValue[item.name] || initialValue
+      }
+      // 处理DatePicker的值
+      if (component.name === 'DatePicker') {
+        if (item.initialValue) {
+          const format = (component.props && component.props.format) || 'YYYY-MM-DD';
+          item.initialValue = moment(item.initialValue, format);
+        }
       }
       // 如果是只读的组件
       if (disabled) {

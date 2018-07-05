@@ -72,7 +72,9 @@ const FuncBasicInfoForm = Form.create({onValuesChange})((props) => {
   const data = formatter(parentTreeData, funcBasicInfo.id);
   return (
     <Spin spinning={loading}>
-      <Form className={classNames({[styles.warningWrapper]: warningWrapper})}>
+      <Form
+        className={classNames({[styles.warningWrapper]: warningWrapper})}
+        style={{marginTop: 24}}>
         <div>
           {getFieldDecorator('id', {
             initialValue: funcBasicInfo.id,

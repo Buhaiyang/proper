@@ -1,11 +1,12 @@
 import React from 'react';
-import { InputNumber, Input, Radio, Checkbox, Select, Button, Icon} from 'antd';
+import { DatePicker, InputNumber, Input, Radio, Checkbox, Select, Button, Icon} from 'antd';
 import { getUuid } from '../../common/oopUtils';
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 export default (name, props, children)=> {
   const Map = {
     Input: <Input {...props} />,
@@ -22,7 +23,8 @@ export default (name, props, children)=> {
       <RadioGroup options={children} {...props} />),
     CheckboxGroup: (
       <CheckboxGroup options={children} {...props} />),
-    InputNumber: <InputNumber {...props} />
+    InputNumber: <InputNumber {...props} />,
+    DatePicker: <DatePicker format={dateFormat} {...props} />,
   }
   return Map[name];
 }
