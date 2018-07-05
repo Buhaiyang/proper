@@ -1,5 +1,5 @@
 import { queryFormTemplate, queryTemplateById, saveOrUpdateTemplate,
-  deleteTemplate, updateTemplateFormDetails} from '../services/formTemplateS';
+  deleteTemplate, updateTemplateFormDetails, queryTemplateByFormkeydefinition} from '../services/formTemplateS';
 
 export default {
   namespace: 'formTemplate',
@@ -43,6 +43,10 @@ export default {
     },
     *updateFormDetails({payload, callback}, {call}) {
       const resp = yield call(updateTemplateFormDetails, payload);
+      if (callback) callback(resp)
+    },
+    *queryByFormkeydefinition({payload, callback}, {call}) {
+      const resp = yield call(queryTemplateByFormkeydefinition, payload);
       if (callback) callback(resp)
     },
   },

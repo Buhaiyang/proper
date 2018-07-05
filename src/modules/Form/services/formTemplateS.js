@@ -1,7 +1,7 @@
 import MongoService from '../../../utils/MongoService'
 
 const formTemplateService = new MongoService('PEP_FORM_TEMPLATE');
-const {fetchPagable, fetchById, update, save, deleteById} = formTemplateService;
+const {fetchPagable, fetchById, update, save, deleteById, fetchByEqual} = formTemplateService;
 
 export async function queryFormTemplate(param) {
   return fetchPagable(param);
@@ -37,4 +37,8 @@ export async function updateTemplateFormDetails(param) {
   //   method: 'PUT',
   //   body: param.formDetails,
   // })
+}
+
+export async function queryTemplateByFormkeydefinition(param) {
+  return fetchByEqual({formkeydefinition: param});
 }

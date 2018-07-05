@@ -26,7 +26,8 @@ const TYPE_ENUM = [
   {label: '工作流', value: 'WORKFLOW'},
 ]
 const ModalFormBasic = Form.create()((props) => {
-  const { form, loading, visible, title, onModalCancel, onModalSubmit, formBasic } = props;
+  const { form, loading, visible, title, onModalCancel,
+    onModalSubmit, formBasic, checkFormkeydefinition } = props;
   const submitForm = ()=>{
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -35,6 +36,21 @@ const ModalFormBasic = Form.create()((props) => {
   }
   const cancelForm = ()=>{
     onModalCancel(form)
+  }
+
+  const rule = {
+    formkeydefinition: []
+  };
+
+  if (!formBasic.formkeydefinition) { // 新建状态
+    rule.formkeydefinition = [{
+      required: true,
+      max: 20,
+      pattern: /^[_0-9A-Za-z]+$/,
+      message: '字段名称不能为空,且必须是"_"、数字或英文字符'
+    }, {
+      validator: checkFormkeydefinition
+    }];
   }
   return (
     <Modal title={title} visible={visible} onOk={submitForm} onCancel={cancelForm}>
@@ -56,6 +72,17 @@ const ModalFormBasic = Form.create()((props) => {
               rules: [{ required: true, message: '名称不能为空' }],
             })(
               <Input placeholder="请输入名称" />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="表单编码"
+          >
+            {form.getFieldDecorator('formkeydefinition', {
+              initialValue: formBasic.formkeydefinition,
+              rules: rule.formkeydefinition,
+            })(
+              <Input placeholder="请输入表单编码" disabled={!!formBasic.formkeydefinition} />
             )}
           </FormItem>
           <FormItem
@@ -231,6 +258,20 @@ export default class Template extends React.PureComponent {
       }
     })
   }
+
+  checkFormkeydefinition = (rule, value, callback) => {
+    this.props.dispatch({
+      type: 'formTemplate/queryByFormkeydefinition',
+      payload: value,
+      callback: (cb)=>{
+        if (cb.result.length === 0) {
+          callback();
+        } else {
+          callback('表单编码已存在');
+        }
+      }
+    });
+  }
   render() {
     const {formTemplate: {grid, entity}, loading, global: { size } } = this.props;
     const columns = [
@@ -295,6 +336,7 @@ export default class Template extends React.PureComponent {
           onModalSubmit={this.handleModalSubmit}
           formBasic={entity}
           loading={loading}
+          checkFormkeydefinition={this.checkFormkeydefinition}
         />
         <Modal
           visible={this.state.formDesignerModalVisible}
