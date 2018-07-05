@@ -241,9 +241,11 @@ export default class Func extends PureComponent {
     tableTitle: '所有',
     addOrEditModalTitle: null, // 新建编辑模态窗口 title
     modalVisible: false,
-    // currentTabKey: 'basic',
     isCreate: true,
     parentNode: null,
+    closeConfirmConfig: {
+      visible: false
+    },
     warningWrapper: false, // from 是否记录修改状态
     warningField: {} // from 字段变化
   }
