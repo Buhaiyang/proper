@@ -33,8 +33,12 @@ function onValuesChange(props, changedValues, allValues) {
   if (conductValuesChange) {
     const warningField = {};
     for (const k in allValues) {
-      if (Object.prototype.hasOwnProperty.call(groupsBasicInfo, k) &&
-        allValues[k] !== groupsBasicInfo[k]) {
+      if (Object.keys(groupsBasicInfo).length === 0) {
+        if (allValues[k]) {
+          warningField[k] = {hasChanged: true, prevValue: allValues[k]};
+        }
+      } else if (Object.prototype.hasOwnProperty.call(groupsBasicInfo, k) &&
+      allValues[k] !== groupsBasicInfo[k]) {
         warningField[k] = {hasChanged: true, prevValue: groupsBasicInfo[k]};
       }
     }

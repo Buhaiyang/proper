@@ -3,6 +3,7 @@ import {Modal, Popover, Button, Alert, Icon, Tabs, Popconfirm } from 'antd';
 import styles from './index.less';
 
 const { TabPane } = Tabs;
+const { confirm } = Modal;
 const hLine = (<div style={{height: 1, borderBottom: '1px solid #ddd', margin: '24px 0'}} />)
 
 function getOffsetTop(element, container) {
@@ -136,7 +137,7 @@ export default class OopModal extends PureComponent {
       props.onOk && props.onOk()
     }
     const onCancel = ()=>{
-      props.onCancel && props.onCancel()
+      props.onCancel && props.onCancel();
     };
     const onDelete = ()=>{
       props.onDelete && props.onDelete()
@@ -157,7 +158,7 @@ export default class OopModal extends PureComponent {
         </Popconfirm>)}
         {defaultActiveKey === activeKey ? (
             <Fragment>
-              <Button onClick={onCancel}>取消</Button>
+              <Button onClick={this.handleCancel}>取消</Button>
               <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
             </Fragment>
           ) :
@@ -166,24 +167,6 @@ export default class OopModal extends PureComponent {
          }
       </Fragment>
     )
-
-    // const footer = (
-    //   <Fragment>
-    //     {isCreate ? null : (
-    //       <Popconfirm
-    //       title="确认删除吗？"
-    //       onConfirm={onDelete}>
-    //       <Button style={{float: 'left'}}>删除</Button>
-    //     </Popconfirm>)}
-    //     {defaultActiveKey === activeKey ? (
-    //         <Fragment>
-    //           <Button onClick={onCancel}>取消</Button>
-    //           <Button type="primary" onClick={onOk} loading={loading}>保存</Button>
-    //         </Fragment>
-    //       ) :
-    //       <Button onClick={onCancel}>关闭</Button>}
-    //   </Fragment>
-    // )
 
     const _props = {
       title: 'Title',
@@ -282,6 +265,36 @@ export default class OopModal extends PureComponent {
     }
     this.checkedBatch.push(key);
   }
+
+  handleCancel = () => {
+    const self = this;
+    const { closeConfirm, closeConfirmCancel, onCancel, tabs } = this.props;
+    const { activeKey } = this.state;
+    if (closeConfirm.visible) {
+      confirm({
+        title: '信息存在改动，是否关闭？',
+        // content: '信息存在改动，是否关闭？',
+        onOk() {
+          onCancel && onCancel();
+        },
+        onCancel() {
+          closeConfirmCancel(true);
+          const {key} = tabs.find(it => Object.prototype.hasOwnProperty.call(it, 'main'));
+          if (key !== activeKey) {
+            self.setState({
+              activeKey: key
+            });
+            const containers = document.getElementsByClassName(styles.oopTabContainer);
+            const curContainer = Array.from(containers).find(item=>item.getAttribute('name') === key);
+            const scrollHeight = self.calculateScrollHeight(curContainer);
+            self.scrollModalBody(curContainer, scrollHeight);
+          }
+        },
+      });
+    } else {
+      onCancel && onCancel();
+    }
+  }
   render() {
     const props = this.getInitProps()
     const modalStyle = {
@@ -298,6 +311,7 @@ export default class OopModal extends PureComponent {
           style={modalStyle}
           className={styles.oopModalContainer}
           destroyOnClose={true}
+          onCancel={this.handleCancel}
           >
           {this.createModalContent(props.tabs, props.isCreate)}
         </Modal>)
