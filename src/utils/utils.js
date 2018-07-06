@@ -237,18 +237,19 @@ export function getRouterDataFromMenuData(res, dynamicWrapper) {
       const menu = menuData[k];
       if (!menu.hideInMenu && (!menu.children || menu.subRoute)) {
         const { moduleName, pathName } = exchangePath2Router(k);
-        if (moduleName && pathName) {
-          // console.log(k, '====>', path)
-          const originRouter = getRouterData();
-          if (originRouter[`${k}`] === undefined) {
+        if (moduleName) {
+          if (pathName) {
+            const originRouter = getRouterData();
+            if (originRouter[`${k}`] === undefined) {
+              routerConfig[`${k}`] = {
+                component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
+              };
+            }
+          } else {
             routerConfig[`${k}`] = {
-              component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages/${pathName}`))
+              component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages`))
             };
           }
-        } else if (moduleName && !pathName) {
-          routerConfig[`${k}`] = {
-            component: dynamicWrapper(()=> import(`../modules/${moduleName}/pages`))
-          };
         }
       }
     }
