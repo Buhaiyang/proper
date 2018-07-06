@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Card, Button, Divider, Spin,
+import { Card, Button, Divider, Spin, Select,
   Form, Modal, Input, Radio, Badge, InputNumber } from 'antd';
 import { connect } from 'dva';
 import classNames from 'classnames';
@@ -10,12 +10,13 @@ import OopTable from '../../../components/OopTable';
 import OopModal from '../../../components/OopModal';
 import DescriptionList from '../../../components/DescriptionList';
 import { oopToast } from './../../../common/oopUtils';
+import { dataFilter, commonSearch } from './utils';
 import styles from './Group.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
-// const { Option } = Select;
+const { Option } = Select;
 const { Description } = DescriptionList;
 const formItemLayout = {
   labelCol: {
@@ -126,18 +127,44 @@ const BasicInfoForm = Form.create({onValuesChange})((props) => {
 });
 
 const UserRelevance = (props) => {
-  const { loading, columns,
-    userList, filterUserAll, deafultSelected, handleUserTrans, groupsBasicInfo } = props;
+  const { loading, columns, userList, deafultSelected, handleUserTrans,
+    groupsBasicInfo, allUsers, userSearchType, setList, setSearchType,
+    filterColumns, groupsCheckedData, setGroupCheckedTypeData, groupsSelf } = props;
   const handleChange = (record, selectedRowKeys) => {
     handleUserTrans(groupsBasicInfo.id, selectedRowKeys)
   }
-
+  const changeSearchType = (value)=>{
+    const checkedTypeData = dataFilter(value, allUsers, deafultSelected);
+    setGroupCheckedTypeData(checkedTypeData)
+    setSearchType(value)
+    setList(
+      commonSearch(groupsSelf.searchInputValue, groupsSelf.searchFilter,
+        value, filterColumns, checkedTypeData, allUsers)
+    )
+  }
+  const preciseFiltrationGroups = (inputValue, filter) => {
+    groupsSelf.searchInputValue = inputValue;
+    groupsSelf.searchFilter = filter;
+    setList(
+      commonSearch(inputValue, filter, userSearchType, filterColumns, groupsCheckedData, allUsers)
+    )
+  }
   return (
       <Card bordered={false}>
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          onInputChange={filterUserAll}
+          onInputChange={preciseFiltrationGroups}
+          extra={
+            <Select
+              defaultValue="all"
+              style={{ width: '10%' }}
+              onSelect={value => changeSearchType(value)} >
+              <Option value="all">全部</Option>
+              <Option value="checked">已绑定</Option>
+              <Option value="unchecked">未绑定</Option>
+            </Select>
+          }
           ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
         />
         <OopTable
@@ -175,7 +202,10 @@ export default class Group extends PureComponent {
       visible: false
     },
     warningWrapper: false, // from 是否记录修改状态
-    warningField: {} // from 字段变化
+    warningField: {}, // from 字段变化
+    userSearchType: 'all',
+    userList: [],
+    groupsCheckedData: []
   };
 
   componentDidMount() {
@@ -301,6 +331,8 @@ export default class Group extends PureComponent {
 
     setTimeout(() => {
       this.setState({
+        groupsCheckedData: [],
+        userSearchType: 'all',
         currentTabKey: 'basic',
         userTargetKeys: [],
         userList: [],
@@ -313,6 +345,7 @@ export default class Group extends PureComponent {
       this.props.dispatch({
         type: 'authGroups/clear'
       });
+      this.searchInputValue = '';
     }, 300);
   }
 
@@ -506,15 +539,6 @@ export default class Group extends PureComponent {
       viewVisible: flag
     });
   }
-
-  filterUserAll = (inputValue, filter) => {
-    const { authGroups: { allUsers } } = this.props;
-    const userList = inputValue ? filter(allUsers) : allUsers;
-    this.setState({
-      userList
-    });
-  }
-
   handleBasicChange = (warningField) => {
     const visible = Object.keys(warningField).length > 0;
     this.setState((prevState) => {
@@ -527,12 +551,27 @@ export default class Group extends PureComponent {
       }
     });
   };
-
+  setList = (userList)=>{
+    this.setState({
+      userList
+    })
+  }
+  setSearchType = (list)=>{
+    this.setState({
+      userSearchType: list
+    })
+  }
+  setGroupCheckedTypeData = (groupsCheckedData)=>{
+    this.setState({
+      groupsCheckedData
+    })
+  }
   render() {
     const { loading, global: { size, oopSearchGrid}, gridLoading } = this.props;
     const { currentTabKey, userTargetKeys, viewVisible, userInfoView,
-      groupUsers, userGroups, isCreate, userList, addOrEditModalTitle,
-      closeConfirmConfig, warningField, warningWrapper} = this.state;
+      groupUsers, userGroups, isCreate, addOrEditModalTitle, userList,
+      closeConfirmConfig, warningField, warningWrapper, userSearchType,
+      groupsCheckedData} = this.state;
     const parentMethods = {
       handleFormSubmit: this.handleFormSubmit,
       closeForm: this.closeForm,
@@ -579,7 +618,7 @@ export default class Group extends PureComponent {
           <Fragment>
             {text === true ?
               <Badge status="processing" text="已启用" /> :
-              <Badge status="default" text={<span style={{color: '#aaa'}}>已停用</span>} />}
+              <Badge status="default" text="已停用" />}
           </Fragment>
         )
       }
@@ -667,17 +706,25 @@ export default class Group extends PureComponent {
             {
               key: 'user',
               title: '用户信息',
-              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
               content: <UserRelevance
                 groupsBasicInfo = {parentMethods.groupsBasicInfo}
                 deafultSelected={userTargetKeys}
                 userAddGroups={this.userAddGroups}
                 loading={!!loading}
                 columns={userColumns}
-                userList={userList}
-                filterUserAll={this.filterUserAll}
+                groupUsers={parentMethods.groupUsers}
                 handleUserTrans={parentMethods.handleUserTrans}
-              />
+                userSearchType={userSearchType}
+                allUsers={parentMethods.allUsers}
+                dataFilter={dataFilter}
+                setList={this.setList}
+                setSearchType={this.setSearchType}
+                userList={userList}
+                filterColumns={['phone', 'name', 'username', 'email', 'enableStatus']}
+                groupsCheckedData={groupsCheckedData}
+                setGroupCheckedTypeData={this.setGroupCheckedTypeData}
+                groupsSelf={this}
+                />
             }]}
         />
         {/* <CreateForm

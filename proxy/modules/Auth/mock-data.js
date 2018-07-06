@@ -38,8 +38,8 @@ module.exports = {
   "GET:/auth/users": {
     "count":100,
     "data":[
-      {"id":"1","username":"denggy","password":"123456","name":"邓广义","email":"1015182620@qq.com","phone":"15904015593","enable":true,"superuser":false,"roleName":"yonghujuese"},
-      {"id":"2","username":"zhangjianlin","password":"123456","name":"张建林","email":"276595311@qq.com","phone":"15912345678","enable":true,"superuser":false},
+      {"id":"1","username":"denggy","password":"123456","name": "邓某某","email": "dengha@qq.com","phone": "15912345678","enable":true,"superuser":false},
+      {"id":"2","username":"zhangjianlin","password":"123456","name":"张林","email":"zhanglian@qq.com","phone":"15912345678","enable":true,"superuser":false},
       {"id":"3","username":"wanghe","password":"123456","name":"王贺","email":"wanghe@qq.com","phone":"15912345678","enable":true,"superuser":false},
       {"id":"4","username":"wanghaopeng","password":"123456","name":"王浩鹏","email":"wanghaopeng@qq.com","phone":"15912345678","enable":true,"superuser":false},
       {"id":"5","username":"liyiming","password":"123456","name":"李一鸣","email":"liyiming@qq.com","phone":"15912345678","enable":true,"superuser":false},
@@ -68,9 +68,20 @@ module.exports = {
     res.send('删除成功')
   },
   'GET:/auth/users/:id/roles':[
-    {"id":"1","name":"普通管理员"},
-    {"id":"2","name":"住院部功能"},
-    {"id":"3","name":"研发部功能"},
+    {"id":"1",
+    "name":"普通管理员", 
+    "description": "普通权限管理员",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "父节点1"},
+    {"id":"2","name":"住院部功能",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "父节点1"},
+    {"id":"3","name":"研发部功能",
+    "enable": true,
+    "parentId": "1",
+    "parentName": "父节点1"},
   ],
   'GET:/auth/roles':[
     {"id":"ggjs","name":"高管角色"},
@@ -80,7 +91,7 @@ module.exports = {
     {"id":"oer1","name":"其他角色2"},
   ],
   'GET:/auth/users/:id/user-groups':[
-    {"id":"ggjs","name":"高管用户"},
+    {"id":"ggjs","name":"高管用户","description": "测试管理用户组","seq": 1,"enable": true},
   ],
   'PUT:/auth/users/:id': (req , res)=>{
     res.send({
@@ -155,61 +166,10 @@ module.exports = {
     "enable": true
   },
   'GET:/auth/user-groups/:id/users':[
-    {
-      "id": "1",
-      "username": "denggy",
-      "pwd": "123456",
-      "name": "邓广义",
-      "email": "denggy@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "2",
-      "username": "cbj",
-      "pwd": "123456",
-      "name": "陈冰洁",
-      "email": "cbj@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "3",
-      "username": "lym",
-      "pwd": "123456",
-      "name": "李一鸣",
-      "email": "lym@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "4",
-      "username": "whp",
-      "pwd": "123456",
-      "name": "王浩鹏",
-      "email": "whp@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "5",
-      "username": "wh",
-      "pwd": "123456",
-      "name": "王贺",
-      "email": "wh@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    }
+    {"id":"1","username":"denggy","password":"123456","name":"邓广义","email":"degguangyi@qq.com","phone":"15912345678","enable":true,"superuser":false,"roleName":"yonghujuese"},
+    {"id":"2","username":"zhangjianlin","password":"123456","name":"张建林","email":"zhangjianli@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"3","username":"wanghe","password":"123456","name":"王贺","email":"wanghe@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"4","username":"wanghaopeng","password":"123456","name":"王浩鹏","email":"wanghaopeng@qq.com","phone":"15912345678","enable":true,"superuser":false},
   ],
   'PUT:/auth/user-groups':(req , res)=>{
     res.send({
@@ -347,50 +307,10 @@ module.exports = {
     res.send({})
   },
   'GET:/auth/roles/:id/users':[
-    {
-      "id": "1",
-      "username": "denggy",
-      "pwd": "123456",
-      "name": "邓广义",
-      "email": "denggy@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "2",
-      "username": "zhangjianlin",
-      "pwd": "123456",
-      "name": "张建林",
-      "email": "zjl@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "3",
-      "username": "wanghe",
-      "pwd": "123456",
-      "name": "王贺",
-      "email": "wh@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    },
-    {
-      "id": "4",
-      "username": "whp",
-      "pwd": "123456",
-      "name": "王浩鹏",
-      "email": "whp@test.com",
-      "phone": "13012345678",
-      "enable": true,
-      "superuser": false,
-      "pepDtype": "pepDtype"
-    }
+    {"id":"1","username":"denggy","password":"123456","name": "邓某某","email": "dengha@qq.com","phone": "15912345678","enable":true,"superuser":false},
+    {"id":"2","username":"zhangjianlin","password":"123456","name":"张林","email":"zhanglian@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"3","username":"wanghe","password":"123456","name":"王贺","email":"wanghe@qq.com","phone":"15912345678","enable":true,"superuser":false},
+    {"id":"4","username":"wanghaopeng","password":"123456","name":"王浩鹏","email":"wanghaopeng@qq.com","phone":"15912345678","enable":true,"superuser":false},
   ],
   'GET:/auth/roles/:id/user-groups':[
     {"id":"ggjs","name":"高管用户组"},
