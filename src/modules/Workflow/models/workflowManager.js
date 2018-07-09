@@ -4,7 +4,7 @@ import * as managerService from '../services/WorkflowManagerS';
 function pave(dataObject, prefix) {
   let paveObject = {};
   for (const key in dataObject) {
-    if (dataObject[key].constructor === Object) {
+    if (dataObject[key] && dataObject[key].constructor === Object) {
       paveObject = {
         ...paveObject,
         ...pave(dataObject[key], prefix ? prefix + key : key)

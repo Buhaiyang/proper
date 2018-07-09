@@ -1,13 +1,13 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
 import { Tabs,
-  message,
   Card,
   Badge } from 'antd';
 import classNames from 'classnames';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
+import OopWorkflowMainModal from '../../../components/OopWorkflowMainModal';
 import { inject } from './../../../common/inject';
 import styles from './Manager.less';
 
@@ -46,7 +46,10 @@ export default class Manager extends React.PureComponent {
     activeIndex: 0,
     task: {},
     design: {},
-    process: {}
+    process: {},
+    wfVisible: false,
+    isLaunch: false,
+    taskOrProcDefKey: null
   }
 
   componentDidMount() {
@@ -160,13 +163,43 @@ export default class Manager extends React.PureComponent {
       }
     });
   }
-
+  handleProcessLaunch = (record)=>{
+    console.log('handleProcessLaunch', record);
+    const {key} = record;
+    this.setState({
+      wfVisible: true,
+      isLaunch: true,
+      taskOrProcDefKey: key
+    })
+  }
+  handleProcessSubmit = (record)=>{
+    console.log('handleProcessSubmit', record)
+    const {taskId} = record;
+    this.setState({
+      wfVisible: true,
+      isLaunch: false,
+      taskOrProcDefKey: taskId
+    })
+  }
+  closeProcessModal = ()=>{
+    this.setState({
+      wfVisible: false
+    })
+  }
+  afterProcessSubmit = ()=>{
+    this.handleTabsChange(this.state.activeKey);
+  }
   render() {
     const {
       loading,
       global: { size },
     } = this.props;
-
+    const businessObj = {
+      qingjialiuchengceshi: {
+        '2moPjwTS1g': 5,
+        cbPexFh62M: '我是测试数据'
+      }
+    }
     const {
       task,
       design,
@@ -208,12 +241,20 @@ export default class Manager extends React.PureComponent {
       ]
     }
 
-    const actionColumn = [
+    const actionLaunchColumn = [
       {
-        text: '查看',
+        text: '流程发起',
         name: 'view',
         icon: 'select',
-        onClick: (record)=>{ message.info('点击查看'); console.log(record) }
+        onClick: (record)=>{ this.handleProcessLaunch(record) }
+      }
+    ];
+    const actionSubmitColumn = [
+      {
+        text: '流程办理',
+        name: 'view',
+        icon: 'select',
+        onClick: (record)=>{ this.handleProcessSubmit(record) }
       }
     ];
 
@@ -247,7 +288,7 @@ export default class Manager extends React.PureComponent {
                 columns={column[activeKey]}
                 loading={loading}
                 size={size}
-                rowButtons={actionColumn}
+                rowButtons={actionSubmitColumn}
                 checkable={false}
                 pagination={{total: task.total}}
               />
@@ -269,7 +310,7 @@ export default class Manager extends React.PureComponent {
                 columns={column[activeKey]}
                 loading={loading}
                 size={size}
-                rowButtons={actionColumn}
+                rowButtons={actionLaunchColumn}
                 checkable={false}
                 pagination={{total: design.total}}
               />
@@ -292,13 +333,21 @@ export default class Manager extends React.PureComponent {
                 columns={column[activeKey]}
                 loading={loading}
                 size={size}
-                rowButtons={actionColumn}
+                rowButtons={actionSubmitColumn}
                 checkable={false}
                 pagination={{total: process.total}}
               />
             </div>
           </div>
         </Card>
+
+        <OopWorkflowMainModal
+          isLaunch={this.state.isLaunch}
+          visible={this.state.wfVisible}
+          closeModal={this.closeProcessModal}
+          afterProcessSubmit={this.afterProcessSubmit}
+          businessObj={businessObj}
+          taskOrProcDefKey={this.state.taskOrProcDefKey} />
       </PageHeaderLayout>
     );
   }

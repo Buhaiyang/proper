@@ -8,7 +8,7 @@ module.exports = {
   "POST:/auth/login": (req, res)=>{
     const { pwd, username } = req.body;
     if(pwd === '123456' && username === 'admin'){
-      res.status(200).send('husrhtluihetioyhoihl');
+      res.status(200).send('eyJpZCI6ImRjNjU3NjZjLTAxNzYtNGExZS1hZDBlLWRkMDZiYTY0NWM3bCIsIm5hbWUiOiJhZG1pbiJ9.eyJlbXBOYW1lIjpudWxsLCJyb2xlcyI6bnVsbCwiaGFzUm9sZSI6dHJ1ZX0.qFivNCKNAmX8IediHVR5q_GvG7dPmw4BmVzwlR3CPmw');
     }else {
       res.setHeader('X-PEP-ERR-TYPE', 'PEP_BIZ_ERR');
       res.status(500).send('失败');

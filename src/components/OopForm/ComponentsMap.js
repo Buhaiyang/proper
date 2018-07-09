@@ -26,5 +26,10 @@ export default (name, props, children)=> {
     InputNumber: <InputNumber {...props} />,
     DatePicker: <DatePicker format={dateFormat} {...props} />,
   }
-  return Map[name];
+  const component = Map[name];
+  if (!component) {
+    console.error(`warning: cannot find component named ${name}`)
+    return
+  }
+  return component;
 }
