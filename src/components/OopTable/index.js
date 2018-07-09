@@ -135,7 +135,7 @@ export default class OopTable extends PureComponent {
   render() {
     const { grid: {list, pagination },
       columns, loading, topButtons = [], rowButtons = [], checkable = true, size,
-      onRowSelect, selectTriggerOnRowClick = false, onSelectAll } = this.props
+      onRowSelect, selectTriggerOnRowClick = false, onSelectAll, rowKey } = this.props
     const cols = this.createRowButtons(columns, rowButtons)
     const rowSelectionCfg = checkable ? {
       onChange: this.rowSelectionChange,
@@ -169,7 +169,7 @@ export default class OopTable extends PureComponent {
         <Table
           className={onRowSelect ? styles.rowHover : ''}
           dataSource={list}
-          rowKey={record => record.id}
+          rowKey={record => record[rowKey || 'id']}
           rowSelection={rowSelectionCfg}
           columns={cols}
           loading={loading}

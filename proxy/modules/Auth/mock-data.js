@@ -34,6 +34,7 @@ module.exports = {
     {"id":"pep-system-config","name":"oopsearch配置","route":"/system/oopsearchConfig","sequenceNumber":0,"icon":"setting","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
     {"id":"pep-system-dictionary","name":"数据字典配置","route":"/system/dictionary","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"parentId":"pep-system","menuCode":null,"root":false},
     {"id":"pep-feedback","name":"意见反馈","route":"feedback","sequenceNumber":1,"icon":"form","description":null,"menuType":{"catalog":"MENU_TYPE","code":"0"},"enable":true,"identifier":null,"parentId":null,"menuCode":null,"root":true},
+    {"id":"pep-workflow-manager","name":"流程管理","route":"/workflow/manager","sequenceNumber":0,"icon":"table","description":null,"menuType":{"catalog":"MENU_TYPE","code":"1"},"enable":true,"identifier":null,"menuCode":null,"parentId":"pep-workflow","root":false,"leaf":true},
   ],
   "GET:/auth/users": {
     "count":100,
