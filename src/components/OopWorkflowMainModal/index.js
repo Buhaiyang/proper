@@ -31,16 +31,17 @@ export default class OopWorkflowMainModal extends PureComponent {
     })
   }
   launchWorkflow = ()=>{
-    this.setState({
-      buttonLoading: true
-    })
+    this.setButtonLoading(true)
     this.oopWorkflowMain.launchWorkflow(()=>{
       this.props.closeModal();
-      this.setState({
-        buttonLoading: false
-      })
+      this.setButtonLoading(false)
       message.success('流程提交成功');
       this.props.afterProcessSubmit();
+    })
+  }
+  setButtonLoading = (flag)=>{
+    this.setState({
+      buttonLoading: flag
     })
   }
   returnWorkflow = ()=>{
@@ -89,6 +90,7 @@ export default class OopWorkflowMainModal extends PureComponent {
          maskClosable={false}>
         <OopWorkflowMain
           {...otherProps}
+          setButtonLoading={this.setButtonLoading}
           ref={(el) => { if (el) { this.oopWorkflowMain = el.getWrappedInstance() } }} />
       </Modal>);
   }

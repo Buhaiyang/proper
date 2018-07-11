@@ -49,7 +49,9 @@ export default class Manager extends React.PureComponent {
     process: {},
     wfVisible: false,
     isLaunch: false,
-    taskOrProcDefKey: null
+    taskOrProcDefKey: null,
+    businessObj: null,
+    procInstId: null
   }
 
   componentDidMount() {
@@ -165,20 +167,26 @@ export default class Manager extends React.PureComponent {
   }
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
-    const {key} = record;
+    const {key, startFormKey} = record;
     this.setState({
       wfVisible: true,
       isLaunch: true,
-      taskOrProcDefKey: key
+      taskOrProcDefKey: key,
+      businessObj: {
+        formKey: startFormKey
+      }
     })
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId} = record;
+    const {taskId, formKey, variables, procInstId} = record;
+    const businessObj = variables[formKey];
     this.setState({
       wfVisible: true,
       isLaunch: false,
-      taskOrProcDefKey: taskId
+      taskOrProcDefKey: taskId,
+      procInstId,
+      businessObj
     })
   }
   closeProcessModal = ()=>{
@@ -194,12 +202,6 @@ export default class Manager extends React.PureComponent {
       loading,
       global: { size },
     } = this.props;
-    const businessObj = {
-      qingjialiuchengceshi: {
-        '2moPjwTS1g': 5,
-        cbPexFh62M: '我是测试数据'
-      }
-    }
     const {
       task,
       design,
@@ -214,7 +216,7 @@ export default class Manager extends React.PureComponent {
         {title: '发起人', dataIndex: 'pepProcInstVOstartUserName'},
         {title: '当前处理情况', dataIndex: 'pepProcInstVOstateValue', render: (val, record) => {
           return (
-            <Fragment><div>{val}</div><div>到达时间:{record.pepProcInstVOendTime}</div></Fragment>
+            <Fragment><div>{val}</div><div>到达时间:{record.createTime}</div></Fragment>
           );
         }},
       ],
@@ -246,7 +248,8 @@ export default class Manager extends React.PureComponent {
         text: '流程发起',
         name: 'view',
         icon: 'select',
-        onClick: (record)=>{ this.handleProcessLaunch(record) }
+        onClick: (record)=>{ this.handleProcessLaunch(record) },
+        display: record=> record.status.code === 'DEPLOYED'
       }
     ];
     const actionSubmitColumn = [
@@ -260,7 +263,7 @@ export default class Manager extends React.PureComponent {
 
     return (
       <PageHeaderLayout content={
-        <Tabs defaultActiveKey="task" onChange={this.handleTabsChange} ref={(el)=>{ this.tabs = el }}>
+        <Tabs animated={false} defaultActiveKey="task" onChange={this.handleTabsChange} ref={(el)=>{ this.tabs = el }}>
           <TabPane key="task" tab="待处理流程" />
           <TabPane key="design" tab="可发起流程" />
           <TabPane key="process" tab="已发起流程" />
@@ -346,8 +349,10 @@ export default class Manager extends React.PureComponent {
           visible={this.state.wfVisible}
           closeModal={this.closeProcessModal}
           afterProcessSubmit={this.afterProcessSubmit}
-          businessObj={businessObj}
-          taskOrProcDefKey={this.state.taskOrProcDefKey} />
+          businessObj={this.state.businessObj}
+          taskOrProcDefKey={this.state.taskOrProcDefKey}
+          procInstId={this.state.procInstId}
+        />
       </PageHeaderLayout>
     );
   }

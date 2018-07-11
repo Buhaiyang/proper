@@ -11,15 +11,18 @@ export async function fetchByFormCode(param) {
 }
 export async function launchWorkflow(params) {
   const {taskOrProcDefKey, formData} = params;
-  return request(`/process/${taskOrProcDefKey}`, {
+  return request(`/workflow/process/${taskOrProcDefKey}`, {
     method: 'POST',
     body: formData,
   });
 }
 export async function submitWorkflow(params) {
   const {taskOrProcDefKey, formData} = params;
-  return request(`/task/${taskOrProcDefKey}`, {
+  return request(`/workflow/task/${taskOrProcDefKey}`, {
     method: 'POST',
     body: formData,
   });
+}
+export async function fetchProcessProgress(params) {
+  return request(`/workflow/task/${params}`);
 }

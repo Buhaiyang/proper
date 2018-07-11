@@ -2,7 +2,7 @@ import {stringify} from 'qs';
 import request from '../../../utils/request';
 
 export async function findTask(params) {
-  return request(`/task?${stringify(params)}`);
+  return request(`/workflow/task?${stringify(params)}`);
 }
 
 export async function findDesign(params) {
@@ -10,5 +10,5 @@ export async function findDesign(params) {
 }
 
 export async function findProcess(params) {
-  return request(`/process?${stringify(params)}`);
+  return request(`/workflow/process?${stringify(params)}`);
 }
