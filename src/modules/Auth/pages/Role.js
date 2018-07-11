@@ -606,33 +606,6 @@ export default class Role extends PureComponent {
     const self = this;
     const basicUserForm = this.basic.getForm();
     if (basicUserForm) {
-      basicUserForm.validateFieldsAndScroll((err, data) => {
-        if (err) return;
-
-        const params = data;
-        if (data.parentId === 'role_no_select') {
-          params.parentId = null;
-        }
-        this.props.dispatch({
-          type: 'authRole/createOrUpdate',
-          payload: params,
-          callback: (res) => {
-            oopToast(res, '保存成功');
-            this.getAllRoles();
-            this.onLoad();
-            self.setState({
-              isCreate: false
-            });
-          }
-        });
-      });
-    }
-  }
-
-  onSubmitForm = () => {
-    const self = this;
-    const basicUserForm = this.basic.getForm();
-    if (basicUserForm) {
       basicUserForm.validateFields((err, data) => {
         if (err) return;
 

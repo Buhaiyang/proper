@@ -40,28 +40,34 @@ export default class OopTreeTable extends PureComponent {
     currentSelectTreeNode: null,
     expandedKeys: [],
     searchValue: '',
-    autoExpandParent: true
+    autoExpandParent: true,
+    selectedKeys: []
   }
   handleOnSelect = (treeNode, event)=>{
-    const currentSelectTreeNode = treeNode.length ? {...event.node.props.dataRef} : null;
-    this.setState({
-      currentSelectTreeNode
-    }, ()=>{
-      const { onTableTreeNodeSelect } = this.props;
-      if (onTableTreeNodeSelect) {
-        // 传递了树节点点击的函数 并且 执行结果为 false 那么不继续执行
-        if (onTableTreeNodeSelect(treeNode, event) === false) {
-          return
-        }
-      }
-      this.onLoad({
-        pagination: {
-          pageNo: 1,
-          pageSize: 10
-        }
+    if (event.selected) {
+      this.setState({
+        selectedKeys: [event.node.props.id]
       });
-      this.table.clearSelection()
-    })
+      const currentSelectTreeNode = treeNode.length ? {...event.node.props.dataRef} : null;
+      this.setState({
+        currentSelectTreeNode
+      }, ()=>{
+        const { onTableTreeNodeSelect } = this.props;
+        if (onTableTreeNodeSelect) {
+          // 传递了树节点点击的函数 并且 执行结果为 false 那么不继续执行
+          if (onTableTreeNodeSelect(treeNode, event) === false) {
+            return
+          }
+        }
+        this.onLoad({
+          pagination: {
+            pageNo: 1,
+            pageSize: 10
+          }
+        });
+        this.table.clearSelection()
+      });
+    }
   }
   renderTreeNodes = (data, treeTitle, treeKey, treeRoot, searchValue)=> {
     const treeNodes = data.map((node) => {
@@ -143,7 +149,7 @@ export default class OopTreeTable extends PureComponent {
     return {...this.state.currentSelectTreeNode}
   }
   render() {
-    const { searchValue, expandedKeys, autoExpandParent } = this.state;
+    const { searchValue, expandedKeys, autoExpandParent, selectedKeys } = this.state;
     const treeConfig = this.props.tree;
     const tableConfig = this.props.table;
     const { treeData, treeTitle, treeKey, treeRoot, treeLoading} = treeConfig;
@@ -183,6 +189,7 @@ export default class OopTreeTable extends PureComponent {
                 onSelect={this.handleOnSelect}
                 {...treeConfig}
                 ref={(el)=>{ this.tree = el }}
+                selectedKeys={selectedKeys}
               >
                 {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot, searchValue)}
               </Tree>
