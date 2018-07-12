@@ -48,7 +48,7 @@ export default class OopTable extends PureComponent {
     const cols = [...columns]
     rowButtons.length && cols.push({
       title: '操作',
-      width: rowButtons.length * 50,
+      width: rowButtons.length < 3 ? 100 : rowButtons.length * 50,
       render: (text, record)=>{
         const actions = [];
         const renderButtons = ((item)=> {

@@ -1,5 +1,5 @@
 import { formatDate } from '../../../utils/utils';
-import * as managerService from '../services/WorkflowManagerS';
+import * as managerService from '../services/workflowManagerS';
 
 function pave(dataObject, prefix) {
   let paveObject = {};

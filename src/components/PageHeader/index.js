@@ -57,6 +57,9 @@ export default class PageHeader extends PureComponent {
     );
   }
   conversionFromLocation = (routerLocation, breadcrumbNameMap) => {
+    if (!routerLocation && !breadcrumbNameMap) {
+      return null;
+    }
     const { linkElement = 'a' } = this.props;
     // Convert the path to an array
     const pathSnippets = routerLocation.pathname.split('/').filter(i => i);

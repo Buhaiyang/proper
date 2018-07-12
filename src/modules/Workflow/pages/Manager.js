@@ -9,6 +9,7 @@ import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import OopWorkflowMainModal from '../../../components/OopWorkflowMainModal';
 import { inject } from './../../../common/inject';
+import { oopToast } from './../../../common/oopUtils';
 import styles from './Manager.less';
 
 const { TabPane } = Tabs;
@@ -33,9 +34,10 @@ function getActiveIndex(children, activeKey) {
   return -1;
 }
 
-@inject(['workflowManager', 'global'])
-@connect(({workflowManager, global, loading}) => ({
+@inject(['workflowManager', 'workflowDesigner', 'global'])
+@connect(({workflowManager, workflowDesigner, global, loading}) => ({
   workflowManager,
+  workflowDesigner,
   global,
   loading: loading.models.workflowManager,
   gridLoading: loading.effects['global/oopSearchResult']
@@ -189,6 +191,17 @@ export default class Manager extends React.PureComponent {
       businessObj
     })
   }
+  handleProcessDeployed = (record)=>{
+    console.log('handleProcessDeployed', record);
+    this.props.dispatch({
+      type: 'workflowDesigner/repository',
+      payload: record.id,
+      callback: (res) => {
+        oopToast(res, '部署成功', '部署失败');
+        this.fetchDesign();
+      }
+    });
+  }
   closeProcessModal = ()=>{
     this.setState({
       wfVisible: false
@@ -245,6 +258,14 @@ export default class Manager extends React.PureComponent {
 
     const actionLaunchColumn = [
       {
+        text: '流程部署',
+        name: 'deployed',
+        icon: 'api',
+        confirm: '确定部署吗？',
+        onClick: (record)=>{ this.handleProcessDeployed(record) },
+        display: record=> record.status.code === 'UN_DEPLOYED'
+      },
+      {
         text: '流程发起',
         name: 'view',
         icon: 'select',
@@ -264,9 +285,9 @@ export default class Manager extends React.PureComponent {
     return (
       <PageHeaderLayout content={
         <Tabs animated={false} defaultActiveKey="task" onChange={this.handleTabsChange} ref={(el)=>{ this.tabs = el }}>
-          <TabPane key="task" tab="待处理流程" />
-          <TabPane key="design" tab="可发起流程" />
-          <TabPane key="process" tab="已发起流程" />
+          <TabPane key="task" tab="待办" />
+          <TabPane key="design" tab="发起" />
+          <TabPane key="process" tab="发起历史" />
           <TabPane key="4" disabled tab="已处理流程" />
           <TabPane key="5" disabled tab="流程草稿箱" />
         </Tabs>
@@ -336,7 +357,6 @@ export default class Manager extends React.PureComponent {
                 columns={column[activeKey]}
                 loading={loading}
                 size={size}
-                rowButtons={actionSubmitColumn}
                 checkable={false}
                 pagination={{total: process.total}}
               />

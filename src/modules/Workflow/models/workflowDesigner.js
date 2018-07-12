@@ -1,4 +1,4 @@
-import { queryWorkflowList, removeWorkflowList, createWorkflow, repositoryWorkflow } from '../services/WorkflowDesignerS';
+import { queryWorkflowList, removeWorkflowList, createWorkflow, repositoryWorkflow } from '../services/workflowDesignerS';
 import { formatDate } from '../../../utils/utils';
 
 export default {

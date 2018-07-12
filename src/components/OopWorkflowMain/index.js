@@ -7,7 +7,8 @@ import React, { PureComponent } from 'react';
 import {connect} from 'dva/index';
 import { Tabs, Spin, Timeline, message } from 'antd';
 import {inject} from '../../common/inject';
-import OopForm from '../OopForm'
+import OopForm from '../OopForm';
+import {getApplicationContextUrl} from '../../utils/utils';
 
 const { TabPane } = Tabs;
 const BusinessPanel = (props)=>{
@@ -121,14 +122,16 @@ export default class OopWorkflowMain extends PureComponent {
   getProcessImageTab = ()=>{
     const { procInstId } = this.props;
     const title = (<h2>流程图</h2>);
+    const context = getApplicationContextUrl();
+    const imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram`;
     if (!procInstId) {
       return
     }
     return (
     <div>
       {title}
-      <div style={{textAlign: 'center'}}>
-        <img alt="流程图" src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3723025962,3480503289&fm=173&app=25&f=JPEG?w=218&h=146&s=997B6084621069C4028A49810300109A" />
+      <div style={{textAlign: 'center', overflowX: 'auto'}}>
+        <img alt="流程图" src={`${context}${imgUrl}`} />
       </div>
     </div>)
   }
