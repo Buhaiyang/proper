@@ -135,7 +135,8 @@ export default class OopTable extends PureComponent {
   render() {
     const { grid: {list, pagination },
       columns, loading, topButtons = [], rowButtons = [], checkable = true, size,
-      onRowSelect, selectTriggerOnRowClick = false, onSelectAll, rowKey } = this.props
+      onRowSelect, selectTriggerOnRowClick = false, onSelectAll, rowKey,
+      _onSelect, _onSelectAll } = this.props
     const cols = this.createRowButtons(columns, rowButtons)
     const rowSelectionCfg = checkable ? {
       onChange: this.rowSelectionChange,
@@ -143,9 +144,12 @@ export default class OopTable extends PureComponent {
       getCheckboxProps: record => ({
         disabled: record.disabled,
       }),
-      onSelect: (record) => {
+      onSelect: (record, selected, selectedRows, nativeEvent) => {
         if (selectTriggerOnRowClick) {
           this.selectRow(record);
+        }
+        if (_onSelect) {
+          _onSelect(record, selected, selectedRows, nativeEvent);
         }
       },
       onSelectAll: (selected, selectedRows, changeRows) => {
@@ -156,6 +160,9 @@ export default class OopTable extends PureComponent {
         })
         if (onSelectAll) {
           onSelectAll(changeRows)
+        }
+        if (_onSelectAll) {
+          _onSelectAll(selected, selectedRows, changeRows);
         }
       },
     } : undefined
