@@ -1,3 +1,67 @@
 .container {
   display: block;
+  width: 100%;
+  & > :global(.ant-tabs) {
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    background-color: white;
+    & > :global(.ant-tabs-bar) {
+      margin: 0;
+    }
+  }
+}
+.tabs {
+  :global(.ant-tabs-nav) {
+    display: flex;
+    width: 100%;
+    & > :global(.ant-tabs-tab) {
+      flex: 1;
+      margin: 0;
+      text-align: center;
+    }
+  }
+}
+
+.tabsContent {
+  width: 100%;
+  margin: 0 5px;
+  padding-top: 44px;
+  &.tabsContentAnimated {
+    display: flex;
+    flex-direction: row;
+    will-change: margin-left;
+    transition: margin-left .3s cubic-bezier(.645, .045, .355, 1);
+  }
+  & > .tabsTabpane {
+    flex-shrink: 0;
+    width: 100%;
+    transition: opacity .45s;
+    opacity: 1;
+  }
+  & > .tabsTabpaneActive {
+    width: 100%;
+  }
+
+  & > .tabsTabpaneInactive {
+    opacity: 0;
+    height: 0;
+    padding: 0!important;
+    pointer-events: none;
+  }
+
+  .status {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    display: block;
+  }
+  .listItemWrapper {
+    padding-left: 15px;
+    & > .listLine {
+      padding: 12.5px 15px 12.5px 0;
+    }
+    .listContent {
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
 }
