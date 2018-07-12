@@ -1,6 +1,7 @@
 import React from 'react';
 import { List, Icon, Tabs, Badge } from 'antd';
 import {connect} from 'dva';
+import {routerRedux} from 'dva/router';
 import classNames from 'classnames';
 import {inject} from '../../../common/inject';
 import styles from './index.less';
@@ -172,7 +173,40 @@ export default class Workflow extends React.PureComponent {
       }
     });
   }
-
+  // navigateToPop = (item, event)=>{
+  //   event.preventDefault();
+  //   event.stopPropagation();
+  //   console.log(item);
+  //   const {key, startFormKey, taskId, formKey, variables, procInstId} = item;
+  //
+  // }
+  handleProcessLaunch = (record)=>{
+    console.log('handleProcessLaunch', record);
+    const {key, startFormKey} = record;
+    const param = encodeURIComponent(JSON.stringify({
+      isLaunch: true,
+      taskOrProcDefKey: key,
+      businessObj: {
+        formKey: startFormKey
+      }
+    }));
+    this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
+  }
+  handleProcessSubmit = (record)=>{
+    console.log('handleProcessSubmit', record)
+    const {taskId, formKey, variables, procInstId} = record;
+    const businessObj = variables[formKey];
+    const param = encodeURIComponent(JSON.stringify({
+      isLaunch: false,
+      taskOrProcDefKey: taskId,
+      procInstId,
+      businessObj
+    }));
+    this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
+  }
+  afterProcessSubmit = ()=>{
+    this.handleTabsChange(this.state.activeKey);
+  }
   render() {
     const {
       loading,
@@ -211,7 +245,7 @@ export default class Workflow extends React.PureComponent {
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>
-                    <a href={`#/customframe/exam?examId=${item.id}`}>
+                    <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
                       <List.Item actions={[<Icon type="right" />]}>
                         <List.Item.Meta
                           title={item.pepProcInstVOprocessDefinitionName}
@@ -237,10 +271,11 @@ export default class Workflow extends React.PureComponent {
               itemLayout="horizontal"
               dataSource={design.data}
               loading={loading}
+              bordered={true}
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>
-                    <a href={`#/customframe/exam?examId=${item.id}`}>
+                    <a onClick={ (event)=>{ this.handleProcessLaunch(item, event) }}>
                       <List.Item actions={[<Icon type="right" />]}>
                         <List.Item.Meta
                           title={item.name}
@@ -281,8 +316,8 @@ export default class Workflow extends React.PureComponent {
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>
-                    <a href={`#/customframe/exam?examId=${item.id}`}>
-                      <List.Item actions={[<Icon type="right" />]}>
+                    <a>
+                      <List.Item>
                         <List.Item.Meta
                           title={item.processDefinitionName}
                           description={item.createTime}

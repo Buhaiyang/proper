@@ -37,6 +37,9 @@ let _routerData = {
   '/customframe/workflow': {
     component: dynamicWrapper(()=>import('../components/CustomFrame/Workflow'))
   },
+  '/customframe/workflowMainPop': {
+    component: dynamicWrapper(()=>import('../components/CustomFrame/WorkflowMainPop'))
+  },
   '/base': {
     component: dynamicWrapper(()=>import('../layouts/UserLayout'))
   },

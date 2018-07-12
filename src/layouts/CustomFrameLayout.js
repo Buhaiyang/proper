@@ -27,6 +27,7 @@ export default class CustomFrameLayout extends React.PureComponent {
           <Content>
             <Switch>
               <Route exact path="/customframe/workflow" component={getRouterData()['/customframe/workflow'].component} />
+              <Route exact path="/customframe/workflowMainPop" component={getRouterData()['/customframe/workflowMainPop'].component} />
             </Switch>
           </Content>
         </Layout>

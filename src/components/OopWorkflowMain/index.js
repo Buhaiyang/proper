@@ -205,7 +205,7 @@ export default class OopWorkflowMain extends PureComponent {
   }
   render() {
     return (
-      <div>
+      <div style={{padding: 12, paddingBottom: 70, paddingTop: 0}}>
         {this.renderPage()}
     </div>);
   }
