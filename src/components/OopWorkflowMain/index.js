@@ -101,13 +101,20 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程进度tab
   getProcessProgressTab = ()=>{
-    const { baseWorkflow: {processProgress} } = this.props;
+    const { baseWorkflow: {processProgress: {currentTasks, hisTasks = [], start = {}}} } = this.props;
+    console.log(currentTasks, start);
     const title = (<h2>流程历史</h2>);
     return (
     <div>
       {title}
-      <Timeline style={{marginLeft: 192}} reverse={false}>
-        {processProgress.map(it=>(
+      <Timeline style={{marginLeft: 192}}>
+        {currentTasks && (
+          <Timeline.Item>
+            <h3>{currentTasks[0].name}</h3>
+            <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
+            <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
+          </Timeline.Item>)}
+        {hisTasks.map(it=>(
         <Timeline.Item key={it.taskId}>
           <h3>{it.name}</h3>
           <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>
@@ -116,15 +123,21 @@ export default class OopWorkflowMain extends PureComponent {
           <div style={{position: 'absolute', top: 0, left: -144}}>{it.endTime}</div>
         </Timeline.Item>)
         )}
+        <Timeline.Item>
+          <h3>{start.name}</h3>
+          <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
+          <div style={{position: 'absolute', top: 0, left: -144}}>{start.createTime}</div>
+        </Timeline.Item>
       </Timeline>
     </div>);
   }
   // 获取流程图
   getProcessImageTab = ()=>{
     const { procInstId } = this.props;
+    const token = window.localStorage.getItem('proper-auth-login-token');
     const title = (<h2>流程图</h2>);
     const context = getApplicationContextUrl();
-    const imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram`;
+    const imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?token=${token}`;
     if (!procInstId) {
       return
     }

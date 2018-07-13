@@ -24,5 +24,5 @@ export async function submitWorkflow(params) {
   });
 }
 export async function fetchProcessProgress(params) {
-  return request(`/workflow/task/${params}`);
+  return request(`/workflow/task/workflowPath/${params}`);
 }
