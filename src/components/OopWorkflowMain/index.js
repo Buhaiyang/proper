@@ -106,7 +106,7 @@ export default class OopWorkflowMain extends PureComponent {
     return (
     <div>
       {title}
-      <Timeline style={{marginLeft: 224}} reverse={false}>
+      <Timeline style={{marginLeft: 192}} reverse={false}>
         {processProgress.map(it=>(
         <Timeline.Item key={it.taskId}>
           <h3>{it.name}</h3>
