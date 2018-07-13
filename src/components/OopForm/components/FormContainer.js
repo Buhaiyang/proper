@@ -13,15 +13,17 @@ export default class FormContainer extends Component {
   render() {
     const { formItemList } = this.props;
     return (
-      <Form layout={this.props.formLayout}>
-        {formItemList.map((item, index) => (
-          <DrageItem
-            key={item.key}
-            index={index}
-            component={item}
-            moveCard={this.moveCard}
-          />)) }
-      </Form>
+      <div className={this.props.className}>
+        <Form layout={this.props.formLayout}>
+          {formItemList.map((item, index) => (
+            <DrageItem
+              key={item.key}
+              index={index}
+              component={item}
+              moveCard={this.moveCard}
+            />)) }
+        </Form>
+      </div>
     )
   }
 }

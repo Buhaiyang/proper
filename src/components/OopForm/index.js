@@ -2,6 +2,7 @@ import React from 'react';
 import { Form } from 'antd';
 import moment from 'moment';
 import {formGenerator} from './utils';
+import styles from './index.less';
 
 @Form.create()
 export default class OopForm extends React.PureComponent {
@@ -33,7 +34,7 @@ export default class OopForm extends React.PureComponent {
         }
       }
     });
-    const formConfig = {...this.props, form};
+    const formConfig = {...this.props, form, className: styles.container };
     return formGenerator(formConfig)
   }
 }

@@ -161,6 +161,15 @@ const EditPanel = (props) => {
       const element = e.currentTarget;
       updateCenterPanel(element.id, element.value);
     }
+    // TODO name的变化会触发刷新整个OopForm hack失去焦点  下轮有 修改name采用Popover的形式 onChange还是有问题
+    const onNameChange = (e)=>{
+      const element = e.currentTarget;
+      updateCenterPanel(element.id, element.value);
+      setTimeout(()=>{
+        const el = document.getElementById(`${element.value}_edit_name`);
+        el && el.focus();
+      }, 1000)
+    }
     const plusClick = ()=>{
       onPlusClick(name)
     }
@@ -191,7 +200,7 @@ const EditPanel = (props) => {
         label: 'name',
         component: {
           name: 'Input',
-          props: {placeholder: name, onChange}
+          props: {placeholder: name, onChange: onNameChange}
         },
         initialValue: name
       }];
@@ -260,7 +269,7 @@ const EditPanel = (props) => {
         label: 'name',
         component: {
           name: 'Input',
-          props: {placeholder: name}
+          props: {placeholder: name, onChange: onNameChange}
         },
         initialValue: name
       })

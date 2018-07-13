@@ -9,6 +9,7 @@ import { Tabs, Spin, Timeline, message } from 'antd';
 import {inject} from '../../common/inject';
 import OopForm from '../OopForm';
 import {getApplicationContextUrl} from '../../utils/utils';
+import styles from './index.less';
 
 const { TabPane } = Tabs;
 const BusinessPanel = (props)=>{
@@ -205,7 +206,7 @@ export default class OopWorkflowMain extends PureComponent {
   }
   render() {
     return (
-      <div style={{padding: 12, paddingBottom: 70, paddingTop: 0}}>
+      <div className={styles.container}>
         {this.renderPage()}
     </div>);
   }

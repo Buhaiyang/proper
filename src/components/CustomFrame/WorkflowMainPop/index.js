@@ -12,6 +12,7 @@ import {connect} from 'dva';
 import { Input, Button, Popover, Alert, message } from 'antd';
 import OopWorkflowMain from '../../OopWorkflowMain';
 import {getParamObj} from '../../../utils/utils';
+import styles from './index.less';
 
 const { TextArea } = Input;
 const PopPage = (props)=>{
@@ -27,7 +28,7 @@ const PopPage = (props)=>{
     textAlign: 'right'
   }
   return (
-  <div style={{width: '100%'}}>
+  <div className={styles.container}>
     {children}
     <div style={footerStyle}>{footer}</div>
   </div>)
