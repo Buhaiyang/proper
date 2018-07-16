@@ -15,6 +15,7 @@ const { TextArea } = Input;
 export default class OopWorkflowMainModal extends PureComponent {
   state = {
     buttonLoading: false,
+    activeTabKey: 'handle'
     // popoverVisible: false
   }
   submitWorkflow = ()=>{
@@ -51,7 +52,9 @@ export default class OopWorkflowMainModal extends PureComponent {
     this.props.closeModal();
   }
   handleAfterClose = ()=>{
-    console.log(this)
+    this.setState({
+      activeTabKey: 'handle'
+    })
   }
   getPopoverContent = ()=>{
     return (
@@ -64,8 +67,14 @@ export default class OopWorkflowMainModal extends PureComponent {
       </div>
     </div>)
   }
+  handleTabsChange = (key)=>{
+    this.setState({
+      activeTabKey: key
+    })
+  }
   render() {
     const {visible, ...otherProps} = this.props;
+    console.log(this.state.activeTabKey)
     const footer = (
       <Fragment>
         <Popover
@@ -73,11 +82,11 @@ export default class OopWorkflowMainModal extends PureComponent {
           content={this.getPopoverContent()}
           trigger="click"
         >
-          {!this.props.isLaunch ? <Button type="danger" ghost loading={this.state.buttonLoading} style={{float: 'left'}}>退回</Button> : null}
+          {!this.props.isLaunch ? <Button type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
         <Button onClick={this.handleCancel}>取消</Button>
-        {this.props.isLaunch ? <Button type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
-          : <Button type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>}
+        {this.state.activeTabKey === 'handle' ? (this.props.isLaunch ? <Button type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
+          : <Button type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>) : null}
       </Fragment>);
     return (
       <Modal
@@ -91,6 +100,7 @@ export default class OopWorkflowMainModal extends PureComponent {
         <OopWorkflowMain
           {...otherProps}
           setButtonLoading={this.setButtonLoading}
+          onTabsChange={this.handleTabsChange}
           ref={(el) => { if (el) { this.oopWorkflowMain = el.getWrappedInstance() } }} />
       </Modal>);
   }

@@ -213,7 +213,8 @@ const EditPanel = (props) => {
           // TODO 350延时躲过节流函数
           setTimeout(()=>{
             // 刷新format
-            updateCenterPanel(`${name}${prefix}_props_format`, event.target.value ? 'YYYY-MM-DD hh:mm:ss' : 'YYYY-MM-DD');
+            // 时间format 'YYYY-MM-DD hh:mm' 写死的时间格式 应该让用户设置格式
+            updateCenterPanel(`${name}${prefix}_props_format`, event.target.value ? 'YYYY-MM-DD hh:mm' : 'YYYY-MM-DD');
           }, 350);
         }
         const toggleShowTime = (

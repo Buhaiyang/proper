@@ -204,6 +204,17 @@ export default class Workflow extends React.PureComponent {
     }));
     this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
   }
+  handleProcessView = (record)=>{
+    console.log('handleProcessView', record);
+    const {procInstId} = record;
+    const param = encodeURIComponent(JSON.stringify({
+      isLaunch: false,
+      taskOrProcDefKey: null,
+      procInstId,
+      businessObj: null
+    }));
+    this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
+  }
   afterProcessSubmit = ()=>{
     this.handleTabsChange(this.state.activeKey);
   }
@@ -316,8 +327,8 @@ export default class Workflow extends React.PureComponent {
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>
-                    <a>
-                      <List.Item>
+                    <a onClick={ (event)=>{ this.handleProcessView(item, event) }}>
+                      <List.Item actions={[<Icon type="right" />]}>
                         <List.Item.Meta
                           title={item.processDefinitionName}
                           description={item.createTime}

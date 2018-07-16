@@ -202,6 +202,17 @@ export default class Manager extends React.PureComponent {
       }
     });
   }
+  handleProcessView = (record)=>{
+    console.log('handleProcessView', record);
+    const {procInstId} = record;
+    this.setState({
+      wfVisible: true,
+      isLaunch: false,
+      taskOrProcDefKey: null,
+      procInstId,
+      businessObj: null
+    })
+  }
   closeProcessModal = ()=>{
     this.setState({
       wfVisible: false
@@ -281,6 +292,14 @@ export default class Manager extends React.PureComponent {
         onClick: (record)=>{ this.handleProcessSubmit(record) }
       }
     ];
+    const actionViewColumn = [
+      {
+        text: '流程查看',
+        name: 'view',
+        icon: 'select',
+        onClick: (record)=>{ this.handleProcessView(record) }
+      }
+    ];
 
     return (
       <PageHeaderLayout content={
@@ -357,6 +376,7 @@ export default class Manager extends React.PureComponent {
                 columns={column[activeKey]}
                 loading={loading}
                 size={size}
+                rowButtons={actionViewColumn}
                 checkable={false}
                 pagination={{total: process.total}}
               />

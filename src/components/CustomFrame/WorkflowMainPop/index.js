@@ -38,6 +38,7 @@ const PopPage = (props)=>{
 export default class WorkflowMainPop extends PureComponent {
   state = {
     buttonLoading: false,
+    activeTabKey: 'handle'
   }
   submitWorkflow = ()=>{
     this.setState({
@@ -71,7 +72,9 @@ export default class WorkflowMainPop extends PureComponent {
     this.props.dispatch(routerRedux.push('/customframe/workflow'));
   }
   handleAfterClose = ()=>{
-    console.log(this)
+    this.setState({
+      activeTabKey: 'handle'
+    })
   }
   getPopoverContent = ()=>{
     return (
@@ -84,6 +87,11 @@ export default class WorkflowMainPop extends PureComponent {
         </div>
       </div>)
   }
+  handleTabsChange = (key)=>{
+    this.setState({
+      activeTabKey: key
+    })
+  }
   render() {
     const { param } = getParamObj(this.props.location.search);
     const props = JSON.parse(decodeURIComponent(param))
@@ -94,11 +102,11 @@ export default class WorkflowMainPop extends PureComponent {
           content={this.getPopoverContent()}
           trigger="click"
         >
-          {!props.isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{float: 'left'}}>退回</Button> : null}
+          {!props.isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
         <Button size="large" onClick={this.handleCancel} style={{marginRight: 8}}>取消</Button>
-        {props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
-          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>}
+        {this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
+          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>) : null}
       </Fragment>);
     return (
       <PopPage
@@ -110,6 +118,7 @@ export default class WorkflowMainPop extends PureComponent {
         <OopWorkflowMain
           {...props}
           setButtonLoading={this.setButtonLoading}
+          onTabsChange={this.handleTabsChange}
           ref={(el) => { if (el) { this.oopWorkflowMain = el.getWrappedInstance() } }} />
       </PopPage>);
   }

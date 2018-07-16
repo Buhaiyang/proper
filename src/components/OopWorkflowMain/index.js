@@ -61,19 +61,23 @@ const BusinessPanel = (props)=>{
 }), null, null, {withRef: true})
 export default class OopWorkflowMain extends PureComponent {
   state = {
-    defaultActiveKey: 'handle'
+    // defaultActiveKey: 'handle'
   }
   // 根据表单ID获取表单对象
   componentDidMount() {
-    const { businessObj: {formKey} } = this.props;
-    if (!formKey) {
-      message.error('表单ID未设置')
-      return
+    if (this.props.businessObj) {
+      const { businessObj: {formKey} } = this.props;
+      if (!formKey) {
+        message.error('表单ID未设置')
+        return
+      }
+      this.props.dispatch({
+        type: 'baseWorkflow/fetchByFormCode',
+        payload: formKey
+      })
+    } else {
+      this.handleTabsChange('progress');
     }
-    this.props.dispatch({
-      type: 'baseWorkflow/fetchByFormCode',
-      payload: formKey
-    })
   }
   // 清空表单对象
   componentWillUnmount() {
@@ -101,14 +105,13 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程进度tab
   getProcessProgressTab = ()=>{
-    const { baseWorkflow: {processProgress: {currentTasks, hisTasks = [], start = {}}} } = this.props;
-    console.log(currentTasks, start);
+    const { baseWorkflow: {processProgress: {currentTasks = [], hisTasks = [], start = {}}} } = this.props;
     const title = (<h2>流程历史</h2>);
     return (
     <div>
       {title}
       <Timeline style={{marginLeft: 192}}>
-        {currentTasks && (
+        {currentTasks.length && (
           <Timeline.Item>
             <h3>{currentTasks[0].name}</h3>
             <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
@@ -151,27 +154,31 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 点击tab变化
   handleTabsChange = (key)=>{
-    const { procInstId, baseWorkflow: {processProgress} } = this.props;
+    const { procInstId, baseWorkflow: {processProgress}, onTabsChange } = this.props;
     if (key === 'progress' && processProgress.length === 0 && procInstId) {
       this.props.dispatch({
         type: 'baseWorkflow/fetchProcessProgress',
         payload: procInstId
       })
     }
+    onTabsChange && onTabsChange(key);
   }
   // render 页面
   renderPage = ()=>{
-    const { isLaunch } = this.props;
-    const handleTab = this.getHandleTabComponent();
+    const { isLaunch, taskOrProcDefKey } = this.props;
     const processProgressTab = this.getProcessProgressTab();
     const processImageTab = this.getProcessImageTab();
     const panes = [
-      {title: '流程处理', key: 'handle', content: handleTab},
       {title: '流程进度', key: 'progress', content: processProgressTab, disabled: isLaunch},
       {title: '流程图', key: 'image', content: processImageTab, disabled: isLaunch},
-    ];
+    ]
+    // 查看流程的情况
+    if (taskOrProcDefKey) {
+      const handleTab = this.getHandleTabComponent();
+      panes.unshift({title: '流程处理', key: 'handle', content: handleTab})
+    }
     const tabs = (
-      <Tabs defaultActiveKey={this.state.defaultActiveKey} onChange={this.handleTabsChange}>
+      <Tabs defaultActiveKey={panes[0].key} onChange={this.handleTabsChange}>
         {panes.map(tab=>(
           <TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>{tab.content}</TabPane>
         ))
