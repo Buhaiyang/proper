@@ -4,7 +4,7 @@ import getComponent from './ComponentsMap';
 import FormContainer from './components/FormContainer';
 
 export const formGenerator = (formConfig)=>{
-  const {className, formJson, form, formLayout = 'horizontal', rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag,
+  const {formTitle, className, formJson, form, formLayout = 'horizontal', rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag,
     dragable = false} = formConfig;
   const formItemLayout = formLayout === 'horizontal' ? {
     labelCol: {
@@ -43,7 +43,8 @@ export const formGenerator = (formConfig)=>{
         className={className}
         formLayout={formLayout}
         formItemList={formItemList}
-        onMove={rowItemDrag} />) : (<div className={className}><Form layout={formLayout}>{formItemList}</Form></div>));
+        formTitle={formTitle}
+        onMove={rowItemDrag} />) : (<div className={className}><h3>{formTitle}</h3><Form layout={formLayout}>{formItemList}</Form></div>));
 }
 
 const createComponent = (component)=>{

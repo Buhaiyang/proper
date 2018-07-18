@@ -22,7 +22,7 @@ const PopPage = (props)=>{
     width: '100%',
     display: 'block',
     bottom: 0,
-    padding: 16,
+    padding: '4px 12px',
     background: '#fff',
     borderTop: '1px solid #ddd',
     textAlign: 'right'
@@ -82,8 +82,8 @@ export default class WorkflowMainPop extends PureComponent {
         <Alert message="您正在进行退回流程操作，请填写退回意见并提交。（退回一旦成功无法撤销）" type="warning" showIcon />
         <TextArea style={{marginTop: 16, height: 90}} />
         <div style={{textAlign: 'right', marginTop: 8}}>
-          <Button onClick={this.handleCancel} style={{marginRight: 8}}>取消</Button>
-          <Button type="primary" onClick={this.returnWorkflow} loading={this.state.buttonLoading}>提交</Button>
+          <Button onClick={this.handleCancel}>取消</Button>
+          <Button type="primary" onClick={this.returnWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 8}}>提交</Button>
         </div>
       </div>)
   }
@@ -104,9 +104,9 @@ export default class WorkflowMainPop extends PureComponent {
         >
           {!props.isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
-        <Button size="large" onClick={this.handleCancel} style={{marginRight: 8}}>取消</Button>
-        {this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
-          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>) : null}
+        <Button size="large" onClick={this.handleCancel}>取消</Button>
+        {this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
+          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>提交</Button>) : null}
       </Fragment>);
     return (
       <PopPage

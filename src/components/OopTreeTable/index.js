@@ -45,8 +45,9 @@ export default class OopTreeTable extends PureComponent {
   }
   handleOnSelect = (treeNode, event)=>{
     if (event.selected) {
+      const id = event.node.props.dataRef.id || event.node.props.dataRef.key;
       this.setState({
-        selectedKeys: [event.node.props.id]
+        selectedKeys: [id]
       });
       const currentSelectTreeNode = treeNode.length ? {...event.node.props.dataRef} : null;
       this.setState({

@@ -43,23 +43,11 @@ export default class Workflow extends React.PureComponent {
     task: {},
     design: {},
     process: {},
-    // wfVisible: false,
-    // isLaunch: false,
-    // taskOrProcDefKey: null,
-    // businessObj: null,
-    // procInstId: null
   }
 
   componentDidMount() {
-    console.log('componentDidMount')
     // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
     window.parent.postMessage('root', '*');
-    // this.props.dispatch({
-    //   type: 'baseFrame/fetchExamList',
-    //   payload: {
-    //     status: 'PUBLISHING'
-    //   }
-    // })
     this.fetchTask();
   }
 
@@ -173,13 +161,6 @@ export default class Workflow extends React.PureComponent {
       }
     });
   }
-  // navigateToPop = (item, event)=>{
-  //   event.preventDefault();
-  //   event.stopPropagation();
-  //   console.log(item);
-  //   const {key, startFormKey, taskId, formKey, variables, procInstId} = item;
-  //
-  // }
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
     const {key, startFormKey} = record;
@@ -194,13 +175,12 @@ export default class Workflow extends React.PureComponent {
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, formKey, variables, procInstId} = record;
-    const businessObj = variables[formKey];
+    const {taskId, form, procInstId} = record;
     const param = encodeURIComponent(JSON.stringify({
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
-      businessObj
+      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`}
     }));
     this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
   }
@@ -260,7 +240,7 @@ export default class Workflow extends React.PureComponent {
                       <List.Item actions={[<Icon type="right" />]}>
                         <List.Item.Meta
                           title={item.pepProcInstVOprocessDefinitionName}
-                          description={item.pepProcInstVOcreateTime}
+                          description={<div><div>{item.pepProcInstVOcreateTime}</div><div><span>发起人: </span><span>{item.pepProcInstVOstartUserName}</span></div></div>}
                         />
                         <div className={styles.listContent}>
                           {item.pepProcInstVOstateValue}
@@ -282,7 +262,6 @@ export default class Workflow extends React.PureComponent {
               itemLayout="horizontal"
               dataSource={design.data}
               loading={loading}
-              bordered={true}
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>

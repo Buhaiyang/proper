@@ -15,6 +15,7 @@ export default class FormContainer extends Component {
     return (
       <div className={this.props.className}>
         <Form layout={this.props.formLayout}>
+          <h3>{this.props.formTitle}</h3>
           {formItemList.map((item, index) => (
             <DrageItem
               key={item.key}

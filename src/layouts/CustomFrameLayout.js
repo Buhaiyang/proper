@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'dva/router';
-import { Layout } from 'antd';
+import { Layout, Button, Icon } from 'antd';
 import styles from './CustomFrameLayout.less';
 import { getRouterData } from '../common/frameHelper';
 import {getParamObj} from '../utils/utils';
@@ -8,22 +8,45 @@ import {getParamObj} from '../utils/utils';
 
 const { Content } = Layout;
 
+const IOSHeaer = (props)=>{
+  return (
+    <div className={styles.header}>
+      <Button type="primary" ghost className={styles.backBtn} onClick={props.onclick}>
+        <Icon type="left" style={{fontWeight: 'bold'}} />{props.text}
+      </Button>
+      <h3 className={styles.title}>{props.title}</h3>
+    </div>)
+}
+
 export default class CustomFrameLayout extends React.PureComponent {
+  isAndroid = ()=>{
+    const {userAgent} = navigator;
+    return userAgent.includes('Android') || userAgent.includes('Adr');
+  }
+  isIOS = ()=>{
+    const {userAgent} = navigator;
+    return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+  }
   componentWillMount() {
-    const token = window.localStorage.getItem('proper-auth-login-token');
-    if (!token) {
-      if (this.props.location.search != null) {
-        const transParams = getParamObj(this.props.location.search);
-        if (transParams) {
-          window.localStorage.setItem('proper-auth-login-token', transParams.token);
-        }
+    window.localStorage.setItem('If_Can_Back', '');
+    // window.localStorage.setItem('pea_dynamic_request_prefix', 'https://icmp2.propersoft.cn/icmp/server-dev')
+    if (this.props.location.search) {
+      const transParams = getParamObj(this.props.location.search);
+      if (transParams) {
+        window.localStorage.setItem('proper-auth-login-token', transParams.token);
       }
     }
+  }
+  handleBack = ()=>{
+    // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
+    // window.parent.postMessage('back', '*');
+    window.localStorage.setItem('If_Can_Back', 'back');
   }
   render() {
     return (
       <div className={styles.customFrame}>
-        <Layout>
+        {this.isIOS() ? <IOSHeaer text="返回" onclick={this.handleBack} title="办公流程" /> : null}
+        <Layout style={{paddingTop: this.isIOS() ? 44 : 0}}>
           <Content>
             <Switch>
               <Route exact path="/customframe/workflow" component={getRouterData()['/customframe/workflow'].component} />

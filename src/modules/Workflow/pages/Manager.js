@@ -181,14 +181,13 @@ export default class Manager extends React.PureComponent {
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, formKey, variables, procInstId} = record;
-    const businessObj = variables[formKey];
+    const {taskId, form, procInstId} = record;
     this.setState({
       wfVisible: true,
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
-      businessObj
+      businessObj: form
     })
   }
   handleProcessDeployed = (record)=>{

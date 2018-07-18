@@ -87,7 +87,7 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程处理tab
   getHandleTabComponent = ()=>{
-    const { baseWorkflow: {formEntity}, businessObj: {formData}, formLoading, isLaunch} = this.props;
+    const { baseWorkflow: {formEntity}, businessObj: {formData, formTitle}, formLoading, isLaunch} = this.props;
     const { formDetails } = formEntity;
     const formConfig = formDetails ? JSON.parse(formDetails) : {};
     const title = isLaunch ? (<h2>流程发起</h2>) : (<h2>流程审批</h2>);
@@ -99,7 +99,7 @@ export default class OopWorkflowMain extends PureComponent {
           isLaunch={isLaunch}
           formLoading={formLoading}
           defaultValue={formData}
-          formConfig={formConfig} />
+          formConfig={{...formConfig, formTitle}} />
       </div>
     )
   }
@@ -121,8 +121,8 @@ export default class OopWorkflowMain extends PureComponent {
         <Timeline.Item key={it.taskId}>
           <h3>{it.name}</h3>
           <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>
-          <div style={{marginTop: 16}}><span>审批状态: </span>{it.variables.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>
-          <div style={{marginTop: 16}}><span>审批意见: </span>{it.variables.approvalRemarks}</div>
+          <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>
+          <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>
           <div style={{position: 'absolute', top: 0, left: -144}}>{it.endTime}</div>
         </Timeline.Item>)
         )}
@@ -148,7 +148,7 @@ export default class OopWorkflowMain extends PureComponent {
     <div>
       {title}
       <div style={{textAlign: 'center', overflowX: 'auto'}}>
-        <img alt="流程图" src={`${context}${imgUrl}`} />
+        <img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} />
       </div>
     </div>)
   }
