@@ -29,7 +29,7 @@ export default class CustomFrameLayout extends React.PureComponent {
   }
   componentWillMount() {
     window.localStorage.setItem('If_Can_Back', '');
-    // window.localStorage.setItem('pea_dynamic_request_prefix', 'https://icmp2.propersoft.cn/icmp/server-dev')
+    // window.localStorage.setItem('pea_dynamic_request_prefix', 'http://192.168.1.111/pep/develop');
     if (this.props.location.search) {
       const transParams = getParamObj(this.props.location.search);
       if (transParams) {
@@ -43,9 +43,10 @@ export default class CustomFrameLayout extends React.PureComponent {
     window.localStorage.setItem('If_Can_Back', 'back');
   }
   render() {
+    const transParams = getParamObj(this.props.location.search);
     return (
       <div className={styles.customFrame}>
-        {this.isIOS() ? <IOSHeaer text="返回" onclick={this.handleBack} title="办公流程" /> : null}
+        {this.isIOS() ? <IOSHeaer text="返回" onclick={this.handleBack} title={decodeURIComponent(transParams.title)} /> : null}
         <Layout style={{paddingTop: this.isIOS() ? 44 : 0}}>
           <Content>
             <Switch>

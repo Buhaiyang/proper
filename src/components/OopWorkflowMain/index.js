@@ -13,7 +13,7 @@ import styles from './index.less';
 
 const { TabPane } = Tabs;
 const BusinessPanel = (props)=>{
-  const {self, formConfig = {}, defaultValue = {}, formLoading, isLaunch} = props;
+  const {self, formConfig = {}, defaultValue = {}, formLoading, isLaunch, taskOrProcDefKey} = props;
   // 清空approvalRemarks审批说明字段
   defaultValue.approvalRemarks = null;
   const ApprovalPanelJson = [{
@@ -45,9 +45,11 @@ const BusinessPanel = (props)=>{
       formConfig.formJson = [];
     }
     formConfig.formJson.forEach((item)=>{ item.component.props = {...item.component.props, disabled: true} });
-    formConfig.formJson = formConfig.formJson.concat(ApprovalPanelJson);
+    // 如果是历史节点 没有taskOrProcDefKey 没有审批意见
+    if (taskOrProcDefKey) {
+      formConfig.formJson = formConfig.formJson.concat(ApprovalPanelJson);
+    }
   }
-  console.log(formConfig.formJson)
   return (
     <Spin spinning={formLoading}>
       <OopForm {...formConfig} defaultValue={defaultValue} ref={(el)=>{ if (el) { self.oopForm = el } }} />
@@ -87,16 +89,17 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程处理tab
   getHandleTabComponent = ()=>{
-    const { baseWorkflow: {formEntity}, businessObj: {formData, formTitle}, formLoading, isLaunch} = this.props;
+    const { name = null, baseWorkflow: {formEntity}, businessObj: {formData, formTitle}, formLoading, isLaunch, taskOrProcDefKey} = this.props;
     const { formDetails } = formEntity;
     const formConfig = formDetails ? JSON.parse(formDetails) : {};
-    const title = isLaunch ? (<h2>流程发起</h2>) : (<h2>流程审批</h2>);
+    const title = (<h2>{name}</h2>);
     return (
       <div>
         {title}
         <BusinessPanel
           self={this}
           isLaunch={isLaunch}
+          taskOrProcDefKey={taskOrProcDefKey}
           formLoading={formLoading}
           defaultValue={formData}
           formConfig={{...formConfig, formTitle}} />
@@ -120,35 +123,40 @@ export default class OopWorkflowMain extends PureComponent {
         {hisTasks.map(it=>(
         <Timeline.Item key={it.taskId}>
           <h3>{it.name}</h3>
-          <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>
-          <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>
-          <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>
-          <div style={{position: 'absolute', top: 0, left: -144}}>{it.endTime}</div>
+          {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
+          {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
+          {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}
+          <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{it.endTime}</div>
         </Timeline.Item>)
         )}
         <Timeline.Item>
           <h3>{start.name}</h3>
           <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
-          <div style={{position: 'absolute', top: 0, left: -144}}>{start.createTime}</div>
+          <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{start.createTime}</div>
         </Timeline.Item>
       </Timeline>
     </div>);
   }
   // 获取流程图
   getProcessImageTab = ()=>{
-    const { procInstId } = this.props;
+    const { procInstId, processDefinitionId, stateCode} = this.props;
     const token = window.localStorage.getItem('proper-auth-login-token');
     const title = (<h2>流程图</h2>);
     const context = getApplicationContextUrl();
-    const imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?token=${token}`;
-    if (!procInstId) {
-      return
+    let imgUrl = null;
+    if (stateCode === 'DONE') {
+      imgUrl = `/repository/process-definitions/${processDefinitionId}/diagram?token=${token}`;
+    } else {
+      imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?token=${token}`;
+    }
+    if (!imgUrl) {
+      return null
     }
     return (
     <div>
       {title}
       <div style={{textAlign: 'center', overflowX: 'auto'}}>
-        <img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} />
+        <a href={`${context}${imgUrl}`} target="_blank"><img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} /></a>
       </div>
     </div>)
   }
@@ -165,18 +173,15 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // render 页面
   renderPage = ()=>{
-    const { isLaunch, taskOrProcDefKey } = this.props;
+    const { isLaunch } = this.props;
     const processProgressTab = this.getProcessProgressTab();
     const processImageTab = this.getProcessImageTab();
+    const handleTab = this.getHandleTabComponent();
     const panes = [
+      {title: '流程处理', key: 'handle', content: handleTab},
       {title: '流程进度', key: 'progress', content: processProgressTab, disabled: isLaunch},
       {title: '流程图', key: 'image', content: processImageTab, disabled: isLaunch},
     ]
-    // 查看流程的情况
-    if (taskOrProcDefKey) {
-      const handleTab = this.getHandleTabComponent();
-      panes.unshift({title: '流程处理', key: 'handle', content: handleTab})
-    }
     const tabs = (
       <Tabs defaultActiveKey={panes[0].key} onChange={this.handleTabsChange}>
         {panes.map(tab=>(

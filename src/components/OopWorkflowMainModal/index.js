@@ -74,7 +74,7 @@ export default class OopWorkflowMainModal extends PureComponent {
   }
   render() {
     const {visible, ...otherProps} = this.props;
-    console.log(this.state.activeTabKey)
+    const {taskOrProcDefKey} = this.props;
     const footer = (
       <Fragment>
         <Popover
@@ -85,8 +85,8 @@ export default class OopWorkflowMainModal extends PureComponent {
           {!this.props.isLaunch ? <Button type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
         <Button onClick={this.handleCancel}>取消</Button>
-        {this.state.activeTabKey === 'handle' ? (this.props.isLaunch ? <Button type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
-          : <Button type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>) : null}
+        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (this.props.isLaunch ? <Button type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading}>发起</Button>
+          : <Button type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading}>提交</Button>) : null) : null}
       </Fragment>);
     return (
       <Modal

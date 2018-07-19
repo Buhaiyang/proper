@@ -1,7 +1,9 @@
 import React from 'react';
 import { Form, Icon, Tooltip } from 'antd';
+import cloneDeep from 'lodash/cloneDeep';
 import getComponent from './ComponentsMap';
 import FormContainer from './components/FormContainer';
+
 
 export const formGenerator = (formConfig)=>{
   const {formTitle, className, formJson, form, formLayout = 'horizontal', rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemDrag,
@@ -16,15 +18,30 @@ export const formGenerator = (formConfig)=>{
       sm: {span: 16},
     },
   } : null;
+  // 把正则的字符串形式转义成正则形式 fe: "/^0-9*$/" => /^0-9*$/
+  const transformRules = (rules)=>{
+    const arr = cloneDeep(rules);
+    arr.forEach((it)=>{
+      const {pattern} = it
+      if (pattern && pattern.constructor.name === 'String') {
+        it.pattern = new RegExp(pattern.split('/')[1]);
+      }
+    });
+    return arr;
+  }
   const {getFieldDecorator} = form;
   const formItemList = [];
   if (Array.isArray(formJson) && formJson.length > 0) {
     for (let i = 0; i < formJson.length; i++) {
       const formItemConfig = formJson[i];
-      const {name, initialValue, rules, component } = formItemConfig;
+      const {name, initialValue, rules = [], component } = formItemConfig;
       let formItem = null;
+      let _rules = null;
       if (name && component) {
-        const formItemInner = getFieldDecorator(name, {initialValue, rules})(
+        if (rules.length) {
+          _rules = transformRules(rules);
+        }
+        const formItemInner = getFieldDecorator(name, {initialValue, rules: _rules})(
           createComponent(component)
         );
         formItem = getFormItem(formItemInner,

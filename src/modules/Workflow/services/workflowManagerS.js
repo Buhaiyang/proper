@@ -13,14 +13,6 @@ export async function findProcess(params) {
   return request(`/workflow/process?${stringify(params)}`);
 }
 
-export async function findGroup(params) {
-  return request(`/auth/user-groups?${stringify(params)}`);
-}
-
-export async function findUser(params) {
-  const p = {
-    userGroupEnable: 'ALL',
-    userEnable: 'ALL'
-  }
-  return request(`/auth/user-groups/${params}/users?${stringify(p)}`);
+export async function findBusinessObj(params) {
+  return request(`/workflow/process/${params}/page`);
 }

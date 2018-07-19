@@ -100,6 +100,7 @@ export default class Designer extends PureComponent {
   };
 
   componentDidMount() {
+    console.log(cookie)
     cookie.remove('X-PEP-TOKEN', { path: '/' });
     cookie.save('X-PEP-TOKEN', window.localStorage.getItem('proper-auth-login-token'), { path: '/' });
     this.props.dispatch({
@@ -110,13 +111,17 @@ export default class Designer extends PureComponent {
       }
     });
   }
-
+  componentWillUnmount() {
+    cookie.remove('X-PEP-TOKEN', { path: '/' });
+  }
   // 查询
   handleSearch = (value) => {
     this.props.dispatch({
       type: 'workflowDesigner/fetch',
       payload: {
         filter: value,
+        modelType: '0',
+        sort: 'modifiedDesc'
       }
     });
   }
@@ -281,7 +286,11 @@ export default class Designer extends PureComponent {
   // 刷新
   refresh = () => {
     this.props.dispatch({
-      type: 'workflowDesigner/fetch'
+      type: 'workflowDesigner/fetch',
+      payload: {
+        modelType: '0',
+        sort: 'modifiedDesc'
+      }
     });
   }
 

@@ -66,7 +66,7 @@ export default class Manager extends React.PureComponent {
       type: 'workflowManager/findTask',
       payload: {
         pageNo: 1,
-        pageSize: 10
+        pageSize: 100
       },
       callback: () => {
         const { workflowManager } = self.props;
@@ -82,6 +82,8 @@ export default class Manager extends React.PureComponent {
     this.props.dispatch({
       type: 'workflowManager/findDesign',
       payload: {
+        pageNo: 1,
+        pageSize: 100,
         modelType: '0',
         sort: 'modifiedDesc'
       },
@@ -100,7 +102,7 @@ export default class Manager extends React.PureComponent {
       type: 'workflowManager/findProcess',
       payload: {
         pageNo: 1,
-        pageSize: 10
+        pageSize: 100
       },
       callback: () => {
         const { workflowManager } = self.props;
@@ -167,29 +169,6 @@ export default class Manager extends React.PureComponent {
       }
     });
   }
-  handleProcessLaunch = (record)=>{
-    console.log('handleProcessLaunch', record);
-    const {key, startFormKey} = record;
-    this.setState({
-      wfVisible: true,
-      isLaunch: true,
-      taskOrProcDefKey: key,
-      businessObj: {
-        formKey: startFormKey
-      }
-    })
-  }
-  handleProcessSubmit = (record)=>{
-    console.log('handleProcessSubmit', record)
-    const {taskId, form, procInstId} = record;
-    this.setState({
-      wfVisible: true,
-      isLaunch: false,
-      taskOrProcDefKey: taskId,
-      procInstId,
-      businessObj: form
-    })
-  }
   handleProcessDeployed = (record)=>{
     console.log('handleProcessDeployed', record);
     this.props.dispatch({
@@ -201,16 +180,53 @@ export default class Manager extends React.PureComponent {
       }
     });
   }
-  handleProcessView = (record)=>{
-    console.log('handleProcessView', record);
-    const {procInstId} = record;
+  handleProcessLaunch = (record)=>{
+    console.log('handleProcessLaunch', record);
+    const {key, startFormKey} = record;
+    this.setState({
+      wfVisible: true,
+      isLaunch: true,
+      taskOrProcDefKey: key,
+      businessObj: {
+        formKey: startFormKey
+      },
+      name: '流程发起'
+    })
+  }
+  handleProcessSubmit = (record)=>{
+    console.log('handleProcessSubmit', record)
+    const {taskId, form, procInstId, name} = record;
     this.setState({
       wfVisible: true,
       isLaunch: false,
-      taskOrProcDefKey: null,
+      taskOrProcDefKey: taskId,
       procInstId,
-      businessObj: null
+      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`},
+      name,
+      stateCode: undefined
     })
+  }
+  handleProcessView = (record)=>{
+    console.log('handleProcessView', record);
+    const {procInstId, processDefinitionId, stateCode} = record;
+    this.props.dispatch({
+      type: 'workflowManager/findBusinessObj',
+      payload: procInstId,
+      callback: (res) => {
+        console.log(res);
+        const businessObj = res.length ? res[0] : null;
+        this.setState({
+          wfVisible: true,
+          isLaunch: false,
+          taskOrProcDefKey: null,
+          procInstId,
+          businessObj,
+          name: null,
+          processDefinitionId,
+          stateCode
+        })
+      }
+    });
   }
   closeProcessModal = ()=>{
     this.setState({
@@ -384,6 +400,7 @@ export default class Manager extends React.PureComponent {
         </Card>
 
         <OopWorkflowMainModal
+          name={this.state.name}
           isLaunch={this.state.isLaunch}
           visible={this.state.wfVisible}
           closeModal={this.closeProcessModal}
@@ -391,6 +408,8 @@ export default class Manager extends React.PureComponent {
           businessObj={this.state.businessObj}
           taskOrProcDefKey={this.state.taskOrProcDefKey}
           procInstId={this.state.procInstId}
+          processDefinitionId={this.state.processDefinitionId}
+          stateCode={this.state.stateCode}
         />
       </PageHeaderLayout>
     );

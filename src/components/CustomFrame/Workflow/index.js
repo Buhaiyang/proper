@@ -57,7 +57,7 @@ export default class Workflow extends React.PureComponent {
       type: 'workflowManager/findTask',
       payload: {
         pageNo: 1,
-        pageSize: 10
+        pageSize: 100
       },
       callback: () => {
         const { workflowManager } = self.props;
@@ -91,7 +91,7 @@ export default class Workflow extends React.PureComponent {
       type: 'workflowManager/findProcess',
       payload: {
         pageNo: 1,
-        pageSize: 10
+        pageSize: 100
       },
       callback: () => {
         const { workflowManager } = self.props;
@@ -169,31 +169,45 @@ export default class Workflow extends React.PureComponent {
       taskOrProcDefKey: key,
       businessObj: {
         formKey: startFormKey
-      }
+      },
+      name: '流程发起'
     }));
     this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, form, procInstId} = record;
+    const {taskId, form, procInstId, name} = record;
     const param = encodeURIComponent(JSON.stringify({
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
-      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`}
+      name,
+      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`},
+      stateCode: undefined
     }));
     this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
   }
   handleProcessView = (record)=>{
     console.log('handleProcessView', record);
-    const {procInstId} = record;
-    const param = encodeURIComponent(JSON.stringify({
-      isLaunch: false,
-      taskOrProcDefKey: null,
-      procInstId,
-      businessObj: null
-    }));
-    this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
+    const {procInstId, processDefinitionId, stateCode} = record;
+    this.props.dispatch({
+      type: 'workflowManager/findBusinessObj',
+      payload: procInstId,
+      callback: (res) => {
+        console.log(res);
+        const businessObj = res.length ? res[0] : null;
+        const param = encodeURIComponent(JSON.stringify({
+          isLaunch: false,
+          taskOrProcDefKey: null,
+          procInstId,
+          businessObj,
+          name: null,
+          processDefinitionId,
+          stateCode
+        }));
+        this.props.dispatch(routerRedux.push(`/customframe/workflowMainPop?param=${param}`));
+      }
+    });
   }
   afterProcessSubmit = ()=>{
     this.handleTabsChange(this.state.activeKey);

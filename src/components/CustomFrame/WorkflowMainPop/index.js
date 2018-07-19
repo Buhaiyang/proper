@@ -95,6 +95,7 @@ export default class WorkflowMainPop extends PureComponent {
   render() {
     const { param } = getParamObj(this.props.location.search);
     const props = JSON.parse(decodeURIComponent(param))
+    const {taskOrProcDefKey} = props;
     const footer = (
       <Fragment>
         <Popover
@@ -105,8 +106,8 @@ export default class WorkflowMainPop extends PureComponent {
           {!props.isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
         <Button size="large" onClick={this.handleCancel}>取消</Button>
-        {this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
-          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>提交</Button>) : null}
+        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
+          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>提交</Button>) : null) : null}
       </Fragment>);
     return (
       <PopPage
