@@ -1,0 +1,38 @@
+.OopPreview {
+  top: 0;
+  padding-bottom: 0;
+  z-index: 9999;
+  :global {
+    .ant-modal-close-x {
+      width: 46px;
+      height: 46px;
+      line-height: 48px;
+    }
+    .ant-modal-header {
+      padding: 12px 24px;
+      .ant-modal-title {
+        color: transparent;
+      }
+    }
+    .ant-modal-body {
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+      img {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+      }
+    }
+    .ant-modal-footer {
+      display: flex;
+      justify-content: center;
+      a {
+        margin: 0 20px;
+        .ant-tooltip-open {
+          color: #424242 !important;
+        }
+      }
+    }
+  }
+}

@@ -37,10 +37,11 @@ export default class OopUpload extends React.PureComponent {
     props.headers = {
       'X-PEP-TOKEN': token
     }
-    props.defaultFileList && props.defaultFileList.forEach((item)=>{
+    props.defaultFileList && props.defaultFileList.forEach((item, index)=>{
       const {id} = item;
-      item.uid = -id;
-      item.url = `${getApplicationContextUrl()}${id}`;
+      item.uid = -(++index);
+      item.url = (id.indexOf('http') === 0 || id.indexOf('data:image/') === 0) ?
+        id : `${getApplicationContextUrl()}${id}`;
       item.thumbUrl = item.url;
     });
     const callbackOnChange = props.onChange;
