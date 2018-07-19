@@ -1,12 +1,5 @@
-import {stringify} from 'qs';
 import request from '../../../utils/request';
 
-// start todo
-export async function fetch(param) {
-  // return fetchPagable(param)
-  return request(`/push/channels?${stringify(param)}`);
-}
-// end todo
 export async function getFileInfo(param) {
   return request(`/file/${param}/meta`);
 }

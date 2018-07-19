@@ -289,16 +289,10 @@ export default class PagePush extends React.PureComponent {
   componentDidMount() {
     this.onLoad();
   }
-  onLoad = ()=>{
-    // todo
-  // onLoad = (param = {})=>{
-    // const {pagination} = param;
-    // this.oopSearch.load({
-    //   pagination,
-    // })
-    this.props.dispatch({
-      type: 'systemPagePush/fetch',
-      payload: {pageNo: 1, pageSize: 10}
+  onLoad = (param = {})=>{
+    const {pagination} = param;
+    this.oopSearch.load({
+      pagination,
     })
   }
   handleRemove = (record)=>{
@@ -535,8 +529,7 @@ export default class PagePush extends React.PureComponent {
     })
   }
   render() {
-    const { loading, global: {size }, gridLoading, systemPagePush: { list }} = this.props;
-    // oopSearchGrid,  todo 不支持oopSearch
+    const { loading, global: { oopSearchGrid, size }, gridLoading} = this.props;
     const { detailVisible, modalFormVisible, info, addOrEditModalTitle, closeConfirmConfig,
       isCreate, fileLoading, fileList, checkAndorid, checkIos, nowFileId } = this.state;
     const { columns } = {columns: [
@@ -594,8 +587,7 @@ export default class PagePush extends React.PureComponent {
         <Card bordered={false}>
           <OopTable
             loading={gridLoading}
-            // grid={oopSearchGrid || {list}}   // todo
-            grid={{list}}
+            grid={oopSearchGrid}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}
