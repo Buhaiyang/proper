@@ -36,13 +36,18 @@ const generateList = (data, props) => {
   }
 };
 export default class OopTreeTable extends PureComponent {
-  state = {
-    currentSelectTreeNode: null,
-    expandedKeys: [],
-    searchValue: '',
-    autoExpandParent: true,
-    selectedKeys: []
+  constructor(props) {
+    super(props);
+    const {tree: {_defaultSelectedKeys = []}} = props
+    this.state = {
+      currentSelectTreeNode: null,
+      expandedKeys: [],
+      searchValue: '',
+      autoExpandParent: true,
+      selectedKeys: [..._defaultSelectedKeys]
+    }
   }
+
   handleOnSelect = (treeNode, event)=>{
     if (event.selected) {
       const id = event.node.props.dataRef.id || event.node.props.dataRef.key;
@@ -70,7 +75,7 @@ export default class OopTreeTable extends PureComponent {
       });
     }
   }
-  renderTreeNodes = (data, treeTitle, treeKey, treeRoot, searchValue)=> {
+  renderTreeNodes = (data = [], treeTitle, treeKey, treeRoot, searchValue)=> {
     const treeNodes = data.map((node) => {
       const item = {
         ...node,
@@ -153,9 +158,14 @@ export default class OopTreeTable extends PureComponent {
     const { searchValue, expandedKeys, autoExpandParent, selectedKeys } = this.state;
     const treeConfig = this.props.tree;
     const tableConfig = this.props.table;
-    const { treeData, treeTitle, treeKey, treeRoot, treeLoading} = treeConfig;
+    const { treeData, treeTitle, treeKey, treeRoot, treeLoading, _defaultSelectedKeys} = treeConfig;
     const { gridLoading, grid, columns, topButtons = [], rowButtons = [], oopSearch } = tableConfig;
     const {size} = this.props;
+    if (selectedKeys.length === 0 && _defaultSelectedKeys) {
+      _defaultSelectedKeys.forEach((item) => {
+        selectedKeys.push(item);
+      });
+    }
     return (
       <Row gutter={16} className={styles.OopTreeTable}>
         <Col span={18} push={6}>
@@ -188,9 +198,9 @@ export default class OopTreeTable extends PureComponent {
                 expandedKeys={expandedKeys}
                 autoExpandParent={autoExpandParent}
                 onSelect={this.handleOnSelect}
+                selectedKeys={selectedKeys}
                 {...treeConfig}
                 ref={(el)=>{ this.tree = el }}
-                selectedKeys={selectedKeys}
               >
                 {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot, searchValue)}
               </Tree>

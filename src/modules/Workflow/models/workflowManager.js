@@ -27,7 +27,9 @@ export default {
       showQuickJumper: true,
       count: 0
     },
-    process: {}
+    process: {},
+    group: [],
+    user: []
   },
   effects: {
     *findTask({ payload, callback }, { call, put }) {
@@ -51,6 +53,22 @@ export default {
       const response = yield call(managerService.findProcess, payload);
       yield put({
         type: 'saveProcess',
+        payload: response.result,
+      });
+      if (callback) callback();
+    },
+    *findGroup({ payload, callback }, { call, put }) {
+      const response = yield call(managerService.findGroup, payload);
+      yield put({
+        type: 'saveGroup',
+        payload: response.result,
+      });
+      if (callback) callback();
+    },
+    *findUser({ payload, callback }, { call, put }) {
+      const response = yield call(managerService.findUser, payload);
+      yield put({
+        type: 'saveUser',
         payload: response.result,
       });
       if (callback) callback();
@@ -81,6 +99,18 @@ export default {
       return {
         ...state,
         process: payload,
+      };
+    },
+    saveGroup(state, {payload}) {
+      return {
+        ...state,
+        group: payload,
+      };
+    },
+    saveUser(state, {payload}) {
+      return {
+        ...state,
+        user: payload,
       };
     },
   }

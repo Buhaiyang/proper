@@ -1,16 +1,11 @@
 import React, { Fragment } from 'react';
 import {
   Modal,
-  Card,
   Row,
   Col,
-  List,
-  Spin,
   Tag,
   Button } from 'antd';
-import classNames from 'classnames';
-import OopSearch from '../OopSearch';
-import OopTable from '../OopTable';
+import OopTreeTable from '../OopTreeTable';
 
 import styles from './index.less';
 
@@ -20,26 +15,30 @@ export default class OopTabTableModal extends React.PureComponent {
     const {
       defaultSelected = {
         data: [],
-        text: ''
       },
-      listCfg = {
-        dataSource: []
-      },
-      tableCfg
-    } = props
+    } = props;
     this.state = {
       modalVisible: false,
       tableCfg: {
-        list: [],
+        data: [],
+        title: '',
         total: 0,
-        ...tableCfg
-      },
-      listCfg: {
-        dataSource: listCfg.dataSource ? listCfg.dataSource : [],
       },
       selectedRecord: [...defaultSelected.data],
-      activeListItem: listCfg.dataSource && listCfg.dataSource.length > 0 ? listCfg.dataSource[0] : {}
-    }
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {tableCfg: tableCfgState} = this.state;
+    const {tableCfg, defaultSelected} = nextProps;
+    this.setState({
+      selectedRecord: [...defaultSelected.data],
+      tableCfg: {
+        data: tableCfg.data,
+        total: tableCfg.total,
+        title: tableCfgState.title
+      }
+    });
   }
 
   handleButtonClick = (e) => {
@@ -57,34 +56,9 @@ export default class OopTabTableModal extends React.PureComponent {
     });
   }
 
-  handleListClick = (record) => {
-    const {listCfg: {onClick}} = this.props;
-    const {activeListItem} = this.state;
-    if (activeListItem.id !== record.id) {
-      this.setState({
-        activeListItem: record
-      });
-      if (onClick) {
-        onClick(record.id);
-      }
-    }
-  }
-
-  handleListSearch = (inputValue, filter) => {
-    const { listCfg: {dataSource} } = this.props;
-    const { listCfg } = this.state;
-    const filterList = inputValue ? filter(dataSource, ['name']) : dataSource;
-    this.setState({
-      listCfg: {
-        ...listCfg,
-        dataSource: filterList
-      }
-    });
-  }
-
   handleModalCancel = () => {
     this.setState({
-      modalVisible: false
+      modalVisible: false,
     });
   }
 
@@ -98,14 +72,14 @@ export default class OopTabTableModal extends React.PureComponent {
   }
 
   handleTableSearch = (inputValue, filter) => {
-    const { tableCfg: {list} } = this.props;
+    const { tableCfg: {data}, filterColums } = this.props;
     const { tableCfg } = this.state;
-    const filterList = inputValue ? filter(list, ['name']) : list;
+    const filterList = inputValue ? filter(data, filterColums) : data;
     this.setState({
       tableCfg: {
         ...tableCfg,
-        list: filterList,
-        total: list.length
+        data: filterList,
+        total: filterList.length
       }
     });
   }
@@ -156,6 +130,26 @@ export default class OopTabTableModal extends React.PureComponent {
     this.btnEle.blur();
   }
 
+  handleTableLoad = ()=>{
+    const {tableCfg} = this.props;
+    if (tableCfg.onLoad) {
+      const currentSelectTreeNode = this.oopTreeTable.getCurrentSelectTreeNode();
+      if (currentSelectTreeNode) {
+        if (currentSelectTreeNode.key) {
+          tableCfg.onLoad(currentSelectTreeNode.key);
+        }
+        if (currentSelectTreeNode.title) {
+          this.setState({
+            tableCfg: {
+              ...tableCfg,
+              title: currentSelectTreeNode.title
+            }
+          });
+        }
+      }
+    }
+  }
+
   renderSelected = () => {
     const {selectedRecord} = this.state;
     if (selectedRecord.length > 0) {
@@ -188,22 +182,27 @@ export default class OopTabTableModal extends React.PureComponent {
       },
       columns,
       defaultSelected,
-      listCfg = {
-        dataSource: []
+      filterColums,
+      treeCfg = {
+        dataSource: [],
+        defaultSelectedKeys: []
       },
       // size,
       tableCfg = {
-        list: [],
-        total: 0
+        data: [],
+        title: '',
+        total: 0,
       },
-      title = '',
+      modalTitle = '',
     } = this.props;
     const {
       modalVisible,
+      tableCfg: tableCfgState,
       selectedRecord,
-      activeListItem
     } = this.state;
     const selectedRowKeys = selectedRecord.map((item) => { return item.id });
+
+    const tableTitle = tableCfgState.title ? tableCfgState.title : tableCfg.title;
 
     return (
       <Fragment>
@@ -220,7 +219,7 @@ export default class OopTabTableModal extends React.PureComponent {
           destroyOnClose={true}
           onCancel={this.handleModalCancel}
           onOk={this.handleModalOk}
-          title={title}
+          title={modalTitle}
           visible={modalVisible}
           width={800}
           wrapClassName={styles.assignModal}>
@@ -241,52 +240,37 @@ export default class OopTabTableModal extends React.PureComponent {
               })}
             </Col>
           </Row>
-          <Row gutter={16} className={styles.OopTreeTable}>
-            <Col span={18} push={6}>
-              <Card bordered={false} title={activeListItem.name}>
-                <OopSearch
-                  placeholder="请输入"
-                  onInputChange={this.handleTableSearch}
-                  ref={(el) => { this.tableSearch = el && el.getWrappedInstance() }}
-                />
-                <OopTable
-                  grid={{list: tableCfg.list}}
-                  columns={columns}
-                  loading={tableCfg.loading}
-                  _onSelect={this.handleTableSelect}
-                  _onSelectAll={this.handleTableSelectAll}
-                  pagination={{total: tableCfg.total}}
-                  dataDefaultSelectedRowKeys={selectedRowKeys}
-                  // size={size}
-                  ref={(el)=>{ this.table = el }}
-                />
-              </Card>
-            </Col>
-            <Col span={6} pull={18}>
-              <Card bordered={false} title={listCfg.title}>
-                <OopSearch
-                  placeholder="请输入"
-                  onInputChange={this.handleListSearch}
-                  ref={(el) => { this.listSearch = el && el.getWrappedInstance() }}
-                />
-                <Spin spinning={listCfg.loading}>
-                  <List
-                    dataSource={listCfg.dataSource}
-                    renderItem={item => (
-                      <List.Item
-                        className={classNames(styles.listItem, {[styles.listItemActive]: item.id === activeListItem.id})}
-                        >
-                          <div className={styles.listItemContentWrapper} onClick={() => this.handleListClick(item)}>
-                            {item.name}
-                          </div>
-                      </List.Item>
-                    )}
-                    split={false}
-                  />
-                </Spin>
-              </Card>
-            </Col>
-          </Row>
+
+          <OopTreeTable
+            ref={(el)=>{ this.oopTreeTable = el }}
+            table={{
+              columns,
+              dataDefaultSelectedRowKeys: selectedRowKeys,
+              filterColums,
+              grid: {list: tableCfgState.data},
+              gridLoading: tableCfg.loading,
+              onLoad: this.handleTableLoad,
+              oopSearch: {
+                placeholder: '请输入',
+                enterButtonText: '搜索',
+                onInputChange: this.handleTableSearch
+              },
+              _onSelect: this.handleTableSelect,
+              _onSelectAll: this.handleTableSelectAll,
+              pagination: {total: tableCfgState.total},
+              title: tableTitle
+            }}
+            tree={{
+              className: styles.tree,
+              _defaultSelectedKeys: treeCfg.defaultSelectedKeys,
+              title: treeCfg.title,
+              treeLoading: treeCfg.loading,
+              treeData: treeCfg.dataSource,
+              treeTitle: 'name',
+              treeKey: 'id',
+            }}
+            // size={size}
+          />
         </Modal>
       </Fragment>
     );

@@ -17,6 +17,7 @@ export default class OopGroupUserPicker extends React.PureComponent {
       type: 'workflowManager/findGroup',
       payload: {
         moduleName: 'authusergroups',
+        userGroupEnable: 'ALL'
       },
       callback: () => {
         const { workflowManager: {group} } = self.props;
@@ -34,6 +35,13 @@ export default class OopGroupUserPicker extends React.PureComponent {
     });
   }
 
+  handleChange = (data) => {
+    const {onChange} = this.props;
+    if (onChange) {
+      onChange(data);
+    }
+  }
+
   render() {
     const {
       value,
@@ -49,6 +57,28 @@ export default class OopGroupUserPicker extends React.PureComponent {
       {title: '手机号码', dataIndex: 'phone'},
     ]
 
+    const filterColums = [
+      'username', 'name', 'email', 'phone'
+    ]
+
+    const treeCfg = {
+      dataSource: group,
+      loading: listLoading,
+      title: '用户组列表'
+    };
+
+    const tableCfg = {
+      data: user,
+      loading: tableLoading,
+      onLoad: this.findUser,
+      total: user.length
+    };
+
+    if (group.length > 0) {
+      treeCfg.defaultSelectedKeys = [group[0].id];
+      tableCfg.title = group[0].name;
+    }
+
     return (
       <OopTabTableModal
         buttonCfg={{
@@ -58,14 +88,11 @@ export default class OopGroupUserPicker extends React.PureComponent {
         }}
         columns={columns}
         defaultSelected={{ data: value, title: ' 已选处理人:' }}
-        listCfg={{
-          dataSource: group,
-          loading: listLoading,
-          onClick: this.findUser,
-          title: '用户组列表'
-        }}
-        tableCfg={{list: user, loading: tableLoading, total: user.length}}
-        title="指定处理人"
+        filterColums={filterColums}
+        modalTitle="指定处理人"
+        onChange={this.handleChange}
+        tableCfg={tableCfg}
+        treeCfg={treeCfg}
       />
     );
   }
