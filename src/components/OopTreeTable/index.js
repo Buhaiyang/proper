@@ -102,9 +102,9 @@ export default class OopTreeTable extends PureComponent {
       }
       return (
         <TreeNode
-        {...item}
-         dataRef={item}
-         icon={ item.icon ? <Icon type={item.icon} /> : null } />);
+          {...item}
+          dataRef={item}
+          icon={ item.icon ? <Icon type={item.icon} /> : null } />);
     })
     return treeRoot ?
       (
@@ -113,7 +113,7 @@ export default class OopTreeTable extends PureComponent {
           key={treeRoot.key}
           icon={ treeRoot.icon ? <Icon type={treeRoot.icon} /> : null }
           dataRef={{...treeRoot}}>
-        {treeNodes}
+          {treeNodes}
         </TreeNode>)
       : treeNodes
   }
