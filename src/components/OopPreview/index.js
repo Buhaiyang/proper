@@ -49,6 +49,7 @@ export default class OopPreview extends PureComponent {
       modalContent.style.minWidth = '330px';
       modalBody.style.height = `${horHeight}px`;
       modalBody.style.maxHeight = `${innerHeight - 100}px`;
+      modalBody.style.minHeight = '200px';
     });
   }
 
@@ -107,20 +108,21 @@ export default class OopPreview extends PureComponent {
   mouseDown = (e) => {
     e.preventDefault();
     if (e.button === 0) {
+      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
       const img = document.getElementById('image');
       const disX = e.clientX - img.offsetLeft;
       const disY = e.clientY - img.offsetTop;
       const { scales } = this.state;
       if (scales > 1) {
         document.body.style.cursor = 'move';
-        img.onmousemove = (event) => {
+        modalBody.onmousemove = (event) => {
           const x = event.clientX - disX;
           const y = event.clientY - disY;
           img.style.left = `${x}px`;
           img.style.top = `${y}px`;
         }
         document.onmouseup = () => {
-          img.onmousemove = null;
+          modalBody.onmousemove = null;
           document.onmouseup = null;
           document.body.style.cursor = 'default';
         }
@@ -169,6 +171,7 @@ export default class OopPreview extends PureComponent {
     return (
       <Modal
         className={styles.OopPreview}
+        maskClosable={false}
         footer={Footer}
         title="."
         {...this.props}
