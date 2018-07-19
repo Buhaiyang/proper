@@ -140,5 +140,64 @@ module.exports = {
         "dataDicType": "BUSINESS"
       }
     ]
-  }
+  },
+  "GET:/push/channels":  {
+    "count": 3,
+    "data": [{
+      "id": "1",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"}, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },{
+      "id": "2",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": null,
+      "ios": { "envProduct": true, "keystorePassword": "1234", "keystoreFilename": "aa_bb_sss.cc", "topic": "sss.sss.sss.sss" },
+      "diplomaId": "12w3e33"
+    },{
+      "id": "3",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX", "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": { "envProduct": true, "keystorePassword": "1234", "keystoreFilename": "aa_bb_sss.cc", "topic": "sss.sss.sss.sss" },
+      "diplomaId": "12w3e33"
+    }]
+  },
+  "PUT:/push/channels": (req, res) => {
+    res.status(200).send('编辑成功')
+  },
+  "POST:/push/channels": (req, res) => {
+    res.status(201).send('创建成功')
+  },
+  "DELETE:/push/channels":(req , res)=>{
+    res.status(202).send('');
+  },
+  "GET:/file/12w3e33/meta":{
+    "id": "01",
+    "fileName": "文件1.p12",
+    "fileDescription": "普通文件",
+    "fileModule": "pep-sys",
+    "fileSize": 1,
+    "fileType": ".p12",
+    "filePath": "D:\u0007\b"
+  },
+  "POST:/file": (req , res)=>{
+    res.send('123e4rr')
+  },
+  "DELETE:/file":(req , res)=>{
+    // res.status(500).send('文件删除失败');
+    res.status(202).send('');
+  },
 }

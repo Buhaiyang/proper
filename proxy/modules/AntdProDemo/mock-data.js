@@ -223,6 +223,41 @@ const systemDic = {
   ]
 }
 
+const systePage = {
+  "count": 3,
+  "data": [{
+    "id": "1",
+    "name": "MobileOA",
+    "desc": "xx医院",
+    "msgSaveDays": 3,
+    "maxSendCount": 5,
+    "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+    "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+    "ios": null,
+    "diplomaId": null
+  },{
+    "id": "2",
+    "name": "MobileOA",
+    "desc": "xx医院",
+    "msgSaveDays": 3,
+    "maxSendCount": 5,
+    "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+    "android": null,
+    "ios": { "envProduct": true, "keystorePassword": "1234", "keystoreFilename": "aa_bb_sss.cc", "topic": "sss.sss.sss.sss" },
+    "diplomaId": "12w3e33"
+  },{
+    "id": "3",
+    "name": "MobileOA",
+    "desc": "xx医院",
+    "msgSaveDays": 3,
+    "maxSendCount": 5,
+    "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+    "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX", "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+    "ios": { "envProduct": true, "keystorePassword": "1234", "keystoreFilename": "aa_bb_sss.cc", "topic": "sss.sss.sss.sss" },
+    "diplomaId": "12w3e33"
+  }]
+}
+
 function queryList(type) {
   let list = {};
   if (type === 'authusers') {
@@ -237,6 +272,8 @@ function queryList(type) {
     list = systemConfig;
   }  else if (type === 'systemdictionary') {
     list = systemDic;
+  } else if (type === 'systempagepush') {
+    list = systePage;
   }
   return list;
 }
