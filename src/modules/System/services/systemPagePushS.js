@@ -17,3 +17,6 @@ export async function remove(param) {
     method: 'DELETE'
   })
 }
+export async function fetch() {
+  return request('/push/channels');
+}

@@ -58,14 +58,12 @@ const ModalForm = Form.create()((props) => {
     callback();
   }
   const handleChangeIos = (e)=>{
-    // setCheckIos(e.target.checked);
     setCheckIos(e);
     () => {
       form.validateFields(['ios'], { force: true });
     }
   }
   const handleChangeAnd = (e)=>{
-    // setCheckAndorid(e.target.checked);
     setCheckAndorid(e);
     () => {
       form.validateFields(['android'], { force: true });
@@ -174,7 +172,6 @@ const ModalForm = Form.create()((props) => {
         {...formItemLayout}
         label="配置项">
         {form.getFieldDecorator('choseId', {
-            // initialValue: !isCreate,
             initialValue: isCreate ? [] : choseType(),
             rules: [{ required: true, message: '至少配置一种'},
             {validator: validateIsChoseFile, message: '请选择配置项' }]
@@ -216,7 +213,6 @@ const ModalForm = Form.create()((props) => {
           {
             "envProduct": true,
             "keystorePassword": "1234",
-            "keystoreFilename": "aa_bb_sss.cc",
             "topic": "sss.sss.sss.sss"
           }'
       >
@@ -265,7 +261,6 @@ const ModalForm = Form.create()((props) => {
   systemPagePush,
   global,
   loading: loading.models.systemPagePush,
-  gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class PagePush extends React.PureComponent {
   state = {
@@ -285,14 +280,19 @@ export default class PagePush extends React.PureComponent {
     // 是否配置ios
     checkIos: false,
     nowFileId: null,
+    list: [],
   }
   componentDidMount() {
     this.onLoad();
   }
-  onLoad = (param = {})=>{
-    const {pagination} = param;
-    this.oopSearch.load({
-      pagination,
+  onLoad = ()=>{
+    this.props.dispatch({
+      type: 'systemPagePush/fetch',
+      callback: (res)=>{
+        this.setState({
+          list: res.result.data
+        })
+      }
     })
   }
   handleRemove = (record)=>{
@@ -528,10 +528,15 @@ export default class PagePush extends React.PureComponent {
       checkAndorid: flag
     })
   }
+  filterPage = (inputValue, filter) => {
+    const { systemPagePush: { pageList } } = this.props;
+    const list = inputValue ? filter(pageList, ['name', 'msgSaveDays', 'maxSendCount', 'desc']) : pageList;
+    this.setState({list})
+  }
   render() {
-    const { loading, global: { oopSearchGrid, size }, gridLoading} = this.props;
+    const { loading, global: { size } } = this.props;
     const { detailVisible, modalFormVisible, info, addOrEditModalTitle, closeConfirmConfig,
-      isCreate, fileLoading, fileList, checkAndorid, checkIos, nowFileId } = this.state;
+      isCreate, fileLoading, fileList, checkAndorid, checkIos, nowFileId, list } = this.state;
     const { columns } = {columns: [
       {title: '渠道名称', dataIndex: 'name', render: (text, record)=>(
         <span
@@ -580,14 +585,14 @@ export default class PagePush extends React.PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="systempagepush"
+          onInputChange={this.filterPage}
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
           <OopTable
-            loading={gridLoading}
-            grid={oopSearchGrid}
+            loading={!!loading}
+            grid={{list}}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}

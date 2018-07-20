@@ -142,21 +142,21 @@ module.exports = {
     ]
   },
   "GET:/push/channels":  {
-    "count": 3,
+    "count": 11,
     "data": [{
       "id": "1",
-      "name": "MobileOA",
+      "name": "aaaaa",
       "desc": "xx医院",
       "msgSaveDays": 3,
       "maxSendCount": 5,
       "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
-      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"}, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
       "ios": null,
       "diplomaId": null
     },{
       "id": "2",
       "name": "MobileOA",
-      "desc": "xx医院",
+      "desc": "bbbbb",
       "msgSaveDays": 3,
       "maxSendCount": 5,
       "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
@@ -173,6 +173,94 @@ module.exports = {
       "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX", "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
       "ios": { "envProduct": true, "keystorePassword": "1234", "keystoreFilename": "aa_bb_sss.cc", "topic": "sss.sss.sss.sss" },
       "diplomaId": "12w3e33"
+    },
+    {
+      "id": "4",
+      "name": "MobileOA",
+      "desc": "ddddd",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "5",
+      "name": "MobileOA",
+      "desc": "cccc",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "6",
+      "name": "MobileOA",
+      "desc": "rrrrr",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "7",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "8",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "9",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "10",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
+    },
+    {
+      "id": "11",
+      "name": "MobileOA",
+      "desc": "xx医院",
+      "msgSaveDays": 3,
+      "maxSendCount": 5,
+      "secretKey": "b2024e00064bc5d8db70fdee087eae4f",
+      "android": { "huawei": { "theAppId": "X", "theAppSecret": "XX",  "theAppPackage": "sss.sss.sss.sss"  }, "xiaomi": { "theAppSecret": "XXX", "theAppPackage": "sss.sss.sss.sss" } },
+      "ios": null,
+      "diplomaId": null
     }]
   },
   "PUT:/push/channels": (req, res) => {
