@@ -34,14 +34,14 @@ export default class OopPreview extends PureComponent {
       horWidth,
       verWidth
     }, () => {
-      const wrap = document.getElementsByClassName('ant-modal-wrap')[0];
-      const modalContent = document.getElementsByClassName('ant-modal-content')[0];
+      const img = document.getElementById('image');
+      const modalBody = img.offsetParent;
+      const modalContent = modalBody.offsetParent;
       const modalWrap = modalContent.offsetParent;
-      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
+      const wrap = modalWrap.offsetParent;
       wrap.style.display = 'flex';
       wrap.style.justifyContent = 'center';
       wrap.style.alignItems = 'center';
-      wrap.style.zIndex = 2000;
       modalWrap.style.width = `${horWidth}px`;
       modalWrap.style.minWidth = '330px';
       modalWrap.style.maxWidth = `${innerWith}px`;
@@ -108,8 +108,8 @@ export default class OopPreview extends PureComponent {
   mouseDown = (e) => {
     e.preventDefault();
     if (e.button === 0) {
-      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
       const img = document.getElementById('image');
+      const modalBody = img.offsetParent;
       const disX = e.clientX - img.offsetLeft;
       const disY = e.clientY - img.offsetTop;
       const { scales } = this.state;
@@ -171,6 +171,8 @@ export default class OopPreview extends PureComponent {
     return (
       <Modal
         className={styles.OopPreview}
+        zIndex={1001}
+        destroyOnClose={true}
         maskClosable={false}
         footer={Footer}
         title="."

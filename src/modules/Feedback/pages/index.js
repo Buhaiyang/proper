@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Input, Select, List, Card, Spin, Modal, Button, message, Icon, Tooltip } from 'antd';
+import { Input, Select, List, Card, Spin, Modal, Button, message } from 'antd';
 import { connect } from 'dva';
 import InfiniteScroll from 'react-infinite-scroller';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
@@ -8,6 +8,7 @@ import styles from './index.less';
 import Ellipsis from './../../../components/Ellipsis/index';
 import { oopToast } from './../../../common/oopUtils';
 import { getApplicationContextUrl } from './../../../utils/utils';
+import OopPreview from '../../../components/OopPreview/index';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -35,7 +36,6 @@ export default class Feedback extends React.Component {
     btnColor: '#1da57a',
     visibleBtn: true,
     preView: false,
-    degs: 0,
     imgUrl: '',
     tokenFix: window.localStorage.getItem('proper-auth-login-token')
   }
@@ -189,28 +189,14 @@ export default class Feedback extends React.Component {
   preViewPic = (flag, id) => {
     this.setState({
       preView: flag,
-      degs: 0,
       imgUrl: flag ? `${getApplicationContextUrl()}/file/${id}?token=${this.state.tokenFix}` : ''
     });
-  }
-
-  // 旋转
-  rotate = (index) => {
-    if (index) {
-      this.setState({
-        degs: this.state.degs > 0 ? (this.state.degs - 90) : 270
-      });
-    } else {
-      this.setState({
-        degs: this.state.degs < 270 ? (this.state.degs + 90) : 0
-      });
-    }
   }
 
   render() {
     const { global: {size}, loading } = this.props;
     const { data, itemArray, viewVisible, btnColor, feedbackStatus,
-      visibleBtn, preView, degs, imgUrl, tokenFix } = this.state;
+      visibleBtn, preView, imgUrl, tokenFix } = this.state;
 
     return (
       <PageHeaderLayout content={
@@ -269,6 +255,7 @@ export default class Feedback extends React.Component {
                               style={{height: 50, cursor: 'pointer'}}
                               alt=""
                               onClick={() =>
+                                // eslint-disable-next-line
                                 this.preViewPic(true, item.feedBackDocuments[item.feedBackDocuments.length - 1].pictureId)
                               }
                               src={`${getApplicationContextUrl()}/file/${item.feedBackDocuments[item.feedBackDocuments.length - 1].pictureId}?token=${tokenFix}`} />
@@ -276,7 +263,7 @@ export default class Feedback extends React.Component {
                           )) : ''}
                     </Ellipsis>
                     <span style={{position: 'absolute', bottom: '16px', left: '16px'}}>
-                      {item.userTel.substr(0, 11)}
+                      {item.userTel ? item.userTel.substr(0, 11) : ''}
                     </span>
                     <span style={{position: 'absolute', bottom: '16px', right: '16px'}}>
                       {item.feedBackDocuments[item.feedBackDocuments.length - 1] ?
@@ -409,87 +396,16 @@ export default class Feedback extends React.Component {
             </div>
           </div>
         </Modal>
-        <Modal
-          style={{transform: `rotate(${this.state.degs}deg)`}}
-          className={styles.preViewModal}
-          visible={preView}
-          closable={false}
-          footer={null}
-          onCancel={() => this.preViewPic(false)} >
-          <img
-            style={{maxWidth: 600}}
-            alt=""
-            src={imgUrl} />
-          {degs === 0 ? (
-            <Fragment>
-              <a
-                style={{position: 'absolute', left: 0, top: '50%', marginTop: -12}}
-                onClick={() => this.rotate(0)}>
-                <Tooltip title="顺时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-              <a
-                style={{position: 'absolute', right: 0, top: '50%', marginTop: -12, transform: 'rotateX(180deg)'}}
-                onClick={() => this.rotate(1)}>
-                <Tooltip title="逆时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-            </Fragment>
-          ) : (degs === 90 ? (
-            <Fragment>
-              <a
-                style={{position: 'absolute', left: '50%', bottom: 0, marginLeft: -12, transform: 'rotate(-90deg)'}}
-                onClick={() => this.rotate(0)}>
-                <Tooltip title="顺时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-              <a
-                style={{position: 'absolute', right: '50%', top: 0, marginRight: -12, transform: 'rotateZ(90deg) rotateY(180deg)'}}
-                onClick={() => this.rotate(1)}>
-                <Tooltip title="逆时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-            </Fragment>
-          ) : (degs === 180 ? (
-            <Fragment>
-              <a
-                style={{position: 'absolute', right: 0, top: '50%', marginTop: -12, transform: 'rotate(180deg)'}}
-                onClick={() => this.rotate(0)}>
-                <Tooltip title="顺时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-              <a
-                style={{position: 'absolute', left: 0, top: '50%', marginTop: -12, transform: 'rotateX(180deg) rotateZ(180deg)'}}
-                onClick={() => this.rotate(1)}>
-                <Tooltip title="逆时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-            </Fragment>
-          ) : (
-            <Fragment>
-              <a
-                style={{position: 'absolute', left: '50%', top: 0, marginLeft: -12, transform: 'rotate(90deg)'}}
-                onClick={() => this.rotate(0)}>
-                <Tooltip title="顺时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-              <a
-                style={{position: 'absolute', right: '50%', bottom: 0, marginRight: -12, transform: 'rotateZ(270deg) rotateY(180deg)'}}
-                onClick={() => this.rotate(1)}>
-                <Tooltip title="逆时针旋转">
-                  <Icon type="reload" style={{ fontSize: 24, color: '#424242' }} />
-                </Tooltip>
-              </a>
-            </Fragment>
-          )))}
-        </Modal>
+        {preView ? (
+          <OopPreview
+            visible={preView}
+            onCancel={() => this.preViewPic(false)}
+            img={{
+              src: imgUrl,
+              alt: '头像'
+            }}
+          />
+        ) : ''}
       </PageHeaderLayout>
     );
   }
