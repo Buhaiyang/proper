@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Card, Form, Input, Button, InputNumber, Spin, Checkbox, message } from 'antd';
+import { Modal, Card, Form, Input, Button, InputNumber, Spin, Checkbox } from 'antd';
 import {connect} from 'dva';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import {inject} from '../../../common/inject';
@@ -29,12 +29,12 @@ const ModalForm = Form.create()((props) => {
     checkAndorid, checkIos, setCheckAndorid, setCheckIos, handleDeleteFile, nowFileId } = props;
   const validateFileId = (rule, value, callback) => {
     if (!value) {
-      callback('配置ios 必须上传证书')
+      callback()
       return false;
     }
     if (value.fileList) {
-      if (value.fileList.length === 0) {
-        callback('配置ios 必须上传证书')
+      if (value.file.type !== 'application/x-pkcs12') {
+        callback()
         return false;
       }
     }
@@ -57,17 +57,16 @@ const ModalForm = Form.create()((props) => {
     }
     callback();
   }
+  const setForce = (type) => {
+    form.validateFields([type], { force: true });
+  };
   const handleChangeIos = (e)=>{
     setCheckIos(e);
-    () => {
-      form.validateFields(['ios'], { force: true });
-    }
+    setForce('ios')
   }
   const handleChangeAnd = (e)=>{
     setCheckAndorid(e);
-    () => {
-      form.validateFields(['android'], { force: true });
-    }
+    setForce('android')
   }
   const choseGroup = (ios, and)=>{
     handleChangeIos(ios);
@@ -138,7 +137,9 @@ const ModalForm = Form.create()((props) => {
         >
           {form.getFieldDecorator('msgSaveDays', {
             initialValue: editInfo.msgSaveDays,
-            rules: [{ required: true, message: '保留时间不能为空，且区间为1~5'}],
+            rules: [{ required: true, message: '保留时间不能为空'},
+            { pattern: /^[0-9]*$/, message: '保留时间只能为数字，且区间为1~5'},
+          ],
           })(
             <InputNumber min={1} max={5} placeholder="请输入" />
           )}
@@ -233,7 +234,7 @@ const ModalForm = Form.create()((props) => {
             initialValue: nowFileId,
             rules: [
               {
-                required: checkIos, message: '请上传“.p12”类型的文件'
+                required: checkIos, message: '请上传.p12类型的文件'
 
               }, {
                 validator: validateFileId
@@ -281,6 +282,7 @@ export default class PagePush extends React.PureComponent {
     checkIos: false,
     nowFileId: null,
     list: [],
+    isDeleteIosFile: false
   }
   componentDidMount() {
     this.onLoad();
@@ -345,13 +347,14 @@ export default class PagePush extends React.PureComponent {
     setTimeout(() => {
       this.setState({
         isCreate: true,
+        isDeleteIosFile: false,
         closeConfirmConfig: {
           visible: false
         },
         fileList: [],
         checkAndorid: false,
         checkIos: false,
-        nowFileId: this.state.info.diplomaId,
+        nowFileId: null,
       });
     }, 300);
   }
@@ -412,7 +415,7 @@ export default class PagePush extends React.PureComponent {
       addOrEditModalTitle: '新建',
       isCreate: flage,
       nowFileId: null,
-      info: {secretKey: 'b2024e00064bc5d8db70fdee087eae4f', maxSendCount: 5, msgSaveDays: 3} // 默认值
+      info: {secretKey: 'b2024e00064bc5d8db70fdee087eae4f', maxSendCount: 5, msgSaveDays: 3}// 默认值
     })
   }
   handleFormChange = () => {
@@ -424,9 +427,17 @@ export default class PagePush extends React.PureComponent {
       }
     });
   };
+  clearFormDiplomaId = (basicUserForm) => {
+    basicUserForm.setFields({
+      diplomaId: {
+        value: null,
+        errors: [new Error('请上传.p12类型的文件')],
+      },
+    })
+  }
   onSubmitForm = () => {
     const self = this;
-    const { checkAndorid, checkIos } = this.state;
+    const { checkAndorid, checkIos, isDeleteIosFile } = this.state;
     const basicUserForm = this.basic.getForm();
     let andJson = null;
     let iosJson = null;
@@ -448,22 +459,23 @@ export default class PagePush extends React.PureComponent {
             iosJson = JSON.parse(ios.replace(/\s+/g, ''));
           }
           if (typeof diplomaId === 'object') {
-            fileId = diplomaId && diplomaId.file && diplomaId.file.response;
-            // 编辑状态，删除列表,传至fileID 为null
-            if (diplomaId && diplomaId.fileList.length === 0) {
-              fileId = null;
+            if (isDeleteIosFile || diplomaId.file.type !== 'application/x-pkcs12') {
+              this.clearFormDiplomaId(basicUserForm);
+              return false;
+            } else {
+              fileId = diplomaId && diplomaId.file && diplomaId.file.response;
             }
           }
           if (typeof diplomaId === 'string') {
             fileId = diplomaId;
           }
+          if (isDeleteIosFile) {
+            this.clearFormDiplomaId(basicUserForm);
+            return false;
+          }
         } else {
           iosJson = null;
           fileId = null;
-        }
-        if (!ios && !android) {
-          message.warning('android 或者 ios 至少配置一个')
-          return false;
         }
         this.props.dispatch({
           type: 'systemPagePush/saveOrUpdate',
@@ -490,9 +502,9 @@ export default class PagePush extends React.PureComponent {
                 closeConfirmConfig: {
                   visible: false
                 },
-                warningField: {},
                 info: {},
                 modalFormVisible: false,
+                isDeleteIosFile: false
               });
             }
           }
@@ -507,16 +519,21 @@ export default class PagePush extends React.PureComponent {
   }
   handleUploadChange = (info) => {
     let { fileList } = info;
-    fileList = fileList.filter((item)=>{
-      return item.type === 'application/x-pkcs12'
-    }).slice(-1);
+    const { file } = info;
+    if (file.type !== 'application/x-pkcs12') {
+      fileList = [];
+    } else if (file.status === 'done') {
+      fileList = fileList.filter((item)=>{
+        return item.type === 'application/x-pkcs12'
+      }).slice(-1);
+    }
     this.setState({
       fileList,
-      nowFileId: 'nowfileid'
+      isDeleteIosFile: false
     })
   }
-  handleDeleteFile= ()=>{
-    this.setState({fileList: [], nowFileId: null})
+  handleDeleteFile = ()=>{
+    this.setState({fileList: [], isDeleteIosFile: true})
   }
   setCheckIos = (flage) => {
     this.setState({
