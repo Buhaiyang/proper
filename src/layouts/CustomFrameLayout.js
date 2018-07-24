@@ -19,6 +19,9 @@ const IOSHeaer = (props)=>{
 }
 
 export default class CustomFrameLayout extends React.PureComponent {
+  state = {
+    title: decodeURIComponent(getParamObj(this.props.location.search).title)
+  }
   isAndroid = ()=>{
     const {userAgent} = navigator;
     return userAgent.includes('Android') || userAgent.includes('Adr');
@@ -43,10 +46,9 @@ export default class CustomFrameLayout extends React.PureComponent {
     window.localStorage.setItem('If_Can_Back', 'back');
   }
   render() {
-    const transParams = getParamObj(this.props.location.search);
     return (
       <div className={styles.customFrame}>
-        {this.isIOS() ? <IOSHeaer text="返回" onclick={this.handleBack} title={decodeURIComponent(transParams.title)} /> : null}
+        {this.isIOS() ? <IOSHeaer text="返回" onclick={this.handleBack} title={this.state.title} /> : null}
         <Layout style={{paddingTop: this.isIOS() ? 44 : 0}}>
           <Content>
             <Switch>

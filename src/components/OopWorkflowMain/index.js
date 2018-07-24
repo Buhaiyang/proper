@@ -8,9 +8,18 @@ import {connect} from 'dva/index';
 import { Tabs, Spin, Timeline, message } from 'antd';
 import {inject} from '../../common/inject';
 import OopForm from '../OopForm';
+import OopPreview from '../OopPreview';
 import {getApplicationContextUrl} from '../../utils/utils';
 import styles from './index.less';
 
+const isAndroid = ()=>{
+  const {userAgent} = navigator;
+  return userAgent.includes('Android') || userAgent.includes('Adr');
+}
+const isIOS = ()=>{
+  const {userAgent} = navigator;
+  return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+}
 const { TabPane } = Tabs;
 const BusinessPanel = (props)=>{
   const {self, formConfig = {}, defaultValue = {}, formLoading, isLaunch, taskOrProcDefKey} = props;
@@ -63,7 +72,8 @@ const BusinessPanel = (props)=>{
 }), null, null, {withRef: true})
 export default class OopWorkflowMain extends PureComponent {
   state = {
-    // defaultActiveKey: 'handle'
+    imagePreviewVisible: false,
+    isApp: isAndroid() || isIOS()
   }
   // 根据表单ID获取表单对象
   componentDidMount() {
@@ -111,31 +121,31 @@ export default class OopWorkflowMain extends PureComponent {
     const { baseWorkflow: {processProgress: {currentTasks = [], hisTasks = [], start = {}}} } = this.props;
     const title = (<h2>流程历史</h2>);
     return (
-    <div>
-      {title}
-      <Timeline style={{marginLeft: 192}}>
-        {currentTasks.length && (
+      <div>
+        {title}
+        <Timeline style={{marginLeft: 192}}>
+          {currentTasks.length && (
+            <Timeline.Item>
+              <h3>{currentTasks[0].name}</h3>
+              <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
+              <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
+            </Timeline.Item>)}
+          {hisTasks.map(it=>(
+            <Timeline.Item key={it.taskId}>
+              <h3>{it.name}</h3>
+              {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
+              {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
+              {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}
+              <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{it.endTime}</div>
+            </Timeline.Item>)
+          )}
           <Timeline.Item>
-            <h3>{currentTasks[0].name}</h3>
-            <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
-            <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
-          </Timeline.Item>)}
-        {hisTasks.map(it=>(
-        <Timeline.Item key={it.taskId}>
-          <h3>{it.name}</h3>
-          {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
-          {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
-          {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}
-          <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{it.endTime}</div>
-        </Timeline.Item>)
-        )}
-        <Timeline.Item>
-          <h3>{start.name}</h3>
-          <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
-          <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{start.createTime}</div>
-        </Timeline.Item>
-      </Timeline>
-    </div>);
+            <h3>{start.name}</h3>
+            <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
+            <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{start.createTime}</div>
+          </Timeline.Item>
+        </Timeline>
+      </div>);
   }
   // 获取流程图
   getProcessImageTab = ()=>{
@@ -145,20 +155,30 @@ export default class OopWorkflowMain extends PureComponent {
     const context = getApplicationContextUrl();
     let imgUrl = null;
     if (stateCode === 'DONE') {
-      imgUrl = `/repository/process-definitions/${processDefinitionId}/diagram?token=${token}`;
+      imgUrl = `/repository/process-definitions/${processDefinitionId}/diagram?access_token=${token}`;
     } else {
-      imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?token=${token}`;
+      imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?access_token=${token}`;
     }
     if (!imgUrl) {
       return null
     }
     return (
-    <div>
-      {title}
-      <div style={{textAlign: 'center', overflowX: 'auto'}}>
-        <a href={`${context}${imgUrl}`} target="_blank"><img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} /></a>
-      </div>
-    </div>)
+      <div>
+        {title}
+        <div style={{textAlign: 'center', overflowX: 'auto'}}>
+          <img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} onClick={this.handlePreviewImage} />
+        </div>
+        {(this.state.isApp && this.state.imagePreviewVisible) ? (
+          <OopPreview
+            visible={this.state.imagePreviewVisible}
+            onCancel={this.handleClosePreviewImage}
+            isApp={this.state.isApp}
+            img={{
+              src: `${context}${imgUrl}`,
+              alt: '流程图',
+            }}
+          />) : null}
+      </div>);
   }
   // 点击tab变化
   handleTabsChange = (key)=>{
@@ -229,10 +249,20 @@ export default class OopWorkflowMain extends PureComponent {
       })
     });
   }
+  handlePreviewImage = ()=>{
+    this.setState({
+      imagePreviewVisible: true
+    })
+  }
+  handleClosePreviewImage = ()=>{
+    this.setState({
+      imagePreviewVisible: false
+    })
+  }
   render() {
     return (
       <div className={styles.container}>
         {this.renderPage()}
-    </div>);
+      </div>);
   }
 }
