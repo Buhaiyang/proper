@@ -1,5 +1,5 @@
 {
-  "entry": "src/index.js",
+  "entry": "src/framework/index/index.js",
   "extraBabelPlugins": [
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
   ],
@@ -11,9 +11,9 @@
     }
   },
   "ignoreMomentLocale": true,
-  "theme": "./src/theme.js",
+  "theme": "./src/config/theme.js",
   "html": {
-    "template": "./src/index.ejs"
+    "template": "./src/framework/index/index.ejs"
   },
   "publicPath": "/",
   "disableDynamicImport": false,

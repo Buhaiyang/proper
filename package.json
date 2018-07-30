@@ -2,7 +2,6 @@
   "name": "proper-enterprise-app",
   "version": "0.4.4",
   "description": "propersoft enterprise application",
-  "private": true,
   "scripts": {
     "precommit": "npm run lint-staged",
     "start": "cross-env ESLINT=none roadhog dev",
@@ -25,8 +24,8 @@
   "dependencies": {
     "@antv/data-set": "^0.8.0",
     "@babel/polyfill": "^7.0.0-beta.36",
-    "@pea/module-auth": "^0.4.0",
-    "@pea/module-workflow": "^0.4.0",
+    "@pea/framework": "0.4.4",
+    "@pea/lib": "0.4.4",
     "antd": "^3.3.0",
     "av-core": "^1.1.1",
     "babel-preset-umi": "^0.2.8",
