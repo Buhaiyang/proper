@@ -1,7 +1,8 @@
-import React from 'react';
-import { List, Icon, Tabs, Badge } from 'antd';
+import React, {Fragment} from 'react';
+import { List, Icon, Tabs, Badge, Spin } from 'antd';
 import {connect} from 'dva';
 import {routerRedux} from 'dva/router';
+import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
 import {inject} from '../../../../framework/common/inject';
 import styles from './index.less';
@@ -40,32 +41,15 @@ export default class Workflow extends React.PureComponent {
   state = {
     activeKey: 'task',
     activeIndex: 0,
-    task: {},
-    design: {},
-    process: {},
+    task: {data: [], pagination: {}},
+    design: {data: [], pagination: {}},
+    process: {data: [], pagination: {}},
   }
 
   componentDidMount() {
     // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
     window.parent.postMessage('root', '*');
-    this.fetchTask();
-  }
-
-  fetchTask = () => {
-    const self = this;
-    this.props.dispatch({
-      type: 'workflowManager/findTask',
-      payload: {
-        pageNo: 1,
-        pageSize: 100
-      },
-      callback: () => {
-        const { workflowManager } = self.props;
-        this.setState({
-          task: workflowManager.task
-        });
-      }
-    });
+    this.fetchData();
   }
 
   fetchDesign = () => {
@@ -85,55 +69,26 @@ export default class Workflow extends React.PureComponent {
     });
   }
 
-  fetchProcess = () => {
+  fetchData = (page) => {
     const self = this;
+    const { activeKey } = this.state;
+    const {[activeKey]: {pagination} } = this.state
     this.props.dispatch({
-      type: 'workflowManager/findProcess',
+      type: 'global/oopSearchResult',
       payload: {
-        pageNo: 1,
-        pageSize: 100
+        moduleName: `workflow_${activeKey}`,
+        pageNo: page || 1,
+        pageSize: pagination.pageSize || 10,
       },
       callback: () => {
-        const { workflowManager } = self.props;
+        const { global } = self.props;
+        const { [activeKey]: listState } = this.state;
         this.setState({
-          process: workflowManager.process
+          [activeKey]: {
+            data: [...((!page || page === '1') ? [] : listState.data), ...global.oopSearchGrid.list],
+            pagination: global.oopSearchGrid.pagination
+          }
         });
-      }
-    });
-  }
-
-  handleSearchTask = (inputValue, filter) => {
-    const { workflowManager: { task } } = this.props;
-    const filterList = inputValue ? filter(task.data, ['pepProcInstVOprocessDefinitionName', 'pepProcInstVOstartUserName', 'pepProcInstVOstateValue']) : task.data;
-    this.setState({
-      task: {
-        ...task,
-        data: filterList,
-        total: filterList.length
-      }
-    });
-  }
-
-  handleSearchDesign = (inputValue, filter) => {
-    const { workflowManager: { design } } = this.props;
-    const filterList = inputValue ? filter(design.data, ['name', 'processVersion']) : design.data;
-    this.setState({
-      design: {
-        ...design,
-        data: filterList,
-        total: filterList.length
-      }
-    });
-  }
-
-  handleSearchProcess = (inputValue, filter) => {
-    const { workflowManager: { process } } = this.props;
-    const filterList = inputValue ? filter(process.data, ['processDefinitionName', 'stateValue']) : process.data;
-    this.setState({
-      process: {
-        ...process,
-        data: filterList,
-        total: filterList.length
       }
     });
   }
@@ -148,16 +103,16 @@ export default class Workflow extends React.PureComponent {
     this.setState({
       activeKey: key,
       activeIndex,
-      task: {},
-      design: {},
-      process: {},
+      task: {data: [], pagination: {}},
+      design: {data: [], pagination: {}},
+      process: {data: [], pagination: {}},
     }, () => {
       if (key === 'task') {
-        self.fetchTask();
+        self.fetchData();
       } else if (key === 'design') {
         self.fetchDesign();
       } else if (key === 'process') {
-        self.fetchProcess();
+        self.fetchData();
       }
     });
   }
@@ -182,7 +137,7 @@ export default class Workflow extends React.PureComponent {
       taskOrProcDefKey: taskId,
       procInstId,
       name,
-      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`},
+      businessObj: {...form, formTitle: `${record.pepProcInstVO.startUserName}的${record.pepProcInstVOprocessDefinitionName}`},
       stateCode: undefined
     }));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
@@ -212,9 +167,11 @@ export default class Workflow extends React.PureComponent {
   afterProcessSubmit = ()=>{
     this.handleTabsChange(this.state.activeKey);
   }
+
   render() {
     const {
       loading,
+      gridLoading
     } = this.props;
     const {
       task,
@@ -232,46 +189,62 @@ export default class Workflow extends React.PureComponent {
           className={styles.tabs}
           onChange={this.handleTabsChange}
           ref={(el)=>{ this.tabs = el }}>
-          <TabPane key="task" tab="待办" />
-          <TabPane key="design" tab="发起" />
-          <TabPane key="process" tab="发起历史" />
+            <TabPane key="task" tab="待办" />
+            <TabPane key="design" tab="发起" />
+            <TabPane key="process" tab="发起历史" />
         </Tabs>
         <div className={classNames(styles.tabsContent, styles.tabsContentAnimated)} style={{marginLeft: `${-activeIndex * 100}%`}}>
           <div className={classNames(styles.tabsTabpane,
-                            {
-                              [styles.tabsTabpaneActive]: (activeKey === 'task'),
-                              [styles.tabsTabpaneInactive]: (activeKey !== 'task')
-                            }
-                          )}>
-            <List
-              itemLayout="horizontal"
-              dataSource={task.data}
-              loading={loading}
-              renderItem={item => (
-                <div className={styles.listItemWrapper}>
-                  <div className={styles.listLine}>
-                    <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
-                      <List.Item actions={[<Icon type="right" />]}>
-                        <List.Item.Meta
-                          title={item.pepProcInstVOprocessDefinitionName}
-                          description={<div><div>{item.pepProcInstVOcreateTime}</div><div><span>发起人: </span><span>{item.pepProcInstVOstartUserName}</span></div></div>}
-                        />
-                        <div className={styles.listContent}>
-                          {item.pepProcInstVOstateValue}
-                        </div>
-                      </List.Item>
-                    </a>
-                  </div>
+            {
+              [styles.tabsTabpaneActive]: (activeKey === 'task'),
+              [styles.tabsTabpaneInactive]: (activeKey !== 'task')
+            }
+          )}>
+            {activeKey === 'task' ? (
+              <Fragment>
+              <InfiniteScroll
+                initialLoad={false}
+                pageStart={1}
+                loadMore={this.fetchData}
+                hasMore={!gridLoading && task.data.length < task.pagination.count}
+                useWindow={false}
+              >
+                <List
+                  itemLayout="horizontal"
+                  dataSource={task.data}
+                  loading={gridLoading}
+                  renderItem={item => (
+                    <div className={styles.listItemWrapper}>
+                      <div className={styles.listLine}>
+                        <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
+                          <List.Item actions={[<Icon type="right" />]}>
+                            <List.Item.Meta
+                              title={item.pepProcInstVO.processDefinitionName}
+                              description={<div><div>{item.pepProcInstVO.createTime}</div><div><span>发起人: </span><span>{item.pepProcInstVO.startUserName}</span></div></div>}
+                            />
+                            <div className={styles.listContent}>
+                              {item.pepProcInstVO.stateValue}
+                            </div>
+                          </List.Item>
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                />
+              </InfiniteScroll>
+              {gridLoading && task.data.length < task.pagination.count && (
+                <div className={styles.loadingContainer}>
+                  <Spin />
                 </div>
               )}
-            />
+            </Fragment>) : null}
           </div>
           <div className={classNames(styles.tabsTabpane,
-                            {
-                              [styles.tabsTabpaneActive]: (activeKey === 'design'),
-                              [styles.tabsTabpaneInactive]: (activeKey !== 'design')
-                            }
-                          )}>
+            {
+              [styles.tabsTabpaneActive]: (activeKey === 'design'),
+              [styles.tabsTabpaneInactive]: (activeKey !== 'design')
+            }
+          )}>
             <List
               itemLayout="horizontal"
               dataSource={design.data}
@@ -290,10 +263,10 @@ export default class Workflow extends React.PureComponent {
                             status={
                               item.status ?
                                 (item.status.code === 'UN_DEPLOYED' ?
-                                  'default' :
+                                    'default' :
                                     (item.status.code === 'DEPLOYED' ?
-                                      'success' :
-                                      (item.status.code === '2' ? 'processing' : 'error')
+                                        'success' :
+                                        (item.status.code === '2' ? 'processing' : 'error')
                                     )
                                 ) : 'default'
                             }
@@ -308,33 +281,49 @@ export default class Workflow extends React.PureComponent {
             />
           </div>
           <div className={classNames(styles.tabsTabpane,
-                            {
-                              [styles.tabsTabpaneActive]: (activeKey === 'process'),
-                              [styles.tabsTabpaneInactive]: (activeKey !== 'process')
-                            }
-                          )}>
-            <List
-              itemLayout="horizontal"
-              dataSource={process.data}
-              loading={loading}
-              renderItem={item => (
-                <div className={styles.listItemWrapper}>
-                  <div className={styles.listLine}>
-                    <a onClick={ (event)=>{ this.handleProcessView(item, event) }}>
-                      <List.Item actions={[<Icon type="right" />]}>
-                        <List.Item.Meta
-                          title={item.processDefinitionName}
-                          description={item.createTime}
-                        />
-                        <div className={styles.listContent}>
-                          {item.stateValue}
+            {
+              [styles.tabsTabpaneActive]: (activeKey === 'process'),
+              [styles.tabsTabpaneInactive]: (activeKey !== 'process')
+            }
+          )}>
+            {activeKey === 'process' ? (
+              <Fragment>
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={1}
+                  loadMore={this.fetchData}
+                  hasMore={!gridLoading && process.data.length < process.pagination.count}
+                  useWindow={false}
+                >
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={process.data}
+                    loading={gridLoading}
+                    renderItem={item => (
+                      <div className={styles.listItemWrapper}>
+                        <div className={styles.listLine}>
+                          <a onClick={ (event)=>{ this.handleProcessView(item, event) }}>
+                            <List.Item actions={[<Icon type="right" />]}>
+                              <List.Item.Meta
+                                title={item.processDefinitionName}
+                                description={item.createTime}
+                              />
+                              <div className={styles.listContent}>
+                                {item.stateValue}
+                              </div>
+                            </List.Item>
+                          </a>
                         </div>
-                      </List.Item>
-                    </a>
+                      </div>
+                    )}
+                  />
+                </InfiniteScroll>
+                {gridLoading && process.data.length < process.pagination.count && (
+                  <div className={styles.loadingContainer}>
+                    <Spin />
                   </div>
-                </div>
-              )}
-            />
+                )}
+              </Fragment>) : null}
           </div>
         </div>
       </div>

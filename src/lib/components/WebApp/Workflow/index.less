@@ -27,6 +27,8 @@
   width: 100%;
   margin: 0 5px;
   padding-top: 44px;
+  height: 100%;
+  // overflow: hidden;
   &.tabsContentAnimated {
     display: flex;
     flex-direction: row;
@@ -38,6 +40,20 @@
     width: 100%;
     transition: opacity .45s;
     opacity: 1;
+    height: 100%;
+    overflow-y: auto;
+    .loadingContainer {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+      text-align: center;
+    }
+    .buttonMoreContent {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+    }
   }
   & > .tabsTabpaneActive {
     width: 100%;

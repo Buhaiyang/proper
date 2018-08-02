@@ -34,19 +34,21 @@ export const formGenerator = (formConfig)=>{
   if (Array.isArray(formJson) && formJson.length > 0) {
     for (let i = 0; i < formJson.length; i++) {
       const formItemConfig = formJson[i];
-      const {name, initialValue, rules = [], component } = formItemConfig;
-      let formItem = null;
-      let _rules = null;
-      if (name && component) {
-        if (rules.length) {
-          _rules = transformRules(rules);
+      const {name, initialValue, rules = [], component, show = true } = formItemConfig;
+      if (show === true) {
+        let formItem = null;
+        let _rules = null;
+        if (name && component) {
+          if (rules.length) {
+            _rules = transformRules(rules);
+          }
+          const formItemInner = getFieldDecorator(name, {initialValue, rules: _rules})(
+            createComponent(component)
+          );
+          formItem = getFormItem(formItemInner,
+            {...formItemConfig, formItemLayout, rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemSetValue, showSetValueIcon});
+          formItemList.push(formItem);
         }
-        const formItemInner = getFieldDecorator(name, {initialValue, rules: _rules})(
-          createComponent(component)
-        );
-        formItem = getFormItem(formItemInner,
-          {...formItemConfig, formItemLayout, rowItemClick, rowItemIconCopy, rowItemIconDelete, rowItemSetValue, showSetValueIcon});
-        formItemList.push(formItem);
       }
     }
   }

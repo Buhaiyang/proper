@@ -4,12 +4,12 @@ import { Tabs,
   Card,
   Badge } from 'antd';
 import classNames from 'classnames';
-import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
-import { oopToast } from '../../../../framework/common/oopUtils';
 import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import OopWorkflowMainModal from '../../../components/OopWorkflowMainModal';
+import { inject } from './../../../../framework/common/inject';
+import { oopToast } from './../../../../framework/common/oopUtils';
 import styles from './Manager.less';
 
 const { TabPane } = Tabs;
@@ -46,9 +46,7 @@ export default class Manager extends React.PureComponent {
   state = {
     activeKey: 'task',
     activeIndex: 0,
-    task: {},
     design: {},
-    process: {},
     wfVisible: false,
     isLaunch: false,
     taskOrProcDefKey: null,
@@ -57,24 +55,7 @@ export default class Manager extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.fetchTask();
-  }
-
-  fetchTask = () => {
-    const self = this;
-    this.props.dispatch({
-      type: 'workflowManager/findTask',
-      payload: {
-        pageNo: 1,
-        pageSize: 100
-      },
-      callback: () => {
-        const { workflowManager } = self.props;
-        this.setState({
-          task: workflowManager.task
-        });
-      }
-    });
+    this.handleSearchTask();
   }
 
   fetchDesign = () => {
@@ -82,8 +63,6 @@ export default class Manager extends React.PureComponent {
     this.props.dispatch({
       type: 'workflowManager/findDesign',
       payload: {
-        pageNo: 1,
-        pageSize: 100,
         modelType: '0',
         sort: 'modifiedDesc'
       },
@@ -96,33 +75,13 @@ export default class Manager extends React.PureComponent {
     });
   }
 
-  fetchProcess = () => {
-    const self = this;
-    this.props.dispatch({
-      type: 'workflowManager/findProcess',
-      payload: {
-        pageNo: 1,
-        pageSize: 100
-      },
-      callback: () => {
-        const { workflowManager } = self.props;
-        this.setState({
-          process: workflowManager.process
-        });
-      }
-    });
-  }
-
-  handleSearchTask = (inputValue, filter) => {
-    const { workflowManager: { task } } = this.props;
-    const filterList = inputValue ? filter(task.data, ['pepProcInstVOprocessDefinitionName', 'pepProcInstVOstartUserName', 'pepProcInstVOstateValue']) : task.data;
-    this.setState({
-      task: {
-        ...task,
-        data: filterList,
-        total: filterList.length
-      }
-    });
+  handleSearchTask = (param = {})=>{
+    const { pagination } = param;
+    const params = {
+      pagination,
+      ...param,
+    }
+    this.taskSearch.load(params);
   }
 
   handleSearchDesign = (inputValue, filter) => {
@@ -137,16 +96,13 @@ export default class Manager extends React.PureComponent {
     });
   }
 
-  handleSearchProcess = (inputValue, filter) => {
-    const { workflowManager: { process } } = this.props;
-    const filterList = inputValue ? filter(process.data, ['processDefinitionName', 'stateValue']) : process.data;
-    this.setState({
-      process: {
-        ...process,
-        data: filterList,
-        total: filterList.length
-      }
-    });
+  handleSearchProcess = (param = {})=>{
+    const { pagination } = param;
+    const params = {
+      pagination,
+      ...param,
+    }
+    this.processSearch.load(params);
   }
 
   handleTabsChange = (key) => {
@@ -161,22 +117,11 @@ export default class Manager extends React.PureComponent {
       activeIndex
     }, () => {
       if (key === 'task') {
-        self.fetchTask();
+        self.handleSearchTask({pagination: {pageNo: 1, pageSize: 10}});
       } else if (key === 'design') {
         self.fetchDesign();
       } else if (key === 'process') {
-        self.fetchProcess();
-      }
-    });
-  }
-  handleProcessDeployed = (record)=>{
-    console.log('handleProcessDeployed', record);
-    this.props.dispatch({
-      type: 'workflowDesigner/repository',
-      payload: record.id,
-      callback: (res) => {
-        oopToast(res, '部署成功', '部署失败');
-        this.fetchDesign();
+        self.handleSearchProcess({pagination: {pageNo: 1, pageSize: 10}});
       }
     });
   }
@@ -201,10 +146,21 @@ export default class Manager extends React.PureComponent {
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
-      businessObj: {...form, formTitle: `${record.pepProcInstVOstartUserName}的${record.pepProcInstVOprocessDefinitionName}`},
+      businessObj: {...form, formTitle: `${record.pepProcInstVO.startUserName}的${record.pepProcInstVO.processDefinitionName}`},
       name,
       stateCode: undefined
     })
+  }
+  handleProcessDeployed = (record)=>{
+    console.log('handleProcessDeployed', record);
+    this.props.dispatch({
+      type: 'workflowDesigner/repository',
+      payload: record.id,
+      callback: (res) => {
+        oopToast(res, '部署成功', '部署失败');
+        this.fetchDesign();
+      }
+    });
   }
   handleProcessView = (record)=>{
     console.log('handleProcessView', record);
@@ -239,21 +195,20 @@ export default class Manager extends React.PureComponent {
   render() {
     const {
       loading,
-      global: { size },
+      global: { size, oopSearchGrid },
+      gridLoading
     } = this.props;
     const {
-      task,
       design,
-      process,
       activeKey,
       activeIndex
     } = this.state;
     const column = {
       task: [
-        {title: '名称', dataIndex: 'pepProcInstVOprocessDefinitionName'},
-        {title: '发起时间', dataIndex: 'pepProcInstVOcreateTime'},
-        {title: '发起人', dataIndex: 'pepProcInstVOstartUserName'},
-        {title: '当前处理情况', dataIndex: 'pepProcInstVOstateValue', render: (val, record) => {
+        {title: '名称', dataIndex: 'pepProcInstVO.processDefinitionName'},
+        {title: '发起时间', dataIndex: 'pepProcInstVO.createTime'},
+        {title: '发起人', dataIndex: 'pepProcInstVO.startUserName'},
+        {title: '当前处理情况', dataIndex: 'pepProcInstVO.stateValue', render: (val, record) => {
           return (
             <Fragment><div>{val}</div><div>到达时间:{record.createTime}</div></Fragment>
           );
@@ -329,34 +284,34 @@ export default class Manager extends React.PureComponent {
         <Card bordered={false}>
           <div className={classNames(styles.tabsContent, styles.tabsContentAnimated)} style={{marginLeft: `${-activeIndex * 100}%`}}>
             <div className={classNames(styles.tabsTabpane,
-                              {
-                                [styles.tabsTabpaneActive]: (activeKey === 'task'),
-                                [styles.tabsTabpaneInactive]: (activeKey !== 'task')
-                              }
-                            )}>
+              {
+                [styles.tabsTabpaneActive]: (activeKey === 'task'),
+                [styles.tabsTabpaneInactive]: (activeKey !== 'task')
+              }
+            )}>
               <OopSearch
                 placeholder="请输入"
                 enterButtonText="搜索"
-                onInputChange={this.handleSearchTask}
-                ref={(el) => { this.taskSearch = el && el.getWrappedInstance() }}
+                moduleName="workflow_task"
+                ref={(el)=>{ this.taskSearch = el && el.getWrappedInstance() }}
               />
               <OopTable
-                rowKey="taskId"
-                grid={{list: task.data}}
-                columns={column[activeKey]}
-                loading={loading}
-                size={size}
-                rowButtons={actionSubmitColumn}
                 checkable={false}
-                pagination={{total: task.total}}
+                columns={column[activeKey]}
+                grid={oopSearchGrid}
+                loading={gridLoading}
+                onLoad={this.handleSearchTask}
+                rowButtons={actionSubmitColumn}
+                rowKey="taskId"
+                size={size}
               />
             </div>
             <div className={classNames(styles.tabsTabpane,
-                              {
-                                [styles.tabsTabpaneActive]: (activeKey === 'design'),
-                                [styles.tabsTabpaneInactive]: (activeKey !== 'design')
-                              }
-                            )}>
+              {
+                [styles.tabsTabpaneActive]: (activeKey === 'design'),
+                [styles.tabsTabpaneInactive]: (activeKey !== 'design')
+              }
+            )}>
               <OopSearch
                 placeholder="请输入"
                 enterButtonText="搜索"
@@ -374,26 +329,27 @@ export default class Manager extends React.PureComponent {
               />
             </div>
             <div className={classNames(styles.tabsTabpane,
-                              {
-                                [styles.tabsTabpaneActive]: (activeKey === 'process'),
-                                [styles.tabsTabpaneInactive]: (activeKey !== 'process')
-                              }
-                            )}>
+              {
+                [styles.tabsTabpaneActive]: (activeKey === 'process'),
+                [styles.tabsTabpaneInactive]: (activeKey !== 'process')
+              }
+            )}>
+
               <OopSearch
                 placeholder="请输入"
                 enterButtonText="搜索"
-                onInputChange={this.handleSearchProcess}
-                ref={(el) => { this.taskSearch = el && el.getWrappedInstance() }}
+                moduleName="workflow_process"
+                ref={(el)=>{ this.processSearch = el && el.getWrappedInstance() }}
               />
               <OopTable
-                rowKey="procInstId"
-                grid={{list: process.data}}
-                columns={column[activeKey]}
-                loading={loading}
-                size={size}
-                rowButtons={actionViewColumn}
                 checkable={false}
-                pagination={{total: process.total}}
+                columns={column[activeKey]}
+                grid={oopSearchGrid}
+                loading={gridLoading}
+                onLoad={this.handleSearchProcess}
+                rowButtons={actionViewColumn}
+                rowKey="procInstId"
+                size={size}
               />
             </div>
           </div>

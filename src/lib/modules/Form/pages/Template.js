@@ -1,7 +1,6 @@
 import React from 'react';
-import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, DatePicker, message } from 'antd';
+import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
 import {connect} from 'dva';
-import moment from 'moment';
 import OopFormDesigner from '../../../components/OopFormDesigner';
 import OopTable from '../../../components/OopTable';
 import { inject } from '../../../../framework/common/inject';
@@ -132,16 +131,6 @@ const ModalFormBasic = Form.create()((props) => {
                 <Radio value={true}>启用</Radio>
                 <Radio value={false}>停用</Radio>
               </RadioGroup>
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="时间"
-          >
-            {form.getFieldDecorator('dateTime', {
-              initialValue: moment(formBasic.dateTime)
-            })(
-              <DatePicker showTime format="YYYY-MM-DD" />
             )}
           </FormItem>
         </Form>

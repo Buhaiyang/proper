@@ -33,7 +33,7 @@ export default {
   },
 
   effects: {
-    *oopSearchResult({ payload }, { put, call }) {
+    *oopSearchResult({ payload, callback }, { put, call }) {
       const resp = yield call(searchResult, payload);
       yield put({
         type: 'saveOopSearchGrid',
@@ -42,6 +42,7 @@ export default {
           ...payload
         }
       });
+      if (callback) callback();
     },
     *oopSearchSuggest({ payload }, { put, call }) {
       const data = yield call(searchSuggest, payload);

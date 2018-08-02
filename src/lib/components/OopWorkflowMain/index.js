@@ -114,6 +114,24 @@ export default class OopWorkflowMain extends PureComponent {
       type: 'baseWorkflow/clear'
     })
   }
+  // 获取当前节点
+  getCurrentNode = ()=>{
+    const { baseWorkflow: {processProgress: {currentTasks = [], ended = false}} } = this.props;
+    if (ended) {
+      return (
+        <Timeline.Item>
+          <h3>已结束</h3>
+        </Timeline.Item>)
+    } else {
+      return (
+        currentTasks.length && (
+          <Timeline.Item>
+          <h3>{currentTasks[0].name}</h3>
+          <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
+          <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
+        </Timeline.Item>))
+    }
+  }
   // 获取流程处理tab
   getHandleTabComponent = ()=>{
     const { name = null, baseWorkflow: {formEntity}, businessObj: {formData, formTitle}, formLoading, isLaunch, taskOrProcDefKey} = this.props;
@@ -136,18 +154,13 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程进度tab
   getProcessProgressTab = ()=>{
-    const { baseWorkflow: {processProgress: {currentTasks = [], hisTasks = [], start = {}}} } = this.props;
+    const { baseWorkflow: {processProgress: {hisTasks = [], start = {}}} } = this.props;
     const title = (<h2>流程历史</h2>);
     return (
       <div>
         {title}
         <Timeline style={{marginLeft: 192}}>
-          {currentTasks.length && (
-            <Timeline.Item>
-              <h3>{currentTasks[0].name}</h3>
-              <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
-              <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
-            </Timeline.Item>)}
+          {this.getCurrentNode()}
           {hisTasks.map(it=>(
             <Timeline.Item key={it.taskId}>
               <h3>{it.name}</h3>

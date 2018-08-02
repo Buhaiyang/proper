@@ -2,6 +2,15 @@ import React, { PureComponent, Fragment } from 'react';
 import { Modal, Tooltip, Icon } from 'antd';
 import styles from './index.less';
 
+const isAndroid = ()=>{
+  const {userAgent} = navigator;
+  return userAgent.includes('Android') || userAgent.includes('Adr');
+}
+const isIOS = ()=>{
+  const {userAgent} = navigator;
+  return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+}
+
 export default class OopPreview extends PureComponent {
   state = {
     scales: 1,
@@ -11,7 +20,11 @@ export default class OopPreview extends PureComponent {
   }
 
   componentDidMount() {
-    this.getNaturalSize();
+    if (isAndroid() || isIOS()) {
+      this.getNaturalSize2();
+    } else {
+      this.getNaturalSize();
+    }
   }
 
   // 初始化图片
@@ -34,14 +47,14 @@ export default class OopPreview extends PureComponent {
       horWidth,
       verWidth
     }, () => {
-      const img = document.getElementById('image');
-      const modalBody = img.offsetParent;
-      const modalContent = modalBody.offsetParent;
+      const wrap = document.getElementsByClassName('ant-modal-wrap')[0];
+      const modalContent = document.getElementsByClassName('ant-modal-content')[0];
       const modalWrap = modalContent.offsetParent;
-      const wrap = modalWrap.offsetParent;
+      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
       wrap.style.display = 'flex';
       wrap.style.justifyContent = 'center';
       wrap.style.alignItems = 'center';
+      wrap.style.zIndex = 2000;
       modalWrap.style.width = `${horWidth}px`;
       modalWrap.style.minWidth = '330px';
       modalWrap.style.maxWidth = `${innerWith}px`;
@@ -52,7 +65,44 @@ export default class OopPreview extends PureComponent {
       modalBody.style.minHeight = '200px';
     });
   }
-
+  // 初始化图片2
+  getNaturalSize2 = () => {
+    const { innerWith, innerHeight } = window;
+    const image = new Image();
+    image.src = this.props.img.src;
+    const naturalWidth = image.width;
+    const naturalHeight = image.height;
+    const maxWith = this.props.img.maxWith ? this.props.img.maxWith : innerWith;
+    let horWidth = naturalWidth > maxWith ? maxWith : naturalWidth;
+    let horHeight = (horWidth / naturalWidth) * naturalHeight;
+    if (horHeight > (innerHeight - 100)) {
+      const width = ((innerHeight - 100) / horHeight) * horWidth;
+      horWidth = width;
+      horHeight = (horWidth / naturalWidth) * naturalHeight;
+    }
+    const verWidth = horWidth > horHeight ? horHeight : (horWidth / naturalHeight) * naturalWidth;
+    this.setState({
+      horWidth,
+      verWidth
+    }, () => {
+      const wrap = document.getElementsByClassName('ant-modal-wrap')[0];
+      const modalContent = document.getElementsByClassName('ant-modal-content')[0];
+      const modalWrap = modalContent.offsetParent;
+      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
+      wrap.style.display = 'flex';
+      wrap.style.justifyContent = 'center';
+      wrap.style.alignItems = 'center';
+      wrap.style.zIndex = 2000;
+      modalWrap.style.width = `${horWidth}px`;
+      modalWrap.style.minWidth = '330px';
+      modalWrap.style.maxWidth = `${innerWith}px`;
+      // modalContent.style.width = `${horWidth}px`;
+      modalContent.style.minWidth = '330px';
+      modalBody.style.height = `${horHeight}px`;
+      modalBody.style.maxHeight = `${innerHeight - 100}px`;
+      modalBody.style.minHeight = '200px';
+    });
+  }
   // 图片缩放
   scale = (flag) => {
     const { maxScale = 3, minScale = 0.1 } = this.props;
@@ -108,8 +158,8 @@ export default class OopPreview extends PureComponent {
   mouseDown = (e) => {
     e.preventDefault();
     if (e.button === 0) {
+      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
       const img = document.getElementById('image');
-      const modalBody = img.offsetParent;
       const disX = e.clientX - img.offsetLeft;
       const disY = e.clientY - img.offsetTop;
       const { scales } = this.state;
@@ -129,9 +179,25 @@ export default class OopPreview extends PureComponent {
       }
     }
   }
+  onTouchMove = (e) => {
+    const img = document.getElementById('image');
+    const modalBody = document.getElementsByClassName('ant-modal-body')[0];
+    const disX = e.changedTouches[0].clientX - img.offsetLeft;
+    const disY = e.changedTouches[0].clientY - img.offsetTop;
+    modalBody.ontouchmove = (event) => {
+      const x = event.changedTouches[0].clientX - disX;
+      const y = event.changedTouches[0].clientY - disY;
+      img.style.left = `${x}px`;
+      img.style.top = `${y}px`;
+    }
+    document.ontouchend = () => {
+      modalBody.ontouchmove = null;
+      document.ontouchend = null;
+    }
+  }
 
   render() {
-    const { img } = this.props;
+    const { img, isApp } = this.props;
     const { scales, degs, horWidth, verWidth } = this.state;
     const index = degs / 90;
     const Footer = (
@@ -167,12 +233,9 @@ export default class OopPreview extends PureComponent {
         </a>
       </Fragment>
     );
-
     return (
       <Modal
         className={styles.OopPreview}
-        zIndex={1001}
-        destroyOnClose={true}
         maskClosable={false}
         footer={Footer}
         title="."
@@ -181,13 +244,15 @@ export default class OopPreview extends PureComponent {
         <img
           id="image"
           onMouseDown={e => this.mouseDown(e)}
+          onTouchMove={e => this.onTouchMove(e)}
           style={{
-            width: `${index % 2 === 1 ? verWidth : horWidth}px`,
+            width: isApp ? '100%' : `${index % 2 === 1 ? verWidth : horWidth}px`,
             transform: `translate(-50%, -50%) scale(${scales}, ${scales}) rotate(${this.state.degs}deg)`,
             cursor: `${scales > 1 ? 'move' : 'default'}`
           }}
-          alt=""
-          {...img} />
+          alt={img.alt}
+          src={img.src}
+        />
       </Modal>
     )
   }
