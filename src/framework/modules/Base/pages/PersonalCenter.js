@@ -358,7 +358,7 @@ export default class PersonalCenter extends React.PureComponent {
     this.props.dispatch({
       type: 'basePersonalCenter/fetch',
       callback: (res) => {
-        this.getUserInfo(res.result.userId);
+        this.getUserInfo(res.result.id);
       }
     });
   }
@@ -396,8 +396,9 @@ export default class PersonalCenter extends React.PureComponent {
 
   // 更新上传头像列表
   updateAvatar = (avatar) => {
+    const tokenFix = window.localStorage.getItem('proper-auth-login-token');
     const url = avatar ? ((avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
-      avatar : `${getApplicationContextUrl()}/file/${avatar}`) : '';
+      avatar : `${getApplicationContextUrl()}/file/${avatar}?access_token=${tokenFix}`) : '';
     const fileList = url ? [{
       uid: -1,
       status: 'done',

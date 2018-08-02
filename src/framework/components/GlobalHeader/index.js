@@ -48,11 +48,12 @@ export default class GlobalHeader extends PureComponent {
     this.triggerResizeEvent();
   }
   getAvatar = (avatar) => {
+    const tokenFix = window.localStorage.getItem('proper-auth-login-token');
     if (!avatar) {
       avatar = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
     }
     return (avatar.indexOf('http') === 0 || avatar.indexOf('data:image/') === 0) ?
-      avatar : `${getApplicationContextUrl()}/file/${avatar}`;
+      avatar : `${getApplicationContextUrl()}/file/${avatar}?access_token=${tokenFix}`;
   }
   @Debounce(600)
   triggerResizeEvent() { // eslint-disable-line

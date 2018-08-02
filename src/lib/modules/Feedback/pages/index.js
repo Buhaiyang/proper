@@ -189,7 +189,7 @@ export default class Feedback extends React.Component {
   preViewPic = (flag, id) => {
     this.setState({
       preView: flag,
-      imgUrl: flag ? `${getApplicationContextUrl()}/file/${id}?token=${this.state.tokenFix}` : ''
+      imgUrl: flag ? `${getApplicationContextUrl()}/file/${id}?access_token=${this.state.tokenFix}` : ''
     });
   }
 
@@ -258,7 +258,7 @@ export default class Feedback extends React.Component {
                                 // eslint-disable-next-line
                                 this.preViewPic(true, item.feedBackDocuments[item.feedBackDocuments.length - 1].pictureId)
                               }
-                              src={`${getApplicationContextUrl()}/file/${item.feedBackDocuments[item.feedBackDocuments.length - 1].pictureId}?token=${tokenFix}`} />
+                              src={`${getApplicationContextUrl()}/file/${item.feedBackDocuments[item.feedBackDocuments.length - 1].pictureId}?access_token=${tokenFix}`} />
                           )
                           )) : ''}
                     </Ellipsis>
@@ -351,7 +351,7 @@ export default class Feedback extends React.Component {
                         style={{width: 46, marginTop: 10, cursor: 'pointer'}}
                         alt=""
                         onClick={() => this.preViewPic(true, item.pictureId)}
-                        src={`${getApplicationContextUrl()}/file/${item.pictureId}?token=${tokenFix}`} />
+                        src={`${getApplicationContextUrl()}/file/${item.pictureId}?access_token=${tokenFix}`} />
                     )}
                   </div>) : (<div />)}
                   <div style={{width: '55%', float: 'right', margin: '5px 0'}}>
