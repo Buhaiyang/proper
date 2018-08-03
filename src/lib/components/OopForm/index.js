@@ -22,6 +22,8 @@ export default class OopForm extends React.PureComponent {
   componentDidMount() {
     console.log('componentDidMount')
   }
+  dictCatalogRequestCount = 0;
+  dataUrlRequestCount = 0;
   componentWillUnmount() {
     // TODO 是否需要清空OopForm$model里的数据字典
     // this.props.dispatch({
@@ -38,6 +40,12 @@ export default class OopForm extends React.PureComponent {
       payload: {
         catalog: dictCatalog
       }
+    })
+  }
+  loadUrlData = (url)=>{
+    this.props.dispatch({
+      type: 'OopForm$model/findUrlData',
+      payload: url
     })
   }
   // renderForm = (name, value)=>{
@@ -79,14 +87,33 @@ export default class OopForm extends React.PureComponent {
           component.props.disabled = true;
         }
       }
-      // 如果是有数据源的组件
+      // 如果是有字典数据源的组件
       if (component.children && component.children.length === 0 && component.dictCatalog) {
         const {dictCatalog} = component;
         if (dictCatalog !== '请选择') {
           if (!OopForm$model[dictCatalog] || OopForm$model[dictCatalog].length === 0) {
-            this.loadDictData(dictCatalog);
+            if (this.dictCatalogRequestCount <= 3) {
+              this.loadDictData(dictCatalog);
+              this.dictCatalogRequestCount += 1;
+            }
           } else {
-            component.children = OopForm$model[dictCatalog]
+            component.children = OopForm$model[dictCatalog];
+            this.dictCatalogRequestCount = 0;
+          }
+        }
+      }
+      // 如果是有url数据源的组件
+      if (component.children && component.children.length === 0 && component.dataUrl) {
+        const {dataUrl} = component;
+        if (dataUrl !== '请选择') {
+          if (!OopForm$model[dataUrl] || OopForm$model[dataUrl].length === 0) {
+            if (this.dataUrlRequestCount <= 3) {
+              this.loadUrlData(dataUrl);
+              this.dataUrlRequestCount += 1;
+            }
+          } else {
+            component.children = OopForm$model[dataUrl];
+            this.dataUrlRequestCount = 0;
           }
         }
       }

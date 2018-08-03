@@ -35,7 +35,7 @@ export default class CustomFrameLayout extends React.PureComponent {
     // window.localStorage.setItem('pea_dynamic_request_prefix', 'http://192.168.1.111/pep/develop');
     if (this.props.location.search) {
       const transParams = getParamObj(this.props.location.search);
-      if (transParams) {
+      if (transParams && transParams.token) {
         window.localStorage.setItem('proper-auth-login-token', transParams.token);
       }
     }

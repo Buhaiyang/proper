@@ -56,8 +56,12 @@ export default {
       });
       if (callback) callback();
     },
-    *findBusinessObj({ payload, callback }, { call }) {
-      const response = yield call(managerService.findBusinessObj, payload);
+    *findBusinessObjByTaskId({ payload, callback }, { call }) {
+      const response = yield call(managerService.findBusinessObjByTaskId, payload);
+      if (callback) callback(response.result);
+    },
+    *findBusinessObjByProcInstId({ payload, callback }, { call }) {
+      const response = yield call(managerService.findBusinessObjByProcInstId, payload);
       if (callback) callback(response.result);
     },
   },

@@ -220,11 +220,8 @@ export default (item, eventsCollection)=>{
       label: '字典数据源',
       component: {
         name: 'Select',
-        children: [
-          {label: '字典1', value: 'CONTACT_TYPE', key: 'CONTACT_TYPE'},
-          {label: '字典2', value: 'MACBIND_TYPE', key: 'MACBIND_TYPE'},
-          {label: '字典3', value: 'DEAL_STATUS', key: 'DEAL_STATUS'}
-        ],
+        children: [],
+        dataUrl: '/sys/datadic/catalog',
         props: {onChange: (value)=>{
           onSelectChange(`${name}${prefix}_dict`, value);
         }}

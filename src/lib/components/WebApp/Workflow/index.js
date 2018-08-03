@@ -119,39 +119,39 @@ export default class Workflow extends React.PureComponent {
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
     const {key, startFormKey} = record;
-    const param = encodeURIComponent(JSON.stringify({
+    const param = (encodeURIComponent(JSON.stringify({
       isLaunch: true,
       taskOrProcDefKey: key,
       businessObj: {
         formKey: startFormKey
       },
       name: '流程发起'
-    }));
+    })));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, form, procInstId, name} = record;
-    const param = encodeURIComponent(JSON.stringify({
+    const {taskId, procInstId, name} = record;
+    const param = (encodeURIComponent(JSON.stringify({
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
       name,
-      businessObj: {...form, formTitle: `${record.pepProcInstVO.startUserName}的${record.pepProcInstVOprocessDefinitionName}`},
+      businessObj: {formTitle: `${record.pepProcInst.startUserName}的${record.pepProcInst.processDefinitionName}`},
       stateCode: undefined
-    }));
+    })));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
   }
   handleProcessView = (record)=>{
     console.log('handleProcessView', record);
     const {procInstId, processDefinitionId, stateCode} = record;
     this.props.dispatch({
-      type: 'workflowManager/findBusinessObj',
+      type: 'workflowManager/findBusinessObjByProcInstId',
       payload: procInstId,
       callback: (res) => {
         console.log(res);
         const businessObj = res.length ? res[0] : null;
-        const param = encodeURIComponent(JSON.stringify({
+        const param = (encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
           procInstId,
@@ -159,7 +159,7 @@ export default class Workflow extends React.PureComponent {
           name: null,
           processDefinitionId,
           stateCode
-        }));
+        })));
         this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
       }
     });
@@ -219,11 +219,11 @@ export default class Workflow extends React.PureComponent {
                         <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
                           <List.Item actions={[<Icon type="right" />]}>
                             <List.Item.Meta
-                              title={item.pepProcInstVO.processDefinitionName}
-                              description={<div><div>{item.pepProcInstVO.createTime}</div><div><span>发起人: </span><span>{item.pepProcInstVO.startUserName}</span></div></div>}
+                              title={item.pepProcInst.processDefinitionName}
+                              description={<div><div>{item.pepProcInst.createTime}</div><div><span>发起人: </span><span>{item.pepProcInst.startUserName}</span></div></div>}
                             />
                             <div className={styles.listContent}>
-                              {item.pepProcInstVO.stateValue}
+                              {item.pepProcInst.stateValue}
                             </div>
                           </List.Item>
                         </a>
@@ -252,8 +252,8 @@ export default class Workflow extends React.PureComponent {
               renderItem={item => (
                 <div className={styles.listItemWrapper}>
                   <div className={styles.listLine}>
-                    <a onClick={ (event)=>{ this.handleProcessLaunch(item, event) }}>
-                      <List.Item actions={[<Icon type="right" />]}>
+                    <a onClick={ (event)=>{ item.status.code === 'DEPLOYED' ? this.handleProcessLaunch(item, event) : null }}>
+                      <List.Item actions={[item.status.code === 'DEPLOYED' ? <Icon type="right" /> : null]}>
                         <List.Item.Meta
                           title={item.name}
                           description={item.lastUpdated}

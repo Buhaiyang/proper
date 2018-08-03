@@ -13,6 +13,10 @@ export async function findProcess(params) {
   return request(`/workflow/process?${stringify(params)}`);
 }
 
-export async function findBusinessObj(params) {
+export async function findBusinessObjByTaskId(params) {
+  return request(`/workflow/task/${params}/page`);
+}
+
+export async function findBusinessObjByProcInstId(params) {
   return request(`/workflow/process/${params}/page`);
 }

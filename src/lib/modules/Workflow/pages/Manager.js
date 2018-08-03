@@ -140,16 +140,24 @@ export default class Manager extends React.PureComponent {
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, form, procInstId, name} = record;
-    this.setState({
-      wfVisible: true,
-      isLaunch: false,
-      taskOrProcDefKey: taskId,
-      procInstId,
-      businessObj: {...form, formTitle: `${record.pepProcInstVO.startUserName}的${record.pepProcInstVO.processDefinitionName}`},
-      name,
-      stateCode: undefined
-    })
+    const {pepProcInst: {procInstId}, taskId, name} = record;
+    this.props.dispatch({
+      type: 'workflowManager/findBusinessObjByTaskId',
+      payload: taskId,
+      callback: (res) => {
+        console.log(res);
+        const businessObj = res.length ? res[0] : null;
+        this.setState({
+          wfVisible: true,
+          isLaunch: false,
+          taskOrProcDefKey: taskId,
+          procInstId,
+          businessObj: {...businessObj, formTitle: `${record.pepProcInst.startUserName}的${record.pepProcInst.processDefinitionName}`},
+          name,
+          stateCode: undefined
+        })
+      }
+    });
   }
   handleProcessDeployed = (record)=>{
     console.log('handleProcessDeployed', record);
@@ -166,7 +174,7 @@ export default class Manager extends React.PureComponent {
     console.log('handleProcessView', record);
     const {procInstId, processDefinitionId, stateCode} = record;
     this.props.dispatch({
-      type: 'workflowManager/findBusinessObj',
+      type: 'workflowManager/findBusinessObjByProcInstId',
       payload: procInstId,
       callback: (res) => {
         console.log(res);
@@ -205,10 +213,10 @@ export default class Manager extends React.PureComponent {
     } = this.state;
     const column = {
       task: [
-        {title: '名称', dataIndex: 'pepProcInstVO.processDefinitionName'},
-        {title: '发起时间', dataIndex: 'pepProcInstVO.createTime'},
-        {title: '发起人', dataIndex: 'pepProcInstVO.startUserName'},
-        {title: '当前处理情况', dataIndex: 'pepProcInstVO.stateValue', render: (val, record) => {
+        {title: '名称', dataIndex: 'pepProcInst.processDefinitionName'},
+        {title: '发起时间', dataIndex: 'pepProcInst.createTime'},
+        {title: '发起人', dataIndex: 'pepProcInst.startUserName'},
+        {title: '当前处理情况', dataIndex: 'pepProcInst.stateValue', render: (val, record) => {
           return (
             <Fragment><div>{val}</div><div>到达时间:{record.createTime}</div></Fragment>
           );
@@ -216,7 +224,7 @@ export default class Manager extends React.PureComponent {
       ],
       design: [
         {title: '名称', dataIndex: 'name'},
-        // {title: '标识', dataIndex: 'pepProcInstVOstateValue'},
+        // {title: '标识', dataIndex: 'pepProcInststateValue'},
         {title: '创建时间', dataIndex: 'created'},
         {title: '更新时间', dataIndex: 'lastUpdated'},
         {title: '部署时间', dataIndex: 'deploymentTime'},

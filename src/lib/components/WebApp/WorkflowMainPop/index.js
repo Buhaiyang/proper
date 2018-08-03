@@ -5,6 +5,8 @@
 * taskOrProcDefKey 任务ID或者流程定义ID
 * isLaunch 是否为发起节点
 * 如果isLaunch为true taskOrProcDefKey为流程定义ID 否则为任务ID
+* procInstId 流程实力ID
+* name 流程办理页面
  */
 import React, { PureComponent, Fragment } from 'react';
 import {routerRedux} from 'dva/router';
@@ -13,19 +15,28 @@ import { Input, Button, Popover, Alert, message } from 'antd';
 import OopWorkflowMain from '../../OopWorkflowMain';
 import {getParamObj} from '../../../../framework/utils/utils';
 import styles from './index.less';
+import {inject} from '../../../../framework/common/inject';
 
 const { TextArea } = Input;
+const isAndroid = ()=>{
+  const {userAgent} = navigator;
+  return userAgent.includes('Android') || userAgent.includes('Adr');
+}
+const isIOS = ()=>{
+  const {userAgent} = navigator;
+  return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+}
 const PopPage = (props)=>{
   const { footer, children } = props;
   const footerStyle = {
-    position: 'fixed',
+    position: (isAndroid() || isIOS()) ? 'fixed' : 'absolute',
     width: '100%',
     display: 'block',
     bottom: 0,
     padding: '4px 12px',
     background: '#fff',
     borderTop: '1px solid #ddd',
-    textAlign: 'right'
+    textAlign: 'right',
   }
   return (
   <div className={styles.container}>
@@ -34,11 +45,42 @@ const PopPage = (props)=>{
   </div>)
 }
 
+@inject(['workflowManager'])
 @connect()
 export default class WorkflowMainPop extends PureComponent {
-  state = {
-    buttonLoading: false,
-    activeTabKey: 'handle'
+  constructor(props) {
+    super(props);
+    const { param } = getParamObj(this.props.location.search);
+    const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode} = JSON.parse(decodeURIComponent(param));
+    this.state = {
+      buttonLoading: false,
+      activeTabKey: 'handle',
+      isLaunch,
+      taskOrProcDefKey,
+      procInstId,
+      name,
+      businessObj,
+      stateCode
+    }
+  }
+  componentDidMount() {
+    const {taskOrProcDefKey, businessObj} = this.state;
+    // businessObj 没有form数据的时候发送请求
+    if (!businessObj.formKey && !businessObj.formData) {
+      this.props.dispatch({
+        type: 'workflowManager/findBusinessObjByTaskId',
+        payload: taskOrProcDefKey,
+        callback: (res) => {
+          const obj = res.length ? res[0] : null;
+          this.setState({
+            businessObj: {
+              ...this.state.businessObj,
+              ...obj
+            }
+          })
+        }
+      });
+    }
   }
   submitWorkflow = ()=>{
     this.setState({
@@ -93,9 +135,7 @@ export default class WorkflowMainPop extends PureComponent {
     })
   }
   render() {
-    const { param } = getParamObj(this.props.location.search);
-    const props = JSON.parse(decodeURIComponent(param))
-    const {taskOrProcDefKey} = props;
+    const {taskOrProcDefKey, isLaunch, businessObj: {formKey}} = this.state;
     const footer = (
       <Fragment>
         <Popover
@@ -103,10 +143,10 @@ export default class WorkflowMainPop extends PureComponent {
           content={this.getPopoverContent()}
           trigger="click"
         >
-          {!props.isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
+          {!isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
         <Button size="large" onClick={this.handleCancel}>取消</Button>
-        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (props.isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
+        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
           : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>提交</Button>) : null) : null}
       </Fragment>);
     return (
@@ -116,11 +156,12 @@ export default class WorkflowMainPop extends PureComponent {
         destroyOnClose={true}
         afterClose={this.handleAfterClose}
         maskClosable={false}>
+        {formKey ? (
         <OopWorkflowMain
-          {...props}
+          {...this.state}
           setButtonLoading={this.setButtonLoading}
           onTabsChange={this.handleTabsChange}
-          ref={(el) => { if (el) { this.oopWorkflowMain = el.getWrappedInstance() } }} />
+          ref={(el) => { if (el) { this.oopWorkflowMain = el.getWrappedInstance() } }} />) : null}
       </PopPage>);
   }
 }

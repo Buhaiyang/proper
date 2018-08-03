@@ -127,7 +127,10 @@ export default class OopWorkflowMain extends PureComponent {
         currentTasks.length && (
           <Timeline.Item>
           <h3>{currentTasks[0].name}</h3>
-          <div style={{marginTop: 16}}><span>当前审批人: </span>{currentTasks[0].assigneeName}</div>
+            {currentTasks[0].assigneeName ? <div style={{marginTop: 16}}><span>当前经办人: </span>{currentTasks[0].assigneeName}</div> : null}
+            {currentTasks[0].candidateGroupNames ? <div style={{marginTop: 16}}><span>候选用户组: </span>{currentTasks[0].candidateGroupNames}</div> : null}
+            {currentTasks[0].candidateRoleNames ? <div style={{marginTop: 16}}><span>候选角色: </span>{currentTasks[0].candidateRoleNames}</div> : null}
+            {currentTasks[0].candidateUserNames ? <div style={{marginTop: 16}}><span>候选用户: </span>{currentTasks[0].candidateUserNames}</div> : null}
           <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
         </Timeline.Item>))
     }
