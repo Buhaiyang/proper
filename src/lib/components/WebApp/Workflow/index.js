@@ -131,7 +131,7 @@ export default class Workflow extends React.PureComponent {
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {taskId, procInstId, name} = record;
+    const {pepProcInst: {procInstId}, taskId, name} = record;
     const param = (encodeURIComponent(JSON.stringify({
       isLaunch: false,
       taskOrProcDefKey: taskId,

@@ -18,19 +18,12 @@ import styles from './index.less';
 import {inject} from '../../../../framework/common/inject';
 
 const { TextArea } = Input;
-const isAndroid = ()=>{
-  const {userAgent} = navigator;
-  return userAgent.includes('Android') || userAgent.includes('Adr');
-}
-const isIOS = ()=>{
-  const {userAgent} = navigator;
-  return !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-}
 const PopPage = (props)=>{
   const { footer, children } = props;
   const footerStyle = {
-    position: (isAndroid() || isIOS()) ? 'fixed' : 'absolute',
+    position: 'fixed',
     width: '100%',
+    maxWidth: '660px',
     display: 'block',
     bottom: 0,
     padding: '4px 12px',
@@ -51,7 +44,7 @@ export default class WorkflowMainPop extends PureComponent {
   constructor(props) {
     super(props);
     const { param } = getParamObj(this.props.location.search);
-    const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode} = JSON.parse(decodeURIComponent(param));
+    const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode, processDefinitionId} = JSON.parse(decodeURIComponent(param));
     this.state = {
       buttonLoading: false,
       activeTabKey: 'handle',
@@ -60,6 +53,7 @@ export default class WorkflowMainPop extends PureComponent {
       procInstId,
       name,
       businessObj,
+      processDefinitionId,
       stateCode
     }
   }
