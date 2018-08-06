@@ -1,3 +1,6 @@
+/**
+ * MongoService 链接MongoDB的前端工具 基于av-core
+ */
 import AV from 'av-core';
 import { routerRedux } from 'dva/router';
 import { prefix, devMode } from '../../config/config';
