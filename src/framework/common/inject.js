@@ -24,9 +24,9 @@ export const inject = (url)=> {
             app.model(model);
           }
         }
-        // 带有model组件的model注入
+        // 带有model组件的model注入 包括lib的Oop系列和WebApp系列
         if (modelUrl.includes('$')) {
-          const model = require(`../../lib/components/${modelUrl.split('$')[0]}/model`).default;
+          const model = require(`../../lib/components/${modelUrl.split('$').join('/')}`).default;
           app.model(model);
         }
       }
