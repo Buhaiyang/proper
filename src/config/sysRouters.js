@@ -19,7 +19,8 @@ const routers = {
     component: ()=>import('../framework/layouts/WebAppLayout')
   },
   '/webapp/workflow': {
-    component: ()=>import('../lib/components/WebApp/Workflow')
+    component: ()=>import('../lib/components/WebApp/Workflow'),
+    main: true
   },
   '/webapp/workflowMainPop': {
     component: ()=>import('../lib/components/WebApp/WorkflowMainPop')

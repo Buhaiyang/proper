@@ -1,3 +1,5 @@
+@import "~antd/lib/style/themes/default.less";
+
 .container {
   display: block;
   width: 100%;
@@ -8,6 +10,15 @@
     background-color: white;
     & > :global(.ant-tabs-bar) {
       margin: 0;
+    }
+  }
+  :global {
+    .ant-spin-container {
+      background: #f5f5f5;
+      min-height: calc(~"100vh - 88px");
+    }
+    .ant-list-item-meta-description {
+      margin-top: 12px;
     }
   }
 }
@@ -72,13 +83,26 @@
     display: block;
   }
   .listItemWrapper {
-    padding-left: 15px;
+    padding: 0 12px;
     border-bottom: 1px solid #ddd;
+    margin-bottom: 6px;
+    background: #fff;
     & > .listLine {
       padding: 0;
     }
     .listContent {
       color: rgba(0, 0, 0, 0.65);
     }
+  }
+  .listItemWrapper:last-child {
+    margin-bottom: 0;
+  }
+  .listItemWrapper:first-child {
+    margin-top: 6px;
+  }
+  .icon {
+    font-size: 16px;
+    padding-right: 8px;
+    color: @primary-color;
   }
 }

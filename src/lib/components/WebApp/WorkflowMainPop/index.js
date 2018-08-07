@@ -20,21 +20,10 @@ import {inject} from '../../../../framework/common/inject';
 const { TextArea } = Input;
 const PopPage = (props)=>{
   const { footer, children } = props;
-  const footerStyle = {
-    position: 'fixed',
-    width: '100%',
-    maxWidth: '660px',
-    display: 'block',
-    bottom: 0,
-    padding: '4px 12px',
-    background: '#fff',
-    borderTop: '1px solid #ddd',
-    textAlign: 'right',
-  }
   return (
   <div className={styles.container}>
     {children}
-    <div style={footerStyle}>{footer}</div>
+    <div className={styles.footer}>{footer}</div>
   </div>)
 }
 
@@ -139,9 +128,9 @@ export default class WorkflowMainPop extends PureComponent {
         >
           {!isLaunch ? <Button size="large" type="danger" ghost loading={this.state.buttonLoading} style={{display: 'none', float: 'left'}}>退回</Button> : null}
         </Popover>
-        <Button size="large" onClick={this.handleCancel}>取消</Button>
-        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>发起</Button>
-          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} style={{marginLeft: 12}}>提交</Button>) : null) : null}
+        <Button size="large" onClick={this.handleCancel} className={styles.cancelBtn}>取消</Button>
+        {taskOrProcDefKey ? (this.state.activeTabKey === 'handle' ? (isLaunch ? <Button size="large" type="primary" onClick={this.launchWorkflow} loading={this.state.buttonLoading} className={styles.submitBtn}>发起</Button>
+          : <Button size="large" type="primary" onClick={this.submitWorkflow} loading={this.state.buttonLoading} className={styles.submitBtn}>提交</Button>) : null) : null}
       </Fragment>);
     return (
       <PopPage

@@ -47,8 +47,6 @@ export default class Workflow extends React.PureComponent {
   }
 
   componentDidMount() {
-    // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
-    window.parent.postMessage('root', '*');
     this.fetchData();
   }
 
@@ -180,7 +178,6 @@ export default class Workflow extends React.PureComponent {
       activeKey,
       activeIndex
     } = this.state;
-
     return (
       <div className={styles.container}>
         <Tabs
@@ -217,10 +214,13 @@ export default class Workflow extends React.PureComponent {
                     <div className={styles.listItemWrapper}>
                       <div className={styles.listLine}>
                         <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
+                          <div style={{padding: '12px 15px 12px 0', borderBottom: '1px solid #ddd'}}><div style={{color: '#333', width: '100%', fontWeight: 'bold'}}>{item.pepProcInst.processDefinitionName}</div></div>
                           <List.Item actions={[<Icon type="right" />]}>
                             <List.Item.Meta
-                              title={item.pepProcInst.processDefinitionName}
-                              description={<div><div>{item.pepProcInst.createTime}</div><div><span>发起人: </span><span>{item.pepProcInst.startUserName}</span></div></div>}
+                              description={<div>
+                                <div><Icon type="clock-circle-o" className={styles.icon} />{item.pepProcInst.createTime}</div>
+                                <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人: </span><span>{item.pepProcInst.startUserName}</span></div>
+                              </div>}
                             />
                             <div className={styles.listContent}>
                               {item.pepProcInst.stateValue}
@@ -255,8 +255,8 @@ export default class Workflow extends React.PureComponent {
                     <a onClick={ (event)=>{ item.status.code === 'DEPLOYED' ? this.handleProcessLaunch(item, event) : null }}>
                       <List.Item actions={[item.status.code === 'DEPLOYED' ? <Icon type="right" /> : null]}>
                         <List.Item.Meta
-                          title={item.name}
-                          description={item.lastUpdated}
+                          title={<span style={{fontWeight: 'bold'}}>{item.name}</span>}
+                          description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.lastUpdated}</Fragment>}
                         />
                         <div>
                           <Badge
@@ -305,8 +305,8 @@ export default class Workflow extends React.PureComponent {
                           <a onClick={ (event)=>{ this.handleProcessView(item, event) }}>
                             <List.Item actions={[<Icon type="right" />]}>
                               <List.Item.Meta
-                                title={item.processDefinitionName}
-                                description={item.createTime}
+                                title={<span style={{fontWeight: 'bold'}}>{item.processDefinitionName}</span>}
+                                description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.createTime}</Fragment>}
                               />
                               <div className={styles.listContent}>
                                 {item.stateValue}

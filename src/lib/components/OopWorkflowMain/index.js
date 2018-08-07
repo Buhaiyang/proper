@@ -84,13 +84,15 @@ const BusinessPanel = (props)=>{
 @inject('baseWorkflow')
 @connect(({baseWorkflow, loading})=>({
   baseWorkflow,
-  formLoading: loading.effects['baseWorkflow/fetchByFormCode']
+  formLoading: loading.effects['baseWorkflow/fetchByFormCode'],
+  progressLoading: loading.effects['baseWorkflow/fetchProcessProgress']
 }), null, null, {withRef: true})
 export default class OopWorkflowMain extends PureComponent {
   state = {
     imagePreviewVisible: false,
     isApp: isAndroid() || isIOS(),
-    approvalRemarksRequire: false
+    approvalRemarksRequire: false,
+    imageLoading: true
   }
   // 根据表单ID获取表单对象
   componentDidMount() {
@@ -131,7 +133,7 @@ export default class OopWorkflowMain extends PureComponent {
             {currentTasks[0].candidateGroupNames ? <div style={{marginTop: 16}}><span>候选用户组: </span>{currentTasks[0].candidateGroupNames.join(',')}</div> : null}
             {currentTasks[0].candidateRoleNames ? <div style={{marginTop: 16}}><span>候选角色: </span>{currentTasks[0].candidateRoleNames.join(',')}</div> : null}
             {currentTasks[0].candidateUserNames ? <div style={{marginTop: 16}}><span>候选用户: </span>{currentTasks[0].candidateUserNames.join(',')}</div> : null}
-          <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div>
+          {/* <div style={{position: 'absolute', top: 0, left: -88, fontSize: 16, fontWeight: 'bold'}}>当前节点</div> */}
         </Timeline.Item>))
     }
   }
@@ -157,28 +159,32 @@ export default class OopWorkflowMain extends PureComponent {
   }
   // 获取流程进度tab
   getProcessProgressTab = ()=>{
-    const { baseWorkflow: {processProgress: {hisTasks = [], start = {}}} } = this.props;
+    const { baseWorkflow: {processProgress: {hisTasks = [], start = {}}}, progressLoading} = this.props;
     const title = (<h2>流程历史</h2>);
     return (
       <div>
         {title}
-        <Timeline style={{marginLeft: 192}}>
-          {this.getCurrentNode()}
-          {hisTasks.map(it=>(
-            <Timeline.Item key={it.taskId}>
-              <h3>{it.name}</h3>
-              {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
-              {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
-              {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}
-              <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{it.endTime}</div>
-            </Timeline.Item>)
-          )}
-          <Timeline.Item>
-            <h3>{start.name}</h3>
-            <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
-            <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{start.createTime}</div>
-          </Timeline.Item>
-        </Timeline>
+        <Spin spinning={progressLoading}>
+          <Timeline style={{margin: '16px 0 0 36px'}}>
+            {this.getCurrentNode()}
+            {hisTasks.map(it=>(
+              <Timeline.Item key={it.taskId}>
+                <div>{it.endTime}</div>
+                <h3>{it.name}</h3>
+                {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
+                {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
+                {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}
+                {/* <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{it.endTime}</div> */}
+              </Timeline.Item>)
+            )}
+            <Timeline.Item>
+              <div>{start.createTime}</div>
+              <h3>{start.name}</h3>
+              <div style={{marginTop: 16}}><span>发起人: </span>{start.startUserName}</div>
+              {/* <div style={{position: 'absolute', top: 0, marginLeft: -160}}>{start.createTime}</div> */}
+            </Timeline.Item>
+          </Timeline>
+        </Spin>
       </div>);
   }
   // 获取流程图
@@ -191,17 +197,28 @@ export default class OopWorkflowMain extends PureComponent {
     if (stateCode === 'DONE') {
       imgUrl = `/repository/process-definitions/${processDefinitionId}/diagram?access_token=${token}`;
     } else {
+      if (!procInstId) {
+        return null
+      }
       imgUrl = `/workflow/service/api/runtime/process-instances/${procInstId}/diagram?access_token=${token}`;
     }
     if (!imgUrl) {
       return null
     }
+    let img = new Image();
+    img.onload = ()=>{
+      this.setState({
+        imageLoading: false
+      });
+      img = null;
+    }
+    img.src = `${context}${imgUrl}`;
     return (
       <div>
         {title}
-        <div style={{textAlign: 'center', overflowX: 'auto'}}>
-          <img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} onClick={this.handlePreviewImage} />
-        </div>
+        <Spin spinning={this.state.imageLoading}><div style={{textAlign: 'center', overflowX: 'auto'}}>
+          {!this.state.imageLoading ? <img alt="流程图" src={`${context}${imgUrl}`} style={{width: '100%'}} onClick={this.handlePreviewImage} /> : null}
+        </div></Spin>
         {(this.state.isApp && this.state.imagePreviewVisible) ? (
           <OopPreview
             visible={this.state.imagePreviewVisible}

@@ -8,4 +8,32 @@
       min-height: 64px;
     }
   }
+  .submitBtn {
+    margin-left: 12px;
+  }
+  .footer {
+    position: fixed;
+    width: 100%;
+    max-width: 660px;
+    display: block;
+    bottom: 0;
+    padding: 4px 12px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+}
+
+@media screen and (max-width: 414px) {
+  .cancelBtn {
+    display: none;
+  }
+  .submitBtn {
+    width: 100%;
+    border-radius: 30px;
+    margin-left: 0 !important;
+  }
+  .footer {
+    border: 0 !important;
+  }
 }

@@ -1,5 +1,6 @@
+@import "~antd/lib/style/themes/default.less";
 
-.customFrame {
+.webAppContainer {
 
   :global {
     height: 100%;
@@ -32,6 +33,7 @@
     padding-left: 10px;
     border-bottom: 0;
     background-color: #f7f7f7;
+    justify-content: space-between;
   }
   .backBtn {
     border: 0;
@@ -39,13 +41,19 @@
     height: 100%;
     padding: 0;
   }
+  .homeBtn {
+    border: 0;
+    align-items: center;
+    height: 100%;
+    padding-left: 12px;
+    padding-right: 0;
+  }
   .title {
     display: flex;
     height: 100%;
     margin: 0;
     padding: 0;
     align-items: center;
-    margin-left: calc(~"100vw/2 - 50px - 32px");
   }
 }
 
@@ -53,10 +61,17 @@
   body {
     background: #d9d9d9;
   }
-  .customFrame {
+  .webAppContainer {
     width: 660px;
     margin: 0 auto;
     position: relative;
   }
 }
-
+// 移动端日期时间选择组件滚动的问题
+@media screen and (max-width: @screen-xs) {
+  :global {
+    .ant-calendar-time-picker-select {
+      overflow-y: auto !important;
+    }
+  }
+}

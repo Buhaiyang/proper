@@ -59,17 +59,22 @@ export default class OopForm extends React.PureComponent {
   //     this.forceUpdate();
   //   });
   // }
+  // 是否是数据字典值
+  isDictValue = (value)=>{
+    return value && typeof value === 'object' && value.catalog !== undefined && value.code !== undefined
+  }
   render() {
     const { OopForm$model, disabled = false, formJson = [], defaultValue = {}, form } = this.props;
     // const changeEventSequence = new Set();
     formJson.forEach((item)=>{
       const {initialValue, component, display} = item;
-      // initialValue是数组但是长度为0 或者 没有initialValue
+      // initialValue是数组但是长度为0 或者 没有initialValue;
+      const value = defaultValue[item.name];
       if ((Array.isArray(initialValue) && initialValue.length === 0)
         || initialValue === undefined) {
-        item.initialValue = defaultValue[item.name]
+        item.initialValue = value
       } else {
-        item.initialValue = defaultValue[item.name] || initialValue
+        item.initialValue = this.isDictValue(value) ? JSON.stringify(value) : (value || initialValue);
       }
       // 处理DatePicker的值
       if (component.name === 'DatePicker') {
