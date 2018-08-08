@@ -41,7 +41,7 @@ export default class WebAppLayout extends React.PureComponent {
   }
   componentWillMount() {
     window.localStorage.setItem('If_Can_Back', '');
-    window.localStorage.setItem('pea_dynamic_request_prefix', 'https://icmp2.propersoft.cn/icmp/server-dev');
+    // window.localStorage.setItem('pea_dynamic_request_prefix', 'https://icmp2.propersoft.cn/icmp/server-dev');
     if (this.props.location.search) {
       const transParams = getParamObj(this.props.location.search);
       if (transParams && transParams.token) {
@@ -60,7 +60,7 @@ export default class WebAppLayout extends React.PureComponent {
   }
   handleHome = ()=>{
     // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
-    // window.parent.postMessage('back', '*');
+    window.parent.postMessage('back', '*');
     window.localStorage.setItem('If_Can_Back', 'back');
   }
   render() {
