@@ -288,4 +288,25 @@ module.exports = {
     // res.status(500).send('文件删除失败');
     res.status(202).send('');
   },
+  "GET:/admin/app/applications/catalogs": [
+    {
+      "code": "demoCatalogCode",
+      "typeName": "问卷调查",
+      "sort": "asc"
+    },
+    {
+      "code": "workflow",
+      "typeName": "工作流程",
+      "sort": "asc"
+    }
+  ],
+  "POST:/admin/app/applications":(req , res)=>{
+    res.send('success');
+  },
+  "PUT:/admin/app/applications/:id":(req , res)=>{
+    res.send('success');
+  },
+  "DELETE:/admin/app/applications":(req , res)=>{
+    res.status(202).send('');
+  },
 }

@@ -346,6 +346,156 @@ const systePage = {
   }]
 }
 
+const systemAppConfig = {
+  "count": 12,
+  "data": [
+    {
+      "code": "demoCatalogCode",
+      "appId": "551",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "552",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "553",
+      "name": "Git/gitlab",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "554",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "555",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "556",
+      "name": "mac",
+      "icon": "./assets/images/application.png",
+      "page": "mac",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "557",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "558",
+      "name": "window",
+      "icon": "./assets/images/application.png",
+      "page": "window",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "559",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "660",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "661",
+      "name": "Git/GitHub",
+      "icon": "./assets/images/application.png",
+      "page": "macAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    },
+    {
+      "code": "demoCatalogCode",
+      "appId": "662",
+      "name": "Git/gitlab",
+      "icon": "./assets/images/application.png",
+      "page": "winAddress",
+      "style": "style",
+      "data": {
+        "questionnaireNo": "6fcb83b7-8fb8-5677-2154-e1e8f46f89d4",
+        "url": "http://192.168.1.111/icmp/desktop/#/customframe/exam-list"
+      }
+    }
+  ]
+}
+
 function queryList(type) {
   let list = {};
   if (type === 'authusers') {
@@ -362,6 +512,8 @@ function queryList(type) {
     list = systemDic;
   } else if (type === 'systempagepush') {
     list = systePage;
+  } else if (type === 'systemappconfig') {
+    list = systemAppConfig;
   }
   return list;
 }
