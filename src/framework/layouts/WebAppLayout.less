@@ -34,6 +34,13 @@
     border-bottom: 0;
     background-color: #f7f7f7;
     justify-content: space-between;
+    :global {
+      .ant-btn-clicked {
+        &:after {
+          border: 0;
+        }
+      }
+    }
   }
   .backBtn {
     border: 0;
