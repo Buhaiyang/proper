@@ -11,7 +11,7 @@ const {moduleName, modelName, pageName, tableName} = parse(routePath);
 
 console.log(`当前路由为${routePath},代码生成开始...`);
 // 当前工程中业务模块的路径
-const modulePath = './src/modules';
+const modulePath = './src/lib/modules';
 // dva中的model模板的路径
 const modelTplPath = './producer/tpl/model.tpl';
 // 页面的page入口文件模板的路径

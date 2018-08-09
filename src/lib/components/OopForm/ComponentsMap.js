@@ -1,5 +1,6 @@
 import React from 'react';
 import { DatePicker, InputNumber, Input, Radio, Checkbox, Select, Button, Icon} from 'antd';
+import OopSystemCurrent from '../OopSystemCurrent';
 import { getUuid } from '../../../framework/common/oopUtils';
 
 const CheckboxGroup = Checkbox.Group;
@@ -32,6 +33,7 @@ export default (name, props, children)=> {
       <CheckboxGroup options={children} {...props} />),
     InputNumber: <InputNumber {...props} />,
     DatePicker: <DatePicker format={dateFormat} {...props} onFocus={(e) => { hackDatePickerIOSFocus(e) }} />,
+    OopSystemCurrent: <OopSystemCurrent {...props} />,
   }
   const component = Map[name];
   if (!component) {

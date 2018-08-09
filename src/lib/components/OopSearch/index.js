@@ -373,7 +373,11 @@ export default class OopSearch extends React.Component {
       restPath: JSON.stringify(this.getRestPathParam()),
       moduleName
     }
-    dispatch({type: 'global/oopSearchResult', payload: params});
+    dispatch({type: 'global/oopSearchResult', payload: params, callback: (resp)=>{
+      if (this.props.onLoadCallback) {
+        this.props.onLoadCallback(resp)
+      }
+    }});
   }
 
   staticRetrievalData(inputValue) {

@@ -129,7 +129,8 @@ export default class OopFormDesigner extends React.PureComponent {
       {label: '多选框', key: 'CheckboxGroup', component: {name: 'CheckboxGroup', children: componentData}, initialValue: []},
       {label: '选择器', key: 'Select', component: {name: 'Select', children: componentData}},
       {label: '日期选择', key: 'DatePicker', component: {name: 'DatePicker'}},
-      {label: '数字输入框', key: 'InputNumber', component: {name: 'InputNumber'}}
+      {label: '数字输入框', key: 'InputNumber', component: {name: 'InputNumber'}},
+      {label: '系统当前', key: 'OopSystemCurrent', component: {name: 'OopSystemCurrent', props: {url: '/auth/current/user', showPropName: 'name'}}}
     ],
     rowItems: this.props.formDetails.formJson,
     formLayout: this.props.formDetails.formLayout,

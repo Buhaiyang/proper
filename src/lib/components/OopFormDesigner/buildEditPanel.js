@@ -265,6 +265,39 @@ export default (item, eventsCollection)=>{
       })
     }
     formConfig = {...formConfig, formLayout: 'vertical', rowItemIconCopy, rowItemIconDelete, rowItemDrag, rowItemSetValue}
+  } else if ('OopSystemCurrent'.includes(cName)) {
+    formConfig.formJson = [{
+      name: `${name}${prefix}_label`,
+      label: '标题',
+      component: {
+        name: 'Input',
+        props: {placeholder: label, onChange}
+      },
+      initialValue: label
+    },
+    {
+      name: `${name}${prefix}_dict`,
+      label: '当前系统参数',
+      component: {
+        name: 'Select',
+        children: [],
+        dataUrl: '/sys/datadic/catalog',
+        props: {onChange: (value)=>{
+          onSelectChange(`${name}${prefix}_dict`, value);
+        }}
+      },
+      initialValue: component.dictCatalog,
+    },
+    {
+      name: `${name}${prefix}_name`,
+      label: 'name',
+      component: {
+        name: 'Input',
+        props: {placeholder: name, onChange: onNameChange}
+      },
+      initialValue: name
+    }];
+    formConfig = {...formConfig, formLayout: 'vertical'};
   }
   const ruleChange = (event)=>{
     const {value} = event.target;

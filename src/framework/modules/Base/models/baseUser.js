@@ -48,9 +48,9 @@ export default {
       };
     },
     saveCurrentUser(state, action) {
-      const data = action.payload;
+      const {data} = action.payload;
       if (data.name == null) {
-        data.name = 'null';
+        data.name = 'Error';
       }
       return {
         ...state,

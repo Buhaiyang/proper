@@ -7,6 +7,7 @@ import OopForm from '../../../components/OopForm';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../../framework/common/inject';
 import { oopToast } from '../../../../framework/common/oopUtils';
+import OopSystemCurrent from '../../../components/OopSystemCurrent';
 
 const ModalForm = Form.create()((props) => {
   const {loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
@@ -26,7 +27,35 @@ const ModalForm = Form.create()((props) => {
       <Button onClick={cancelForm}>取消</Button>
       <Button type="primary" onClick={submitForm} loading={loading}>保存</Button>
     </Fragment>);
-  const formConfig = ${formConfig}
+  const formConfig = {
+    formJson: [{
+      name: 'id',
+      component: {name: 'Input', props: {type: 'hidden'}},
+      wrapper: true
+    }, {
+      label: '名称',
+      key: 'Input',
+      component: {name: 'Input', props: {placeholder: '下拉的查询项名称'}},
+      name: 'vROHZEpk1a',
+      rules: [{required: true, message: '此项为必填项'}]
+    }, {
+      label: 'URL',
+      key: 'Input',
+      component: {name: 'Input', props: {placeholder: '请求数据的URL'}},
+      name: 'alqtQANGIM',
+      rules: [{required: true, message: '此项为必填项'}]
+    }, {
+      label: '回显的属性值',
+      key: 'Input',
+      component: {name: 'Input', props: {placeholder: '回填到页面的值'}},
+      name: '3HpWBS7VEi'
+    }, {
+      label: '排序',
+      key: 'InputNumber',
+      component: {name: 'InputNumber', props: {placeholder: '排序'}},
+      name: 'lPTMBWvoAQ'
+    }], formLayout: 'horizontal'
+  }
   return (
     <Modal title={title} visible={visible} footer={footer} onCancel={cancelForm}>
       <Spin spinning={loading}>
@@ -36,14 +65,14 @@ const ModalForm = Form.create()((props) => {
   )
 });
 
-@inject(['${modelName}', 'global'])
-@connect(({ ${modelName}, global, loading }) => ({
-  ${modelName},
+@inject(['formCurrentComponentSetting', 'global'])
+@connect(({ formCurrentComponentSetting, global, loading }) => ({
+  formCurrentComponentSetting,
   global,
-  loading: loading.models.${modelName},
+  loading: loading.models.formCurrentComponentSetting,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
-export default class Manager extends React.PureComponent {
+export default class CurrentComponentSetting extends React.PureComponent {
   state = {
     modalFormVisible: false,
   }
@@ -56,7 +85,7 @@ export default class Manager extends React.PureComponent {
     //  pagination
     // });
     this.props.dispatch({
-      type: '${modelName}/fetch',
+      type: 'formCurrentComponentSetting/fetch',
       payload: {
         pagination,
         ...condition
@@ -68,14 +97,14 @@ export default class Manager extends React.PureComponent {
   }
   handleEdit = (record)=>{
     this.props.dispatch({
-      type: '${modelName}/fetchById',
+      type: 'formCurrentComponentSetting/fetchById',
       payload: record.id,
     });
     this.setModalFormVisible(true);
   }
   handleRemove = (record)=>{
     this.props.dispatch({
-      type: '${modelName}/remove',
+      type: 'formCurrentComponentSetting/remove',
       payload: record.id,
       callback: (res)=>{
         oopToast(res, '删除成功', '删除失败');
@@ -87,12 +116,12 @@ export default class Manager extends React.PureComponent {
     const me = this;
     Modal.confirm({
       title: '提示',
-      content: \`确定删除选中的\$\{items.length\}条数据吗\`,
+      content: `确定删除选中的${items.length}条数据吗`,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
         me.props.dispatch({
-          type: '${modelName}/batchRemove',
+          type: 'formCurrentComponentSetting/batchRemove',
           payload: {ids: items.toString()},
           callback(res) {
             me.oopTable.clearSelection()
@@ -108,13 +137,13 @@ export default class Manager extends React.PureComponent {
     setTimeout(()=>{
       form.resetFields();
       this.props.dispatch({
-        type: '${modelName}/clearEntity'
+        type: 'formCurrentComponentSetting/clearEntity'
       });
     }, 300)
   }
   handleModalSubmit = (values)=>{
     this.props.dispatch({
-      type: '${modelName}/saveOrUpdate',
+      type: 'formCurrentComponentSetting/saveOrUpdate',
       payload: values,
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
@@ -126,9 +155,14 @@ export default class Manager extends React.PureComponent {
     this.setState({modalFormVisible: flag})
   }
   render() {
-    const {${modelName}: {entity, list}, loading,
+    const {formCurrentComponentSetting: {entity, list}, loading,
       global: { oopSearchGrid, size }, gridLoading } = this.props;
-    const { columns } = ${gridConfig};
+    const {columns} = {
+      columns: [{title: '名称', dataIndex: 'vROHZEpk1a'}, {
+        title: 'URL',
+        dataIndex: 'alqtQANGIM'
+      }, {title: '回显的属性值', dataIndex: '3HpWBS7VEi'}, {title: '排序', dataIndex: 'lPTMBWvoAQ'}]
+    };
     const topButtons = [
       {
         text: '新建',
@@ -165,7 +199,7 @@ export default class Manager extends React.PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="${modelName.toLocaleLowerCase()}"
+          moduleName="formcurrentcomponentsetting"
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
@@ -179,6 +213,8 @@ export default class Manager extends React.PureComponent {
             size={size}
             ref={(el)=>{ this.oopTable = el }}
           />
+          <OopSystemCurrent value={{url: '/auth/current/user', showPropName: 'name', label: '当前登录人'}} name="currentUser" />
+          <OopSystemCurrent value={{url: '/sys/current/date', label: '当前时间'}} name="currentSysDate" />
         </Card>
         <ModalForm
           visible={this.state.modalFormVisible}
@@ -188,6 +224,6 @@ export default class Manager extends React.PureComponent {
           formEntity={entity}
           loading={!!loading}
         />
-      </PageHeaderLayout>)
+      </PageHeaderLayout>);
   }
 }

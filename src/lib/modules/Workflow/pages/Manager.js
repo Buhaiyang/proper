@@ -147,6 +147,10 @@ export default class Manager extends React.PureComponent {
       callback: (res) => {
         console.log(res);
         const businessObj = res.length ? res[0] : null;
+        // HACK 兼容后台数据结构的问题
+        if (businessObj.formData[businessObj.formKey]) {
+          businessObj.formData = businessObj.formData[businessObj.formKey]
+        }
         this.setState({
           wfVisible: true,
           isLaunch: false,

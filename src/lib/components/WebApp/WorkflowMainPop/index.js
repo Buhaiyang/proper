@@ -55,6 +55,10 @@ export default class WorkflowMainPop extends PureComponent {
         payload: taskOrProcDefKey,
         callback: (res) => {
           const obj = res.length ? res[0] : null;
+          // HACK 兼容后台数据结构的问题
+          if (obj.formData[obj.formKey]) {
+            obj.formData = obj.formData[obj.formKey]
+          }
           this.setState({
             businessObj: {
               ...this.state.businessObj,
