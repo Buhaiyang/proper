@@ -47,14 +47,14 @@ export default class OopPreview extends PureComponent {
       horWidth,
       verWidth
     }, () => {
-      const wrap = document.getElementsByClassName('ant-modal-wrap')[0];
-      const modalContent = document.getElementsByClassName('ant-modal-content')[0];
+      const img = document.getElementById('image');
+      const modalBody = img.offsetParent;
+      const modalContent = modalBody.offsetParent;
       const modalWrap = modalContent.offsetParent;
-      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
+      const wrap = modalWrap.offsetParent;
       wrap.style.display = 'flex';
       wrap.style.justifyContent = 'center';
       wrap.style.alignItems = 'center';
-      wrap.style.zIndex = 2000;
       modalWrap.style.width = `${horWidth}px`;
       modalWrap.style.minWidth = '330px';
       modalWrap.style.maxWidth = `${innerWith}px`;
@@ -65,6 +65,7 @@ export default class OopPreview extends PureComponent {
       modalBody.style.minHeight = '200px';
     });
   }
+
   // 初始化图片2
   getNaturalSize2 = () => {
     const { innerWith, innerHeight } = window;
@@ -147,19 +148,39 @@ export default class OopPreview extends PureComponent {
   // 下载图片
   download = () => {
     const { img: {src, filename = 'pic'}} = this.props;
-    let a = document.createElement('a');
-    a.href = src;
-    a.download = filename;
-    a.click();
-    a = null;
+    let imgData = '';
+    let img = document.createElement('img');
+    img.setAttribute('crossOrigin', 'Anonymous');
+    img.onload = () => {
+      imgData = this.getBase64Image(img);
+      let a = document.createElement('a');
+      a.href = imgData;
+      a.download = filename;
+      a.click();
+      a = null;
+      img = null;
+    }
+    img.src = src;
+  }
+
+  // 图片转base64
+  getBase64Image = (img) =>{
+    let canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    const dataURL = canvas.toDataURL('image/png');
+    canvas = null;
+    return dataURL;
   }
 
   // 拖拽图片
   mouseDown = (e) => {
     e.preventDefault();
     if (e.button === 0) {
-      const modalBody = document.getElementsByClassName('ant-modal-body')[0];
       const img = document.getElementById('image');
+      const modalBody = img.offsetParent;
       const disX = e.clientX - img.offsetLeft;
       const disY = e.clientY - img.offsetTop;
       const { scales } = this.state;
