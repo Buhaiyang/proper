@@ -171,6 +171,7 @@ export default class OopWorkflowMain extends PureComponent {
               <Timeline.Item key={it.taskId}>
                 <div>{it.endTime}</div>
                 <h3>{it.name}</h3>
+                {it.sameAssigneeSkip ? <strong>此节点处理人与上一节点相同，已自动跳过</strong> : null}
                 {it.assigneeName && <div style={{marginTop: 16}}><span>审批人: </span>{it.assigneeName}</div>}
                 {it.form.formData.passOrNot !== undefined && <div style={{marginTop: 16}}><span>审批状态: </span>{it.form.formData.passOrNot === 1 ? '同意' : <span>不同意</span>}</div>}
                 {it.form.formData.approvalRemarks !== undefined && <div style={{marginTop: 16}}><span>审批意见: </span>{it.form.formData.approvalRemarks}</div>}

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {Fragment, PureComponent} from 'react';
 import {Spin, Input } from 'antd';
 import {connect} from 'dva/index';
 import DescriptionList from '../../../framework/components/DescriptionList';
@@ -14,24 +14,35 @@ const {Description} = DescriptionList;
   global,
 }))
 export default class OopSystemCurrent extends PureComponent {
-  state = {
-    value: this.props.value || null
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      id: value.id || null,
+      text: value.text || null,
+      code: value.code || null
+    };
   }
   componentWillReceiveProps(nextProps) {
     // Should be a controlled component.
-    if (nextProps.url && nextProps.OopSystemCurrent$model[nextProps.url]) {
-      const value = nextProps.OopSystemCurrent$model[nextProps.url];
-      this.setState({value: value.id});
+    if (nextProps.code !== this.state.code) {
+      if (nextProps.url && nextProps.OopSystemCurrent$model[nextProps.url]) {
+        const value = nextProps.OopSystemCurrent$model[nextProps.url];
+        const state = this.getValue(value, nextProps.showPropName, nextProps.code);
+        this.setState({...state});
+      }
     }
   }
   componentDidMount() {
     const { url } = this.props;
-    if (url) {
+    // 如果是一个code 那么不发送请求
+    if (this.props.code !== this.state.code) {
       this.props.dispatch({
         type: 'OopSystemCurrent$model/fetch',
         payload: url,
         callback: (resp)=>{
-          this.triggerChange(resp.result.id);
+          const state = this.getValue(resp.result, this.props.showPropName, this.props.code);
+          this.triggerChange(state);
         }
       })
     }
@@ -43,7 +54,11 @@ export default class OopSystemCurrent extends PureComponent {
     }
   }
   renderResult = ()=>{
-    const {OopSystemCurrent$model, showPropName, url} = this.props;
+    const {OopSystemCurrent$model, showPropName, url, value} = this.props;
+    // 如果有value从value读取值
+    if (value && value.text) {
+      return value.text
+    }
     const entity = OopSystemCurrent$model[url];
     if (entity) {
       if (typeof showPropName === 'undefined') {
@@ -53,15 +68,28 @@ export default class OopSystemCurrent extends PureComponent {
       }
     }
   }
+  getValue = (result, showPropName, code)=>{
+    if (result) {
+      if (typeof showPropName === 'undefined') {
+        return {id: result.id, text: result.data, code};
+      } else {
+        return {id: result.id, text: result.data ? result.data[showPropName] : result.id, code};
+      }
+    }
+  }
   render() {
-    const {OopSystemCurrent$model, global: {size}, label, url, name, loading} = this.props;
+    const {global: {size}, label, loading} = this.props;
     return (
       <div className={styles.container} style={{marginTop: 0}}>
         <Spin spinning={!!loading}>
           <DescriptionList col="1" size={size}>
             <div>
-              {OopSystemCurrent$model[url] ? (<Input type="hidden" name={name} value={this.state.value} />) : null}
-              <Description term={label}>{this.renderResult()}</Description>
+              <Fragment>
+                <Input type="hidden" value={this.state.id} />
+                <Input type="hidden" value={this.state.text} />
+                <Input type="hidden" value={this.state.code} />
+              </Fragment>
+              <Description term={label}>{this.state.text}</Description>
             </div>
           </DescriptionList>
         </Spin>

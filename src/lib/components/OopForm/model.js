@@ -17,7 +17,7 @@ export default {
       const response = yield call(service.findUrlData, payload);
       yield put({
         type: 'saveUrlData',
-        payload: {response, url: payload}
+        payload: {response, dataUrl: payload}
       })
     }
   },
@@ -33,12 +33,15 @@ export default {
       }
     },
     saveUrlData(state, action) {
+      const {dataUrl} = action.payload;
+      const {value, labelPropName, valuePropName, disabledPropName} = dataUrl;
       return {
         ...state,
-        [action.payload.url]: action.payload.response.result.map(it=>({
-          label: it.catalogName,
-          value: it.id,
-          disabled: !it.enable
+        [value]: action.payload.response.result.map(it=>({
+          ...it,
+          label: it[labelPropName],
+          value: it[valuePropName],
+          disabled: it[disabledPropName] === undefined ? false : it[disabledPropName],
         }))
       }
     }

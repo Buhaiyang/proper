@@ -140,7 +140,7 @@ export default class Manager extends React.PureComponent {
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
-    const {pepProcInst: {procInstId}, taskId, name} = record;
+    const {pepProcInst: {procInstId, processTitle}, taskId, name} = record;
     this.props.dispatch({
       type: 'workflowManager/findBusinessObjByTaskId',
       payload: taskId,
@@ -156,7 +156,7 @@ export default class Manager extends React.PureComponent {
           isLaunch: false,
           taskOrProcDefKey: taskId,
           procInstId,
-          businessObj: {...businessObj, formTitle: `${record.pepProcInst.startUserName}的${record.pepProcInst.processDefinitionName}`},
+          businessObj: {...businessObj, formTitle: processTitle},
           name,
           stateCode: undefined
         })

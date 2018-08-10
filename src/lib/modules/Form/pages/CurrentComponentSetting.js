@@ -7,7 +7,6 @@ import OopForm from '../../../components/OopForm';
 import OopTable from '../../../components/OopTable';
 import {inject} from '../../../../framework/common/inject';
 import { oopToast } from '../../../../framework/common/oopUtils';
-import OopSystemCurrent from '../../../components/OopSystemCurrent';
 
 const ModalForm = Form.create()((props) => {
   const {loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
@@ -36,24 +35,30 @@ const ModalForm = Form.create()((props) => {
       label: '名称',
       key: 'Input',
       component: {name: 'Input', props: {placeholder: '下拉的查询项名称'}},
-      name: 'vROHZEpk1a',
+      name: 'name',
+      rules: [{required: true, message: '此项为必填项'}]
+    }, {
+      label: '编码',
+      key: 'Input',
+      component: {name: 'Input', props: {placeholder: '唯一的编码'}},
+      name: 'code',
       rules: [{required: true, message: '此项为必填项'}]
     }, {
       label: 'URL',
       key: 'Input',
       component: {name: 'Input', props: {placeholder: '请求数据的URL'}},
-      name: 'alqtQANGIM',
+      name: 'url',
       rules: [{required: true, message: '此项为必填项'}]
     }, {
       label: '回显的属性值',
       key: 'Input',
       component: {name: 'Input', props: {placeholder: '回填到页面的值'}},
-      name: '3HpWBS7VEi'
+      name: 'showPropName'
     }, {
       label: '排序',
       key: 'InputNumber',
       component: {name: 'InputNumber', props: {placeholder: '排序'}},
-      name: 'lPTMBWvoAQ'
+      name: 'sort'
     }], formLayout: 'horizontal'
   }
   return (
@@ -158,10 +163,13 @@ export default class CurrentComponentSetting extends React.PureComponent {
     const {formCurrentComponentSetting: {entity, list}, loading,
       global: { oopSearchGrid, size }, gridLoading } = this.props;
     const {columns} = {
-      columns: [{title: '名称', dataIndex: 'vROHZEpk1a'}, {
-        title: 'URL',
-        dataIndex: 'alqtQANGIM'
-      }, {title: '回显的属性值', dataIndex: '3HpWBS7VEi'}, {title: '排序', dataIndex: 'lPTMBWvoAQ'}]
+      columns: [
+        {title: '名称', dataIndex: 'name'},
+        {title: '编码', dataIndex: 'code'},
+        {title: 'URL', dataIndex: 'url'},
+        {title: '回显的属性值', dataIndex: 'showPropName'},
+        {title: '排序', dataIndex: 'sort'}
+      ]
     };
     const topButtons = [
       {
@@ -213,8 +221,6 @@ export default class CurrentComponentSetting extends React.PureComponent {
             size={size}
             ref={(el)=>{ this.oopTable = el }}
           />
-          <OopSystemCurrent value={{url: '/auth/current/user', showPropName: 'name', label: '当前登录人'}} name="currentUser" />
-          <OopSystemCurrent value={{url: '/sys/current/date', label: '当前时间'}} name="currentSysDate" />
         </Card>
         <ModalForm
           visible={this.state.modalFormVisible}

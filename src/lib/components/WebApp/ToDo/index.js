@@ -37,9 +37,9 @@ function getActiveIndex(children, activeKey) {
   loading: loading.models.workflowManager,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
-export default class Workflow extends React.PureComponent {
+export default class ToDo extends React.PureComponent {
   state = {
-    activeKey: 'design',
+    activeKey: 'task',
     activeIndex: 0,
     task: {data: [], pagination: {}},
     design: {data: [], pagination: {}},
@@ -47,7 +47,7 @@ export default class Workflow extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.fetchDesign();
+    this.fetchData();
   }
 
   fetchDesign = () => {
@@ -178,20 +178,67 @@ export default class Workflow extends React.PureComponent {
       activeKey,
       activeIndex
     } = this.state;
-    console.log(task)
     return (
       <div className={styles.container}>
         <Tabs
           animated={false}
-          defaultActiveKey="design"
+          defaultActiveKey="task"
           className={styles.tabs}
           onChange={this.handleTabsChange}
           ref={(el)=>{ this.tabs = el }}>
-            {/* <TabPane key="task" tab="待办" /> */}
-            <TabPane key="design" tab="发起" />
-            <TabPane key="process" tab="发起历史" />
+          <TabPane key="task" tab="待办" />
+          {/* <TabPane key="design" tab="发起" style={{display: 'none'}} /> */}
+          {/* <TabPane key="process" tab="发起历史" style={{display: 'none'}} /> */}
         </Tabs>
         <div className={classNames(styles.tabsContent, styles.tabsContentAnimated)} style={{marginLeft: `${-activeIndex * 100}%`}}>
+          <div className={classNames(styles.tabsTabpane,
+            {
+              [styles.tabsTabpaneActive]: (activeKey === 'task'),
+              [styles.tabsTabpaneInactive]: (activeKey !== 'task')
+            }
+          )}>
+            {activeKey === 'task' ? (
+              <Fragment>
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={1}
+                  loadMore={this.fetchData}
+                  hasMore={!gridLoading && task.data.length < task.pagination.count}
+                  useWindow={false}
+                >
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={task.data}
+                    loading={gridLoading}
+                    renderItem={item => (
+                      <div className={styles.listItemWrapper}>
+                        <div className={styles.listLine}>
+                          <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
+                            <div style={{padding: '12px 15px 12px 0', borderBottom: '1px solid #ddd'}}><div style={{color: '#333', width: '100%', fontWeight: 'bold'}}>{item.pepProcInst.processDefinitionName}</div></div>
+                            <List.Item actions={[<Icon type="right" />]}>
+                              <List.Item.Meta
+                                description={<div>
+                                  <div><Icon type="clock-circle-o" className={styles.icon} />{item.pepProcInst.createTime}</div>
+                                  <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人: </span><span>{item.pepProcInst.startUserName}</span></div>
+                                </div>}
+                              />
+                              <div className={styles.listContent}>
+                                {item.pepProcInst.stateValue}
+                              </div>
+                            </List.Item>
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  />
+                </InfiniteScroll>
+                {gridLoading && task.data.length < task.pagination.count && (
+                  <div className={styles.loadingContainer}>
+                    <Spin />
+                  </div>
+                )}
+              </Fragment>) : null}
+          </div>
           <div className={classNames(styles.tabsTabpane,
             {
               [styles.tabsTabpaneActive]: (activeKey === 'design'),

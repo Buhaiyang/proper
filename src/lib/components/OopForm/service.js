@@ -1,11 +1,24 @@
 import {stringify} from 'qs';
 import request from '../../../framework/utils/request';
+import MongoService from '../../../framework/utils/MongoService';
 
 // 查询数据字典
 export async function fetchDictionary(param) {
   return request(`/sys/datadic?${stringify(param)}`);
 }
 // 根据URL查询数据源
-export async function findUrlData(url) {
-  return request(url);
+// url是一个对象
+export async function findUrlData(urlObj) {
+  if (typeof urlObj === 'object') {
+    const {value} = urlObj;
+    // restful
+    if (value.includes('/')) {
+      return request(value);
+    }
+    // Mongo
+    if (value.includes('_')) {
+      const ms = new MongoService(value);
+      return ms.fetch();
+    }
+  }
 }

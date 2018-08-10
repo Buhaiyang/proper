@@ -130,7 +130,13 @@ export default class OopFormDesigner extends React.PureComponent {
       {label: '选择器', key: 'Select', component: {name: 'Select', children: componentData}},
       {label: '日期选择', key: 'DatePicker', component: {name: 'DatePicker'}},
       {label: '数字输入框', key: 'InputNumber', component: {name: 'InputNumber'}},
-      {label: '系统当前', key: 'OopSystemCurrent', component: {name: 'OopSystemCurrent', props: {url: '/auth/current/user', showPropName: 'name'}}}
+      {
+        label: '系统当前',
+        key: 'OopSystemCurrent',
+        component: {
+          name: 'OopSystemCurrent',
+          props: {url: '/auth/current/user', showPropName: 'name', code: 'currentLoginUser', label: '当前登录人'}}
+      }
     ],
     rowItems: this.props.formDetails.formJson,
     formLayout: this.props.formDetails.formLayout,
@@ -218,6 +224,12 @@ export default class OopFormDesigner extends React.PureComponent {
       ...copy,
       name: getUuid(10)
     }
+    // 系统当前组件的Name给默认值 不随机生成
+    if (newItem.component.name === 'OopSystemCurrent') {
+      newItem.name = item.component.props.code;
+      newItem.label = item.component.props.label;
+      delete newItem.component.props.label;
+    }
     this.state.rowItems.push(newItem);
     this.forceUpdate()
   }
@@ -272,10 +284,18 @@ export default class OopFormDesigner extends React.PureComponent {
     // 组件内部props的同步
     if (attr === 'props') {
       const { component } = this.state.currentRowItem;
-      component.props = {
-        ...component.props,
-        [idAttr[3]]: value
-      };
+      // 支持批量更新props
+      if (idAttr[3] === 'props') {
+        component.props = {
+          ...component.props,
+          ...value
+        };
+      } else {
+        component.props = {
+          ...component.props,
+          [idAttr[3]]: value
+        };
+      }
       this.forceUpdate();
       return
     }

@@ -276,19 +276,6 @@ export default (item, eventsCollection)=>{
       initialValue: label
     },
     {
-      name: `${name}${prefix}_dict`,
-      label: '当前系统参数',
-      component: {
-        name: 'Select',
-        children: [],
-        dataUrl: '/sys/datadic/catalog',
-        props: {onChange: (value)=>{
-          onSelectChange(`${name}${prefix}_dict`, value);
-        }}
-      },
-      initialValue: component.dictCatalog,
-    },
-    {
       name: `${name}${prefix}_name`,
       label: 'name',
       component: {
@@ -296,7 +283,40 @@ export default (item, eventsCollection)=>{
         props: {placeholder: name, onChange: onNameChange}
       },
       initialValue: name
-    }];
+    }
+    ];
+    const currentSysArgsComp = {
+      name: `${name}${prefix}_dict`,
+      label: '当前系统参数',
+      component: {
+        name: 'Select',
+        children: [],
+        dataUrl: {
+          value: 'PEP_FORM_CURRENTCOMPONENTSETTING',
+          labelPropName: 'name',
+          valuePropName: 'code',
+          disabledPropName: 'enable'
+        },
+        props: {onChange: (value)=>{
+          const optionProps = currentSysArgsComp.component.children.find(it=>it.code === value);
+          const props = {
+            code: value,
+            url: optionProps.url,
+            showPropName: optionProps.showPropName,
+          }
+          // TODO 300毫秒节流
+          updateCenterPanel(`${name}${prefix}_label`, optionProps.name);
+          setTimeout(()=>{
+            setTimeout(()=>{
+              updateCenterPanel(`${name}${prefix}_name`, value);
+            }, 350)
+            updateCenterPanel(`${name}${prefix}_props_props`, props);
+          }, 350)
+        }}
+      },
+      initialValue: component.props.code,
+    };
+    formConfig.formJson.push(currentSysArgsComp);
     formConfig = {...formConfig, formLayout: 'vertical'};
   }
   const ruleChange = (event)=>{
