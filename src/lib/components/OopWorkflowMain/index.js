@@ -94,6 +94,8 @@ export default class OopWorkflowMain extends PureComponent {
     approvalRemarksRequire: false,
     imageLoading: true
   }
+  // 表单是否加载完成
+  isComplete = false;
   // 根据表单ID获取表单对象
   componentDidMount() {
     if (this.props.businessObj) {
@@ -104,7 +106,10 @@ export default class OopWorkflowMain extends PureComponent {
       }
       this.props.dispatch({
         type: 'baseWorkflow/fetchByFormCode',
-        payload: formKey
+        payload: formKey,
+        callback: ()=>{
+          this.isComplete = true
+        }
       })
     } else {
       this.handleTabsChange('progress');
@@ -267,10 +272,16 @@ export default class OopWorkflowMain extends PureComponent {
   submitWorkflow = (callback)=>{
     console.log('submitWorkflow...');
     const {taskOrProcDefKey, setButtonLoading} = this.props;
+    if (!this.isComplete) {
+      message.warning('有点卡哦，数据还没返回', ()=>{
+        setButtonLoading(false);
+      });
+      return
+    }
     const form = this.oopForm.getForm();
     form.validateFields({force: true}, (err, formData)=>{
       if (err) {
-        setButtonLoading(false)
+        setButtonLoading(false);
         return
       }
       this.props.dispatch({

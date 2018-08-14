@@ -221,7 +221,12 @@ export default (item, eventsCollection)=>{
       component: {
         name: 'Select',
         children: [],
-        dataUrl: '/sys/datadic/catalog',
+        dataUrl: {
+          value: '/sys/datadic/catalog',
+          labelPropName: 'catalogName',
+          valuePropName: 'id',
+          disabledPropName: 'enable',
+        },
         props: {onChange: (value)=>{
           onSelectChange(`${name}${prefix}_dict`, value);
         }}

@@ -9,7 +9,6 @@
 * name 流程办理页面
  */
 import React, { PureComponent, Fragment } from 'react';
-import {routerRedux} from 'dva/router';
 import {connect} from 'dva';
 import { Input, Button, Popover, Alert, message } from 'antd';
 import OopWorkflowMain from '../../OopWorkflowMain';
@@ -28,12 +27,14 @@ const PopPage = (props)=>{
 }
 
 @inject(['workflowManager'])
-@connect()
+@connect(({loading})=>({
+  formLoading: loading.effects['workflowManager/findBusinessObjByTaskId']
+}))
 export default class WorkflowMainPop extends PureComponent {
   constructor(props) {
     super(props);
     const { param } = getParamObj(this.props.location.search);
-    const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode, processDefinitionId} = JSON.parse(decodeURIComponent(param));
+    const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode, processDefinitionId} = JSON.parse(decodeURIComponent(atob(param)));
     this.state = {
       buttonLoading: false,
       activeTabKey: 'handle',
@@ -98,7 +99,8 @@ export default class WorkflowMainPop extends PureComponent {
     console.log('returnWorkflow...');
   }
   handleCancel = ()=>{
-    this.props.dispatch(routerRedux.push('/webapp/workflow'));
+    // this.props.dispatch(routerRedux.push('/webapp/workflow'));
+    history.go(-1);
   }
   handleAfterClose = ()=>{
     this.setState({

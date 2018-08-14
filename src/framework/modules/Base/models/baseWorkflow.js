@@ -7,12 +7,13 @@ export default {
     processProgress: []
   },
   effects: {
-    *fetchByFormCode({ payload }, { call, put }) {
+    *fetchByFormCode({ callback, payload }, { call, put }) {
       const response = yield call(fetchByFormCode, payload);
       yield put({
         type: 'saveFormEntity',
         payload: response,
       });
+      if (callback) callback(response);
     },
     *launchWorkflow({ callback, payload }, { call }) {
       const response = yield call(launchWorkflow, payload);

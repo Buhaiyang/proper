@@ -129,11 +129,11 @@ export default {
         return {
           ...state,
           oopSearchGrid: {
-            list: result.data,
+            list: result.data || [],
             pagination: {
               pageNo: pagination.pageNo,
               pageSize: pagination.pageSize,
-              count: result.count,
+              count: result.count || 0,
             }
           }
         }

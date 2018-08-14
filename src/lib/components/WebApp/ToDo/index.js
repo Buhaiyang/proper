@@ -1,7 +1,8 @@
 import React, {Fragment} from 'react';
-import { List, Icon, Tabs, Badge, Spin } from 'antd';
+import { List, Icon, Tabs, Spin } from 'antd';
 import {connect} from 'dva';
 import {routerRedux} from 'dva/router';
+import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
 import {inject} from '../../../../framework/common/inject';
@@ -34,7 +35,6 @@ function getActiveIndex(children, activeKey) {
   workflowManager,
   workflowDesigner,
   global,
-  loading: loading.models.workflowManager,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class ToDo extends React.PureComponent {
@@ -42,30 +42,13 @@ export default class ToDo extends React.PureComponent {
     activeKey: 'task',
     activeIndex: 0,
     task: {data: [], pagination: {}},
-    design: {data: [], pagination: {}},
-    process: {data: [], pagination: {}},
+    taskAssignee: {data: [], pagination: {}},
   }
 
   componentDidMount() {
     this.fetchData();
   }
 
-  fetchDesign = () => {
-    const self = this;
-    this.props.dispatch({
-      type: 'workflowManager/findDesign',
-      payload: {
-        modelType: '0',
-        sort: 'modifiedDesc'
-      },
-      callback: () => {
-        const { workflowManager } = self.props;
-        this.setState({
-          design: workflowManager.design
-        })
-      }
-    });
-  }
 
   fetchData = (page) => {
     const self = this;
@@ -92,7 +75,6 @@ export default class ToDo extends React.PureComponent {
   }
 
   handleTabsChange = (key) => {
-    const self = this;
     const { children } = this.tabs.props
     let activeIndex = getActiveIndex(children, key);
     if (activeIndex === -1) {
@@ -102,22 +84,15 @@ export default class ToDo extends React.PureComponent {
       activeKey: key,
       activeIndex,
       task: {data: [], pagination: {}},
-      design: {data: [], pagination: {}},
-      process: {data: [], pagination: {}},
+      taskAssignee: {data: [], pagination: {}},
     }, () => {
-      if (key === 'task') {
-        self.fetchData();
-      } else if (key === 'design') {
-        self.fetchDesign();
-      } else if (key === 'process') {
-        self.fetchData();
-      }
+      this.fetchData();
     });
   }
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
     const {key, startFormKey} = record;
-    const param = (encodeURIComponent(JSON.stringify({
+    const param = btoa(encodeURIComponent(JSON.stringify({
       isLaunch: true,
       taskOrProcDefKey: key,
       businessObj: {
@@ -127,10 +102,11 @@ export default class ToDo extends React.PureComponent {
     })));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
   }
+  // 待办
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
     const {pepProcInst: {procInstId, processTitle}, taskId, name} = record;
-    const param = (encodeURIComponent(JSON.stringify({
+    const param = btoa(encodeURIComponent(JSON.stringify({
       isLaunch: false,
       taskOrProcDefKey: taskId,
       procInstId,
@@ -140,6 +116,7 @@ export default class ToDo extends React.PureComponent {
     })));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
   }
+  // 发起历史
   handleProcessView = (record)=>{
     console.log('handleProcessView', record);
     const {procInstId, processDefinitionId, stateCode} = record;
@@ -149,12 +126,35 @@ export default class ToDo extends React.PureComponent {
       callback: (res) => {
         console.log(res);
         const businessObj = res.length ? res[0] : null;
-        const param = (encodeURIComponent(JSON.stringify({
+        const param = btoa(encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
           procInstId,
           businessObj,
           name: null,
+          processDefinitionId,
+          stateCode
+        })));
+        this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+      }
+    });
+  }
+  // 已处理
+  handleDoneProcessView = (record)=>{
+    console.log('handleDoneProcessView', record);
+    const {pepProcInst: {procInstId, processTitle, stateCode, processDefinitionId}} = record;
+    this.props.dispatch({
+      type: 'workflowManager/findBusinessObjByProcInstId',
+      payload: procInstId,
+      callback: (res) => {
+        console.log(res);
+        const businessObj = res.length ? res[0] : null;
+        const param = btoa(encodeURIComponent(JSON.stringify({
+          isLaunch: false,
+          taskOrProcDefKey: null,
+          procInstId,
+          businessObj,
+          name: processTitle,
           processDefinitionId,
           stateCode
         })));
@@ -168,13 +168,11 @@ export default class ToDo extends React.PureComponent {
 
   render() {
     const {
-      loading,
       gridLoading
     } = this.props;
     const {
       task,
-      design,
-      process,
+      taskAssignee,
       activeKey,
       activeIndex
     } = this.state;
@@ -187,8 +185,7 @@ export default class ToDo extends React.PureComponent {
           onChange={this.handleTabsChange}
           ref={(el)=>{ this.tabs = el }}>
           <TabPane key="task" tab="待办" />
-          {/* <TabPane key="design" tab="发起" style={{display: 'none'}} /> */}
-          {/* <TabPane key="process" tab="发起历史" style={{display: 'none'}} /> */}
+          <TabPane key="taskAssignee" tab="已办" />
         </Tabs>
         <div className={classNames(styles.tabsContent, styles.tabsContentAnimated)} style={{marginLeft: `${-activeIndex * 100}%`}}>
           <div className={classNames(styles.tabsTabpane,
@@ -214,13 +211,13 @@ export default class ToDo extends React.PureComponent {
                       <div className={styles.listItemWrapper}>
                         <div className={styles.listLine}>
                           <a onClick={ (event)=>{ this.handleProcessSubmit(item, event) }}>
-                            <div style={{padding: '12px 15px 12px 0', borderBottom: '1px solid #ddd'}}><div style={{color: '#333', width: '100%', fontWeight: 'bold'}}>{item.pepProcInst.processDefinitionName}</div></div>
+                            <div style={{padding: '12px 15px 12px 0', borderBottom: '1px solid #ddd'}}><div style={{color: '#333', width: '100%', fontWeight: 'bold'}}>{item.pepProcInst.processTitle}</div></div>
                             <List.Item actions={[<Icon type="right" />]}>
                               <List.Item.Meta
-                                description={<div>
-                                  <div><Icon type="clock-circle-o" className={styles.icon} />{item.pepProcInst.createTime}</div>
-                                  <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人: </span><span>{item.pepProcInst.startUserName}</span></div>
-                                </div>}
+                                description={<Fragment>
+                                  <div><Icon type="clock-circle-o" className={styles.icon} /><span>到达时间 : </span><span>{moment(item.pepProcInst.createTime).format('YYYY-MM-DD HH:mm')}</span></div>
+                                  <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人 : </span><span>{item.pepProcInst.startUserName}</span></div>
+                                </Fragment>}
                               />
                               <div className={styles.listContent}>
                                 {item.pepProcInst.stateValue}
@@ -241,75 +238,41 @@ export default class ToDo extends React.PureComponent {
           </div>
           <div className={classNames(styles.tabsTabpane,
             {
-              [styles.tabsTabpaneActive]: (activeKey === 'design'),
-              [styles.tabsTabpaneInactive]: (activeKey !== 'design')
+              [styles.tabsTabpaneActive]: (activeKey === 'taskAssignee'),
+              [styles.tabsTabpaneInactive]: (activeKey !== 'taskAssignee')
             }
           )}>
-            <List
-              itemLayout="horizontal"
-              dataSource={design.data}
-              loading={loading}
-              renderItem={item => (
-                <div className={styles.listItemWrapper}>
-                  <div className={styles.listLine}>
-                    <a onClick={ (event)=>{ item.status.code === 'DEPLOYED' ? this.handleProcessLaunch(item, event) : null }}>
-                      <List.Item actions={[item.status.code === 'DEPLOYED' ? <Icon type="right" /> : null]}>
-                        <List.Item.Meta
-                          title={<span style={{fontWeight: 'bold'}}>{item.name}</span>}
-                          description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.lastUpdated}</Fragment>}
-                        />
-                        <div>
-                          <Badge
-                            status={
-                              item.status ?
-                                (item.status.code === 'UN_DEPLOYED' ?
-                                    'default' :
-                                    (item.status.code === 'DEPLOYED' ?
-                                        'success' :
-                                        (item.status.code === '2' ? 'processing' : 'error')
-                                    )
-                                ) : 'default'
-                            }
-                            text={ item.status ? item.status.name : '未部署' }
-                            className={styles.status} />
-                        </div>
-                      </List.Item>
-                    </a>
-                  </div>
-                </div>
-              )}
-            />
-          </div>
-          <div className={classNames(styles.tabsTabpane,
-            {
-              [styles.tabsTabpaneActive]: (activeKey === 'process'),
-              [styles.tabsTabpaneInactive]: (activeKey !== 'process')
-            }
-          )}>
-            {activeKey === 'process' ? (
+            {activeKey === 'taskAssignee' ? (
               <Fragment>
                 <InfiniteScroll
                   initialLoad={false}
                   pageStart={1}
                   loadMore={this.fetchData}
-                  hasMore={!gridLoading && process.data.length < process.pagination.count}
+                  hasMore={!gridLoading && taskAssignee.data.length < taskAssignee.pagination.count}
                   useWindow={false}
                 >
                   <List
                     itemLayout="horizontal"
-                    dataSource={process.data}
+                    dataSource={taskAssignee.data}
                     loading={gridLoading}
                     renderItem={item => (
                       <div className={styles.listItemWrapper}>
                         <div className={styles.listLine}>
-                          <a onClick={ (event)=>{ this.handleProcessView(item, event) }}>
+                          <a onClick={ (event)=>{ this.handleDoneProcessView(item, event) }}>
+                            <div style={{padding: '12px 15px 12px 0', borderBottom: '1px solid #ddd'}}>
+                              <div style={{color: '#333', width: '100%', fontWeight: 'bold'}}>{item.pepProcInst.processTitle || `${item.pepProcInst.startUserName}的${item.pepProcInst.processDefinitionName}`}</div>
+                            </div>
                             <List.Item actions={[<Icon type="right" />]}>
                               <List.Item.Meta
-                                title={<span style={{fontWeight: 'bold'}}>{item.processDefinitionName}</span>}
-                                description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.createTime}</Fragment>}
+                                description={
+                                <Fragment>
+                                  <div><Icon type="clock-circle-o" className={styles.icon} /><span>办理时间 : </span><span>{moment(item.endTime).format('YYYY-MM-DD HH:mm')}</span></div>
+                                  <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人 : </span><span>{item.pepProcInst.startUserName}</span></div>
+                                </Fragment>
+                              }
                               />
                               <div className={styles.listContent}>
-                                {item.stateValue}
+                                {item.pepProcInst.stateValue}
                               </div>
                             </List.Item>
                           </a>
@@ -318,7 +281,7 @@ export default class ToDo extends React.PureComponent {
                     )}
                   />
                 </InfiniteScroll>
-                {gridLoading && process.data.length < process.pagination.count && (
+                {gridLoading && taskAssignee.data.length < taskAssignee.pagination.count && (
                   <div className={styles.loadingContainer}>
                     <Spin />
                   </div>

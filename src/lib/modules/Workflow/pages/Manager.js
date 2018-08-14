@@ -105,6 +105,15 @@ export default class Manager extends React.PureComponent {
     this.processSearch.load(params);
   }
 
+  handleSearchTaskAssignee = (param = {})=>{
+    const { pagination } = param;
+    const params = {
+      pagination,
+      ...param,
+    }
+    this.taskAssigneeSearch.load(params);
+  }
+
   handleTabsChange = (key) => {
     const self = this;
     const { children } = this.tabs.props
@@ -122,6 +131,8 @@ export default class Manager extends React.PureComponent {
         self.fetchDesign();
       } else if (key === 'process') {
         self.handleSearchProcess({pagination: {pageNo: 1, pageSize: 10}});
+      } else if (key === 'taskAssignee') {
+        self.handleSearchTaskAssignee({pagination: {pageNo: 1, pageSize: 10}});
       }
     });
   }
@@ -196,6 +207,29 @@ export default class Manager extends React.PureComponent {
       }
     });
   }
+  // 已处理
+  handleDoneProcessView = (record)=>{
+    console.log('handleDoneProcessView', record);
+    const {pepProcInst: {procInstId, processTitle, stateCode, processDefinitionId}} = record;
+    this.props.dispatch({
+      type: 'workflowManager/findBusinessObjByProcInstId',
+      payload: procInstId,
+      callback: (res) => {
+        console.log(res);
+        const businessObj = res.length ? res[0] : null;
+        this.setState({
+          wfVisible: true,
+          isLaunch: false,
+          taskOrProcDefKey: null,
+          procInstId,
+          businessObj,
+          name: processTitle,
+          processDefinitionId,
+          stateCode
+        });
+      }
+    });
+  }
   closeProcessModal = ()=>{
     this.setState({
       wfVisible: false
@@ -246,6 +280,16 @@ export default class Manager extends React.PureComponent {
         {title: '名称', dataIndex: 'processDefinitionName'},
         {title: '发起时间', dataIndex: 'createTime'},
         {title: '流程状态', dataIndex: 'stateValue'},
+      ],
+      taskAssignee: [
+        {title: '名称', dataIndex: 'pepProcInst.processDefinitionName'},
+        {title: '发起时间', dataIndex: 'pepProcInst.createTime'},
+        {title: '发起人', dataIndex: 'pepProcInst.startUserName'},
+        {title: '当前处理情况', dataIndex: 'pepProcInst.stateValue', render: (val, record) => {
+          return (
+            <Fragment><div>{val}</div><div>办理时间:{record.endTime}</div></Fragment>
+          );
+        }},
       ]
     }
 
@@ -282,6 +326,14 @@ export default class Manager extends React.PureComponent {
         onClick: (record)=>{ this.handleProcessView(record) }
       }
     ];
+    const actionDoneProcessColumn = [
+      {
+        text: '流程查看',
+        name: 'view',
+        icon: 'select',
+        onClick: (record)=>{ this.handleDoneProcessView(record) }
+      }
+    ];
 
     return (
       <PageHeaderLayout content={
@@ -289,7 +341,7 @@ export default class Manager extends React.PureComponent {
           <TabPane key="task" tab="待办" />
           <TabPane key="design" tab="发起" />
           <TabPane key="process" tab="发起历史" />
-          <TabPane key="4" disabled tab="已处理流程" />
+          <TabPane key="taskAssignee" tab="已处理流程" />
           <TabPane key="5" disabled tab="流程草稿箱" />
         </Tabs>
       }>
@@ -361,6 +413,29 @@ export default class Manager extends React.PureComponent {
                 onLoad={this.handleSearchProcess}
                 rowButtons={actionViewColumn}
                 rowKey="procInstId"
+                size={size}
+              />
+            </div>
+            <div className={classNames(styles.tabsTabpane,
+              {
+                [styles.tabsTabpaneActive]: (activeKey === 'taskAssignee'),
+                [styles.tabsTabpaneInactive]: (activeKey !== 'taskAssignee')
+              }
+            )}>
+              <OopSearch
+                placeholder="请输入"
+                enterButtonText="搜索"
+                moduleName="workflow_taskAssignee"
+                ref={(el)=>{ this.taskAssigneeSearch = el && el.getWrappedInstance() }}
+              />
+              <OopTable
+                checkable={false}
+                columns={column[activeKey]}
+                grid={oopSearchGrid}
+                loading={gridLoading}
+                onLoad={this.handleSearchTaskAssignee}
+                rowButtons={actionDoneProcessColumn}
+                rowKey="taskId"
                 size={size}
               />
             </div>

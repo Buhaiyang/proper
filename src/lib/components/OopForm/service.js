@@ -21,4 +21,5 @@ export async function findUrlData(urlObj) {
       return ms.fetch();
     }
   }
+  return new Promise();
 }

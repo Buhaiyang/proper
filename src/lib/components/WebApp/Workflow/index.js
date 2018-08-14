@@ -2,6 +2,7 @@ import React, {Fragment} from 'react';
 import { List, Icon, Tabs, Badge, Spin } from 'antd';
 import {connect} from 'dva';
 import {routerRedux} from 'dva/router';
+import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
 import {inject} from '../../../../framework/common/inject';
@@ -41,7 +42,6 @@ export default class Workflow extends React.PureComponent {
   state = {
     activeKey: 'design',
     activeIndex: 0,
-    task: {data: [], pagination: {}},
     design: {data: [], pagination: {}},
     process: {data: [], pagination: {}},
   }
@@ -101,13 +101,10 @@ export default class Workflow extends React.PureComponent {
     this.setState({
       activeKey: key,
       activeIndex,
-      task: {data: [], pagination: {}},
       design: {data: [], pagination: {}},
       process: {data: [], pagination: {}},
     }, () => {
-      if (key === 'task') {
-        self.fetchData();
-      } else if (key === 'design') {
+      if (key === 'design') {
         self.fetchDesign();
       } else if (key === 'process') {
         self.fetchData();
@@ -117,26 +114,13 @@ export default class Workflow extends React.PureComponent {
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
     const {key, startFormKey} = record;
-    const param = (encodeURIComponent(JSON.stringify({
+    const param = btoa(encodeURIComponent(JSON.stringify({
       isLaunch: true,
       taskOrProcDefKey: key,
       businessObj: {
         formKey: startFormKey
       },
       name: '流程发起'
-    })));
-    this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
-  }
-  handleProcessSubmit = (record)=>{
-    console.log('handleProcessSubmit', record)
-    const {pepProcInst: {procInstId, processTitle}, taskId, name} = record;
-    const param = (encodeURIComponent(JSON.stringify({
-      isLaunch: false,
-      taskOrProcDefKey: taskId,
-      procInstId,
-      name,
-      businessObj: {formTitle: processTitle},
-      stateCode: undefined
     })));
     this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
   }
@@ -149,7 +133,7 @@ export default class Workflow extends React.PureComponent {
       callback: (res) => {
         console.log(res);
         const businessObj = res.length ? res[0] : null;
-        const param = (encodeURIComponent(JSON.stringify({
+        const param = btoa(encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
           procInstId,
@@ -172,13 +156,11 @@ export default class Workflow extends React.PureComponent {
       gridLoading
     } = this.props;
     const {
-      task,
       design,
       process,
       activeKey,
       activeIndex
     } = this.state;
-    console.log(task)
     return (
       <div className={styles.container}>
         <Tabs
@@ -187,7 +169,6 @@ export default class Workflow extends React.PureComponent {
           className={styles.tabs}
           onChange={this.handleTabsChange}
           ref={(el)=>{ this.tabs = el }}>
-            {/* <TabPane key="task" tab="待办" /> */}
             <TabPane key="design" tab="发起" />
             <TabPane key="process" tab="发起历史" />
         </Tabs>
@@ -209,7 +190,12 @@ export default class Workflow extends React.PureComponent {
                       <List.Item actions={[item.status.code === 'DEPLOYED' ? <Icon type="right" /> : null]}>
                         <List.Item.Meta
                           title={<span style={{fontWeight: 'bold'}}>{item.name}</span>}
-                          description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.lastUpdated}</Fragment>}
+                          description={
+                          <Fragment>
+                            <Icon type="clock-circle-o" className={styles.icon} />
+                            <span>部署时间 : </span>
+                            <span>{moment(item.lastUpdated).format('YYYY-MM-DD HH:mm')}</span>
+                          </Fragment>}
                         />
                         <div>
                           <Badge
@@ -259,7 +245,12 @@ export default class Workflow extends React.PureComponent {
                             <List.Item actions={[<Icon type="right" />]}>
                               <List.Item.Meta
                                 title={<span style={{fontWeight: 'bold'}}>{item.processDefinitionName}</span>}
-                                description={<Fragment><Icon type="clock-circle-o" className={styles.icon} />{item.createTime}</Fragment>}
+                                description={
+                                  <Fragment>
+                                    <Icon type="clock-circle-o" className={styles.icon} />
+                                    <span>创建时间 : </span>
+                                    <span>{moment(item.createTime).format('YYYY-MM-DD HH:mm')}</span>
+                                  </Fragment>}
                               />
                               <div className={styles.listContent}>
                                 {item.stateValue}
