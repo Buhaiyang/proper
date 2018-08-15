@@ -13,13 +13,24 @@
         line-height: 21px;
       }
     }
-  }
-}
-:global {
-  .feedbackModal {
-    .ant-modal-footer {
-      border: none;
+    .feedbackModal {
+      .ant-modal-footer {
+        border: none;
+      }
     }
+    .ant-card-extra {
+      display: flex;
+    }
+  }
+  .mobileModel {
+    margin-left: 12px;
+    max-width: ~"calc(100vw/3 - 300px)";
+    width: auto;
+    display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: pointer;
   }
 }
 

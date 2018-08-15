@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Card, Form, Spin, Input, Radio, Select, InputNumber, message } from 'antd';
 import {connect} from 'dva';
 import OopFormDesigner from '../../../components/OopFormDesigner';
+import OopSearch from '../../../components/OopSearch';
 import OopTable from '../../../components/OopTable';
 import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
@@ -281,6 +282,10 @@ export default class Template extends React.PureComponent {
       }
     });
   }
+  handleInputChange = (inputValue, filter)=>{
+    console.log(inputValue, filter);
+    // TODO Mongo查询的数据不支持OopSearch
+  }
   render() {
     const {formTemplate: {grid, entity}, loading, global: { size } } = this.props;
     const columns = [
@@ -327,6 +332,12 @@ export default class Template extends React.PureComponent {
     return (
       <PageHeaderLayout>
         <Card bordered={false}>
+          <OopSearch
+            placeholder="请输入"
+            enterButtonText="搜索"
+            onInputChange={this.handleInputChange}
+            ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
+          />
           <OopTable
             loading={loading}
             grid={grid}
@@ -354,6 +365,7 @@ export default class Template extends React.PureComponent {
           onCancel={this.handleFormDesignerModalCancel}
           onOk={this.handleFormDesignerModalSubmit}
           okText="保存"
+          maskClosable={false}
           destroyOnClose={true}>
           <OopFormDesigner
             ref={(el)=>{ this.oopFormDesigner = el }}

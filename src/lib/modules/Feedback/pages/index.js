@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Input, Select, List, Card, Spin, Modal, Button, message } from 'antd';
+import { Input, Select, List, Card, Spin, Modal, Button, Popover, message } from 'antd';
 import { connect } from 'dva';
 import InfiniteScroll from 'react-infinite-scroller';
 import { inject } from '../../../../framework/common/inject';
@@ -237,10 +237,12 @@ export default class Feedback extends React.Component {
                       <span>
                         {item.feedBackDocuments[item.feedBackDocuments.length - 1].netType}
                       </span>
-                      <span style={{marginLeft: '24px'}}>
-                        {item.feedBackDocuments[item.feedBackDocuments.length - 1].mobileModel}
+                      <span className={styles.mobileModel}>
+                        <Popover content={item.feedBackDocuments[item.feedBackDocuments.length - 1].mobileModel}>
+                          <span>{item.feedBackDocuments[item.feedBackDocuments.length - 1].mobileModel}</span>
+                        </Popover>
                       </span>
-                      <span style={{marginLeft: '24px'}}>
+                      <span style={{marginLeft: 12}}>
                         {item.feedBackDocuments[item.feedBackDocuments.length - 1].appVersion}
                       </span>
                     </Fragment>}>
