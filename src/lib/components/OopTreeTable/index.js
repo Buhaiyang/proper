@@ -1,10 +1,10 @@
-import React, { PureComponent } from 'react';
-import { Row, Col, Card, Tree, Spin, Input, Icon } from 'antd';
+import React, { PureComponent, Fragment } from 'react';
+import { Row, Col, Card, Tree, Spin, Input, Icon, Menu, Dropdown, Modal } from 'antd';
 import OopTable from '../OopTable';
 import OopSearch from '../OopSearch';
 import styles from './index.less';
 
-
+const {confirm} = Modal;
 const { TreeNode } = Tree
 const { Search } = Input
 const dataList = []
@@ -35,6 +35,17 @@ const generateList = (data, props) => {
     }
   }
 };
+function setPosition(x, y) {
+  setTimeout(
+    () => {
+      const popoverDom = document.querySelector('.ant-dropdown')
+      const popoverDomHeight = -20;
+      const popoverDomWidth = popoverDom.offsetWidth;
+      popoverDom.style.top = `${y - popoverDomHeight - 4}px`;
+      popoverDom.style.left = `${x - (popoverDomWidth / 2)}px`;
+    }, 0, y, x
+  )
+}
 export default class OopTreeTable extends PureComponent {
   constructor(props) {
     super(props);
@@ -44,10 +55,15 @@ export default class OopTreeTable extends PureComponent {
       expandedKeys: [],
       searchValue: '',
       autoExpandParent: true,
-      selectedKeys: [..._defaultSelectedKeys]
+      selectedKeys: [..._defaultSelectedKeys],
+      popoverConfig: {
+        treeMenuState: 'button',
+        popoverY: null,
+        popoverX: null,
+        popoverInfo: null,
+      }
     }
   }
-
   handleOnSelect = (treeNode, event)=>{
     if (event.selected) {
       const id = event.node.props.dataRef.id || event.node.props.dataRef.key;
@@ -74,6 +90,52 @@ export default class OopTreeTable extends PureComponent {
         this.table.clearSelection()
       });
     }
+  }
+  handleOnRightClick = ({event, node}) => {
+    if (!(this.props.tree.onRightClickConfig)) {
+      return
+    }
+    const y = event.pageY;
+    const x = event.pageX;
+    setPosition.call(this, x, y)
+    this.props.tree.onRightClickConfig.rightClick(node.props.dataRef)
+    this.props.tree.onRightClickConfig.menuVisible(true)
+    const data = {
+      popoverY: y,
+      popoverX: x,
+      popoverInfo: node,
+      treeMenuState: 'button'
+    }
+    this.setState({
+      popoverConfig: data
+    });
+  }
+  confirm = (item) => {
+    this.props.tree.onRightClickConfig.menuVisible(false)
+    const {props} = this.state.popoverConfig.popoverInfo;
+    const { onClick } = item;
+    confirm({
+      title: item.confirm,
+      onOk() {
+        onClick(props)
+      },
+      onCancel() {
+      },
+    });
+  }
+  handleVisibleChange = () => {
+    this.props.tree.onRightClickConfig.menuVisible(false)
+  }
+  handelPopover = (type) =>{
+    const x = this.state.popoverConfig.popoverX;
+    const y = this.state.popoverConfig.popoverY;
+    setPosition.call(this, x, y)
+    this.setState({
+      popoverConfig: {
+        ...this.state.popoverConfig,
+        treeMenuState: type.key
+      },
+    });
   }
   renderTreeNodes = (data = [], treeTitle, treeKey, treeRoot, searchValue)=> {
     const treeNodes = data.map((node) => {
@@ -155,10 +217,15 @@ export default class OopTreeTable extends PureComponent {
     return {...this.state.currentSelectTreeNode}
   }
   render() {
+    let menuList = null;
+    if ((this.props.tree.onRightClickConfig)) {
+      const {menuList: temp} = this.props.tree.onRightClickConfig
+      menuList = temp
+    }
     const { searchValue, expandedKeys, autoExpandParent, selectedKeys } = this.state;
     const treeConfig = this.props.tree;
     const tableConfig = this.props.table;
-    const { treeData, treeTitle, treeKey, treeRoot, treeLoading, _defaultSelectedKeys} = treeConfig;
+    const { treeData, treeTitle, treeKey, treeRoot, treeLoading, _defaultSelectedKeys, } = treeConfig;
     const { gridLoading, grid, columns, topButtons = [], rowButtons = [], oopSearch } = tableConfig;
     const {size} = this.props;
     if (selectedKeys.length === 0 && _defaultSelectedKeys) {
@@ -166,6 +233,43 @@ export default class OopTreeTable extends PureComponent {
         selectedKeys.push(item);
       });
     }
+    let menuHTML = null;
+    menuList && (this.state.popoverConfig.treeMenuState === 'button' ? menuHTML = (
+          <Menu>
+            {
+              menuList.map((item)=>{
+                const {name} = item;
+                if (!item.confirm) {
+                  return (
+                    <Menu.Item key={name} onClick={(nameParam)=>{ this.handelPopover(nameParam) }}>
+                      <Icon type={item.icon} style={{fontSize: 16}} />{item.text}
+                    </Menu.Item>
+                  )
+                } else {
+                  return (
+                    <Menu.Item key={name}>
+                      <div onClick={()=>{ this.confirm(item) }}>
+                        <Icon type={item.icon} style={{ fontSize: 16}} />
+                          <span style={{paddingLeft: 9}}>{item.text}</span>
+                      </div>
+                    </Menu.Item>
+                  )
+                }
+              })
+            }
+          </Menu>) : menuHTML = (
+          <li key="other">
+            {menuList.map((item) => {
+              if (item.name === this.state.popoverConfig.treeMenuState) {
+                return (
+                <Fragment key={item.name}>{item.render}</Fragment>
+              );
+              }
+              return null
+            })
+          }
+        </li>)
+    )
     return (
       <Row gutter={16} className={styles.OopTreeTable}>
         <Col span={18} push={6}>
@@ -190,20 +294,34 @@ export default class OopTreeTable extends PureComponent {
         <Col span={6} pull={18}>
           <Card bordered={false} title={treeConfig.title}>
             <Spin spinning={treeLoading}>
-              <Search style={{ marginBottom: 8 }} placeholder="搜索" onChange={this.handleOnChange} />
-              <Tree
-                showIcon
-                defaultExpandAll={true}
-                onExpand={this.onExpand}
-                expandedKeys={expandedKeys}
-                autoExpandParent={autoExpandParent}
-                onSelect={this.handleOnSelect}
-                selectedKeys={selectedKeys}
-                {...treeConfig}
-                ref={(el)=>{ this.tree = el }}
+              <Search style={{ marginBottom: 8}} placeholder="搜索" onChange={this.handleOnChange} />
+              {menuList && (
+              <Dropdown
+                style={{zIndex: 1000}}
+                overlay={menuHTML}
+                trigger={['click']}
+                visible={this.props.tree.onRightClickConfig.treeMenuVisible }
+                onVisibleChange={this.handleVisibleChange}
+                ref={(el)=>{ this.popover = el }}
               >
-                {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot, searchValue)}
-              </Tree>
+              <div />
+              </Dropdown>
+              )
+            }
+                <Tree
+                  showIcon
+                  defaultExpandAll={true}
+                  onExpand={this.onExpand}
+                  expandedKeys={expandedKeys}
+                  autoExpandParent={autoExpandParent}
+                  onSelect={this.handleOnSelect}
+                  selectedKeys={selectedKeys}
+                  {...treeConfig}
+                  ref={(el)=>{ this.tree = el }}
+                  onRightClick={this.handleOnRightClick}
+                >
+                  {this.renderTreeNodes(treeData, treeTitle, treeKey, treeRoot, searchValue)}
+                </Tree>
             </Spin>
           </Card>
         </Col>

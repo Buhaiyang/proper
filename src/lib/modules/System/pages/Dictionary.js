@@ -1,11 +1,10 @@
 import React, {Fragment} from 'react';
-import { Modal, Card, Form, Spin, Input, Button, Radio, InputNumber } from 'antd';
+import { Modal, Card, Form, Spin, Input, Button, Radio, InputNumber, Select } from 'antd';
 import {connect} from 'dva';
 import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import { oopToast } from '../../../../framework/common/oopUtils';
-import OopSearch from '../../../components/OopSearch';
-import OopTable from '../../../components/OopTable';
+import OopTreeTable from '../../../components/OopTreeTable';
 import DescriptionList from '../../../../framework/components/DescriptionList';
 
 const { Description } = DescriptionList;
@@ -21,6 +20,86 @@ const formItemLayout = {
     sm: { span: 16 },
   },
 };
+const TreeForm = Form.create()((props) => {
+  const { form } = props;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    props.form.validateFields((err, values) => {
+      if (!err) {
+        props.onSubmit(values)
+      }
+    });
+  }
+  const handlePopoverC = () => {
+    props.onCancel();
+  }
+  return (
+    <Form key="form" style={{ backgroundColor: '#fff', border: '1px solid #e8e8e8', padding: 15, borderRadius: 5}}>
+          <FormItem { ...formItemLayout } key="1" label="名称">
+            {form.getFieldDecorator('catalogName', {
+              initialValue: props.catalogName,
+              rules: [
+                { required: true, whitespace: true, message: '名称不能为空', }
+              ]
+            })(<Input placeholder="请输入字典项内容" style={{width: 200}} />)}
+          </FormItem>
+          <FormItem {...formItemLayout} key="2" label="编码">
+            {form.getFieldDecorator('catalogCode', {
+              initialValue: props.catalogCode,
+              rules: [
+                { required: true, whitespace: true, pattern: /^(?![0-9]+$)[^ \u4e00-\u9fa5]+$/, message: '不能为空，且不能为纯数字', },
+              ]
+            })(<Input placeholder="请输入字典编码" style={{width: 200}} />)}
+          </FormItem>
+          {props.catalogType ? (
+          <FormItem {...formItemLayout} key="3" label="类型">
+            {form.getFieldDecorator('catalogType', {
+              initialValue: props.catalogType,
+              rules: [
+                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '类型不能为空，且为非汉字', },
+              ]
+            })(
+              <Select disabled={true} getPopupContainer={()=>document.querySelector('.ant-form')} style={{ width: '200' }} placeholder="请选择类型">
+                <Select.Option key="b" value="BUSINESS">BUSINESS</Select.Option>
+                <Select.Option key="s" value="SYSTEM">SYSTEM</Select.Option>
+              </Select>
+            )
+            }
+          </FormItem>) :
+          (
+          <FormItem {...formItemLayout} key="3" label="类型">
+            {form.getFieldDecorator('catalogType', {
+              initialValue: props.catalogType,
+              rules: [
+                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '类型不能为空，且为非汉字', },
+              ]
+            })(
+              <Select getPopupContainer={()=>document.querySelector('.ant-form')} style={{ width: '200' }} placeholder="请选择类型">
+                <Select.Option key="b" value="BUSINESS">BUSINESS</Select.Option>
+                <Select.Option key="s" value="SYSTEM">SYSTEM</Select.Option>
+              </Select>
+            )
+            }
+        </FormItem>)
+        }
+          <FormItem {...formItemLayout} key="4" label="排序">
+            {form.getFieldDecorator('sort', {
+              initialValue: props.sort,
+              rules: [
+                { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '排序不能为空', },
+              ]
+            })(<InputNumber min={0} max={100} />)}
+          </FormItem>
+          <FormItem key="5" style={{marginBottom: 0}}>
+            {/* <Button type="primary" htmlType="submit" size="small"> */}
+            <Button style={{float: 'right'}} key="p" size="small" type="primary" onClick={handleSubmit} className="login-form-button">
+              确认
+            </Button>
+            <Button key="s" style={{float: 'right', marginRight: 10}} size="small" onClick={handlePopoverC}>取消</Button>
+          </FormItem>
+    </Form>
+  )
+});
 const ModalForm = Form.create()((props) => {
   const { form, loading, visible, title, onModalCancel, onModalSubmit, formEntity } = props;
   const submitForm = ()=>{
@@ -97,28 +176,124 @@ const ModalForm = Form.create()((props) => {
     </Modal>
   )
 });
-
+// function documentClick (event){
+//   if(event.target.children[0]){
+//     if(event.target.children[0].className == "index__primaryColor___BRfLf"){
+//       console.log("点着了")
+//     }
+//   }
+//   // alert(1)
+// }
 @inject(['systemDictionary', 'global'])
 @connect(({ systemDictionary, global, loading }) => ({
   systemDictionary,
   global,
   loading: loading.models.systemDictionary,
-  gridLoading: loading.effects['global/oopSearchResult']
+  gridLoading: loading.effects['systemDictionary/getTableData']
 }))
 export default class Dictionary extends React.PureComponent {
   state = {
+    tableTitle: '所有',
     modalFormVisible: false,
     visible: false,
-    info: {}
+    info: {},
+    treeMenuVisible: false,
+    id: null,
+    catalogName: '',
+    catalogCode: '',
+    catalogType: '',
+    sort: '',
+    newTableData: {},
+    pageNumShow: 1,
   }
   componentDidMount() {
     this.onLoad();
+    // document.addEventListener("click",documentClick)
+    this.tableInit();
+  }
+  // componentWillUnmount(){
+
+
+  //   // document.removeEventListener("click", documentClick);
+  // }
+  tableInit = (pagination) =>{
+    const param = {
+      dataDicType: '',
+      pageSize: 10
+    }
+    if (pagination) {
+      param.pageNo = pagination.pageNo;
+    } else {
+      param.pageNo = 1;
+    }
+    this.props.dispatch({
+      type: 'systemDictionary/tableInit',
+      payload: param,
+    });
   }
   onLoad = (param = {})=>{
     const {pagination} = param;
-    this.oopSearch.load({
-      pagination,
-      dataDicType: ''
+    this.props.dispatch({
+      type: 'systemDictionary/getTreeData',
+    });
+    if (pagination) {
+      this.setState({
+        pageNumShow: pagination.pageNo
+      })
+      this.tableInit(pagination);
+    }
+  }
+  handlePopoverEditSub = (values) =>{
+    const {catalogName, catalogCode, catalogType, sort} = values;
+    const {id} = this.state;
+    // console.log(node)
+    // const {id} = node.props;
+    console.log(id)
+    const param = [{
+      catalogCode,
+      catalogName,
+      catalogType,
+      sort
+    }, id]
+    this.treeListEdit(param)
+    this.setState({
+      treeMenuVisible: false,
+      catalogName: '',
+      catalogCode: '',
+      catalogType: '',
+      sort: '',
+    })
+  }
+  handlePopoverAddSub = (values) =>{
+    this.treeListAdd(values)
+    this.setState({
+      treeMenuVisible: false,
+      catalogName: '',
+      catalogCode: '',
+      catalogType: '',
+      sort: '',
+    })
+  }
+  handlePopoverC = () =>{
+    this.setState({
+      treeMenuVisible: false,
+    });
+  }
+  rightClick = (data) =>{
+    const newData = {
+      catalogName: data.catalogName,
+      catalogCode: data.catalogCode,
+      catalogType: data.catalogType,
+      sort: data.sort,
+      id: data.id
+    }
+    this.setState({
+      ...newData
+    });
+  }
+  setVisible = (state) => {
+    this.setState({
+      treeMenuVisible: state,
     })
   }
   handleCreate = ()=>{
@@ -134,6 +309,36 @@ export default class Dictionary extends React.PureComponent {
   deleteById = (record) => {
     this.props.dispatch({
       type: 'systemDictionary/remove',
+      payload: record.id,
+      callback: (res)=>{
+        oopToast(res, '删除成功', '删除失败');
+        this.onLoad();
+      }
+    })
+  }
+  treeListAdd = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListAdd',
+      payload: record,
+      callback: (res)=>{
+        oopToast(res, '添加成功', '添加失败');
+        this.onLoad();
+      }
+    })
+  }
+  treeListEdit = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListEdit',
+      payload: record,
+      callback: (res)=>{
+        oopToast(res, '保存成功', '保存失败');
+        this.onLoad();
+      }
+    })
+  }
+  treeListDelete = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListDelete',
       payload: record.id,
       callback: (res)=>{
         oopToast(res, '删除成功', '删除失败');
@@ -177,10 +382,41 @@ export default class Dictionary extends React.PureComponent {
   setModalFormVisible = (flag) =>{
     this.setState({modalFormVisible: flag})
   }
+  handleTableTreeNodeSelect = ()=>{
+    const treeNode = this.oopTreeTable.getCurrentSelectTreeNode();
+    this.setState({
+      tableTitle: treeNode.catalogName || treeNode.title || '所有',
+    })
+    this.tableInit();
+    this.props.dispatch({
+      type: 'systemDictionary/getTableData',
+      payload: treeNode.catalogCode,
+    });
+  }
+  filterTable = (inputValue, filter) => {
+    const {systemDictionary: {tableData, tableInitData} } = this.props;
+    const filterTable = tableData.length > 0 ? tableData : tableInitData.data
+    const tableDataFinal = inputValue ? filter(filterTable, ['catalog', 'code', 'name']) : filterTable;
+    const newTableDataFinal = {list: tableDataFinal, pagination: { pageNo: 3, pageSize: 10, count: tableData.length}}
+    this.setState({
+      newTableData: newTableDataFinal,
+    })
+  }
   render() {
-    const {systemDictionary: {entity}, loading,
-      global: { oopSearchGrid, size }, gridLoading } = this.props;
-    const { visible, info } = this.state;
+    const {systemDictionary: {entity, treeData, tableData, tableInitData},
+      global: { size }, gridLoading } = this.props;
+    const loading = false;
+    const { visible, info, tableTitle, newTableData, pageNumShow } = this.state;
+    const tableDataFinal = JSON.stringify(newTableData) !== '{}' ?
+      newTableData : tableData.length > 0 ? {list: tableData, pagination: {
+        pageNo: 1,
+        pageSize: 10,
+        count: tableData.length}} : {
+        list: tableInitData.data,
+        pagination: {
+          pageNo: pageNumShow,
+          pageSize: 10,
+          count: tableInitData.count}};
     const { newForm, editFrom } = { newForm: '新建数据字典', editFrom: '编辑数据字典' }
     const columns = [
       { title: '字典项', dataIndex: 'catalog', render: (text, record)=>(
@@ -229,27 +465,89 @@ export default class Dictionary extends React.PureComponent {
         display: record=>(record.dataDicType !== 'SYSTEM'),
       },
     ];
+    const menuList = [
+      {
+        icon: 'folder-add',
+        text: '增加',
+        name: 'add',
+        onClick: (record) => {
+          this.treeListAdd(record)
+        },
+        render: (
+            <TreeForm
+              onSubmit={(values)=>{ this.handlePopoverAddSub(values) }}
+              onCancel={()=>{ this.handlePopoverC() }}
+            />)
+      },
+      {
+        icon: 'edit',
+        text: '编辑',
+        name: 'edit',
+        onClick: (record) => {
+          this.treeListEdit(record)
+        },
+        render: (
+              <TreeForm
+              catalogType={this.state.catalogType}
+              catalogName={this.state.catalogName}
+              catalogCode={this.state.catalogCode}
+              sort={this.state.sort}
+              onSubmit={(values)=>{ this.handlePopoverEditSub(values) }}
+              onCancel={()=>{ this.handlePopoverC() }}
+            />)
+      },
+      {
+        confirm: '确认删除这条信息吗？',
+        icon: 'delete',
+        text: '删除',
+        name: 'remove',
+        onClick: (record) => {
+          this.treeListDelete(record)
+        },
+      }
+    ]
     return (
-      <PageHeaderLayout content={
-        <OopSearch
-          placeholder="请输入"
-          enterButtonText="搜索"
-          moduleName="systemdictionary"
-          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
-        />
-      }>
+      <PageHeaderLayout>
         <Card bordered={false}>
-          <OopTable
-            onLoad={this.onLoad}
-            checkable={false}
-            loading={gridLoading}
-            grid={oopSearchGrid}
-            columns={columns}
-            rowButtons={rowButtons}
-            topButtons={topButtons}
-            size={size}
-            ref={(el)=>{ this.oopTable = el }}
-          />
+        <OopTreeTable
+          ref={(el)=>{ this.oopTreeTable = el }}
+          table={{
+            title: `${tableTitle}数据字典`,
+            grid: tableDataFinal,
+            columns,
+            gridLoading,
+            onLoad: this.onLoad,
+            topButtons,
+            rowButtons,
+            oopSearch: {
+              onInputChange: this.filterTable,
+              placeholder: '请输入',
+              enterButtonText: '搜索'
+            }
+          }}
+          tree={{
+            onRightClickConfig: {
+              menuList,
+              menuVisible: (state)=>{ this.setVisible(state) },
+              treeMenuVisible: this.state.treeMenuVisible,
+              rightClick: (data)=>{
+                this.rightClick(data)
+              },
+            },
+            title: '数据字典项',
+            treeLoading: loading,
+            treeData,
+            treeTitle: 'catalogName',
+            treeKey: 'id',
+            treeRoot: {
+              key: '-1',
+              title: '数据字典项',
+              // icon: 'laptop'
+            },
+          }}
+          size={size}
+          onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
+        />
         </Card>
         <ModalForm
           visible={this.state.modalFormVisible}
@@ -289,3 +587,4 @@ export default class Dictionary extends React.PureComponent {
       </PageHeaderLayout>)
   }
 }
+
