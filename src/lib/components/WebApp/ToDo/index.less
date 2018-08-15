@@ -13,12 +13,14 @@
     }
   }
   :global {
-    .ant-spin-container {
-      background: #f5f5f5;
-      min-height: calc(~"100vh - 44px");
-    }
-    .ant-list-item-meta-description {
-      margin-top: 12px;
+    .ant-list.ant-list-split {
+      .ant-spin-container {
+        background: #f5f5f5;
+        min-height: calc(~"100vh - 44px");
+      }
+      .ant-list-item-meta-description {
+        margin-top: 12px;
+      }
     }
   }
 }
@@ -113,9 +115,13 @@
 }
 
 @media screen and (max-width: @screen-xs) {
-  :global {
-    .ant-spin-container {
-      min-height: calc(~"100vh - 88px") !important;
+  .container {
+    :global {
+      .ant-list.ant-list-split {
+        .ant-spin-container {
+          min-height: calc(~"100vh - 88px") !important;
+        }
+      }
     }
   }
 }

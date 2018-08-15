@@ -7,6 +7,7 @@ import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import styles from './Designer.less';
 import Ellipsis from '../../../../framework/components/Ellipsis';
+import {prefix} from '../../../../config/config';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -102,7 +103,9 @@ export default class Designer extends PureComponent {
   componentDidMount() {
     console.log(cookie)
     cookie.remove('X-PEP-TOKEN', { path: '/' });
+    // 在flowable的前端页面里获取表单的属性 需要的请求前缀
     cookie.save('X-PEP-TOKEN', window.localStorage.getItem('proper-auth-login-token'), { path: '/' });
+    window.localStorage.setItem('pea_workflow_dynamic_request_prefix', prefix);
     this.props.dispatch({
       type: 'workflowDesigner/fetch',
       payload: {

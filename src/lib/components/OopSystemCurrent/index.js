@@ -1,6 +1,7 @@
 import React, {Fragment, PureComponent} from 'react';
 import {Spin, Input } from 'antd';
 import {connect} from 'dva/index';
+import moment from 'moment';
 import DescriptionList from '../../../framework/components/DescriptionList';
 import {inject} from '../../../framework/common/inject';
 import styles from './index.less';
@@ -36,7 +37,7 @@ export default class OopSystemCurrent extends PureComponent {
   componentDidMount() {
     const { url } = this.props;
     // 如果是一个code 那么不发送请求
-    if (this.props.code !== this.state.code) {
+    if (url && this.props.code !== this.state.code) {
       this.props.dispatch({
         type: 'OopSystemCurrent$model/fetch',
         payload: url,
@@ -89,7 +90,7 @@ export default class OopSystemCurrent extends PureComponent {
                 <Input type="hidden" value={this.state.text} />
                 <Input type="hidden" value={this.state.code} />
               </Fragment>
-              <Description term={label}>{this.state.text}</Description>
+              <Description term={label}>{(typeof this.state.text) === 'number' ? moment(this.state.text).format('YYYY-MM-DD HH:mm:ss') : this.state.text}</Description>
             </div>
           </DescriptionList>
         </Spin>

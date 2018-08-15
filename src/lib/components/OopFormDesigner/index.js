@@ -343,6 +343,10 @@ export default class OopFormDesigner extends React.PureComponent {
       if (component.dictCatalog) {
         component.children = [];
       }
+      // “系统当前” 组件 在设置表单的时候 不设置默认值
+      if (component.name === 'OopSystemCurrent') {
+        item.initialValue = undefined;
+      }
     })
     return {
       formJson: rowItems,

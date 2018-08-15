@@ -297,6 +297,12 @@ export default class OopWorkflowMain extends PureComponent {
   launchWorkflow = (callback)=>{
     console.log('launchWorkflow...');
     const {taskOrProcDefKey, setButtonLoading} = this.props;
+    if (!this.isComplete) {
+      message.warning('有点卡哦，数据还没返回', ()=>{
+        setButtonLoading(false);
+      });
+      return
+    }
     const form = this.oopForm.getForm();
     form.validateFields((err, formData)=>{
       if (err) {
