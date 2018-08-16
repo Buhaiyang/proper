@@ -28,7 +28,7 @@ export default class OopTable extends PureComponent {
     })
   }
   createTopButtons = (topButtons)=>{
-    return topButtons.map(btn =>(
+    const btns = topButtons.map(btn =>(
       // 1.btn属性配置了displayReg并且displayReg执行返回结果为true 或者 2.没有配置displayReg 渲染按钮
       ((btn.display && btn.display(this.state.selectedRowKeys)) || !btn.display) &&
       (
@@ -42,7 +42,12 @@ export default class OopTable extends PureComponent {
           {btn.text}
         </Button>
       )
-    ))
+    ));
+    if (this.props.showExportButton !== false) {
+      const exportButton = (<Button key="export" icon="export" style={{float: 'right'}} onClick={this.handleExport}>导出</Button>);
+      btns.push(exportButton)
+    }
+    return btns
   }
   createRowButtons = (columns, rowButtons)=>{
     const cols = [...columns]
@@ -124,6 +129,10 @@ export default class OopTable extends PureComponent {
       this.rowSelectionChange(keys, selectedRows)
     }
     this.rowSelectionChange(keys, lastCheck)
+  }
+  handleExport = ()=>{
+    console.log('export table data');
+    console.log(this.props.grid);
   }
   componentWillReceiveProps(props) {
     if (props.dataDefaultSelectedRowKeys) {

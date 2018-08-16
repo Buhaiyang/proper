@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Input, Select, Card, DatePicker, Icon, Tooltip } from 'antd';
+import { Input, Select, Card, DatePicker, Icon, Tooltip, Spin } from 'antd';
 import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import styles from './TomcatLog.less';
@@ -170,7 +170,7 @@ export default class TomcatLog extends React.Component {
   }
 
   render() {
-    const { global: {size} } = this.props;
+    const { global: {size}, loading } = this.props;
     const { logs, lockColor, updateColor } = this.state;
 
     const wrapperHeight = document.getElementById('root').clientHeight
@@ -227,12 +227,13 @@ export default class TomcatLog extends React.Component {
             </div>
           }
           style={{ height: cardHeight, overflow: 'hidden' }}>
-          <div className="tomcatCardContent" style={{overflowY: 'scroll', height: cardBodyHeight}}>
-            <div style={{padding: '16px 24px'}}>
-              {
-                logs.map(item => (
-                  <div key={item._id.$oid} style={{display: 'flex', flexDirection: 'row', marginBottom: '10px'}}>
-                    <div className="logLeft">
+          <Spin spinning={loading}>
+            <div className="tomcatCardContent" style={{overflowY: 'scroll', height: cardBodyHeight}}>
+              <div style={{padding: '16px 24px'}}>
+                {
+                  logs.map(item => (
+                    <div key={item._id.$oid} style={{display: 'flex', flexDirection: 'row', marginBottom: '10px'}}>
+                      <div className="logLeft">
                       <span className="logEcho">
                       {
                         item.times > 1 ? (
@@ -240,24 +241,28 @@ export default class TomcatLog extends React.Component {
                         ) : null
                       }
                       </span>
-                      <span
-                        style={{color: item.lv === 'DEBUG' ? '#00a65a' :
-                        (item.lv === 'INFO' ? '#3c8dbc' :
-                        (item.lv === 'WARN' ? '#f39c12' : '#dd4b39')),
-                        border: '1px solid',
-                        borderColor: item.lv === 'DEBUG' ? '#00a65a' :
-                        (item.lv === 'INFO' ? '#3c8dbc' :
-                        (item.lv === 'WARN' ? '#f39c12' : '#dd4b39')),
-                        borderRadius: '5px', padding: '2px 8px'}}>{item.lv}</span>
+                        <span
+                          style={{color: item.lv === 'DEBUG' ? '#00a65a' :
+                              (item.lv === 'INFO' ? '#3c8dbc' :
+                                (item.lv === 'WARN' ? '#f39c12' : '#dd4b39')),
+                            border: '1px solid',
+                            borderColor: item.lv === 'DEBUG' ? '#00a65a' :
+                              (item.lv === 'INFO' ? '#3c8dbc' :
+                                (item.lv === 'WARN' ? '#f39c12' : '#dd4b39')),
+                            borderRadius: '5px', padding: '2px 8px'}}>{item.lv}</span>
+                      </div>
+                      <div className="logRight">
+                        <span dangerouslySetInnerHTML={{ __html: item.msgAfter }} />
+                      </div>
                     </div>
-                    <div className="logRight">
-                      <span dangerouslySetInnerHTML={{ __html: item.msgAfter }} />
-                    </div>
-                  </div>
-                ))
-              }
+                  ))
+                }
+                {
+                  logs.length === 0 ? (<div className={styles.emptyPlaceHolder}>好像没能查到日志哦</div>) : null
+                }
+              </div>
             </div>
-          </div>
+          </Spin>
         </Card>
       </PageHeaderLayout>
     );

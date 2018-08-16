@@ -324,6 +324,7 @@ export default class Appver extends React.Component {
       }>
         <Card bordered={false}>
           <List
+            loading={loading}
             split={false}
             dataSource={list}
             className={styles.appverList}
