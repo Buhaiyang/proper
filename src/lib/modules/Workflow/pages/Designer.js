@@ -77,6 +77,7 @@ const CreateModal = connect()((props) => {
       visible={viewVisible}
       onOk={okHandle}
       onCancel={() => createCancel(false)}
+      maskClosable={false}
       destroyOnClose={true}
     >
       <CreateForm ref={(el)=>{ this.CreateForm = el; }} />

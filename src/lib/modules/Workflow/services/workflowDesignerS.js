@@ -2,6 +2,13 @@ import { stringify } from 'qs';
 import request from '../../../../framework/utils/request';
 
 export async function queryWorkflowList(params) {
+  // 拼装模糊查询
+  if (params && params.filter) {
+    params = {
+      ...params,
+      filter: `%${params.filter}%`
+    }
+  }
   return request(`/repository/models?${stringify(params)}`);
 }
 

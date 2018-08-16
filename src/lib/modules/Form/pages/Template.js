@@ -145,7 +145,6 @@ const ModalFormBasic = Form.create()((props) => {
   formTemplate,
   global,
   loading: loading.models.formTemplate,
-  gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class Template extends React.PureComponent {
   state = {
@@ -154,7 +153,8 @@ export default class Template extends React.PureComponent {
     formDetails: {
       formJson: [],
       formLayout: 'horizontal'
-    }
+    },
+    list: []
   }
   currentRowRecordId = null;
   setFormDesignerModalVisible = (flag) =>{
@@ -166,13 +166,13 @@ export default class Template extends React.PureComponent {
   componentDidMount() {
     this.onLoad();
   }
-  onLoad = (param = {})=>{
-    const { pagination, ...condition } = param;
+  onLoad = ()=>{
     this.props.dispatch({
       type: 'formTemplate/fetch',
-      payload: {
-        pagination,
-        ...condition
+      callback: (resp)=>{
+        this.setState({
+          list: resp.result
+        })
       }
     });
   }
@@ -283,11 +283,15 @@ export default class Template extends React.PureComponent {
     });
   }
   handleInputChange = (inputValue, filter)=>{
-    console.log(inputValue, filter);
-    // TODO Mongo查询的数据不支持OopSearch
+    const {formTemplate: {grid: {list}}} = this.props;
+    const filterList = inputValue ? filter(list, ['name', 'description']) : list;
+    this.setState({
+      list: filterList
+    })
   }
   render() {
-    const {formTemplate: {grid, entity}, loading, global: { size } } = this.props;
+    const {formTemplate: {entity}, loading, global: { size } } = this.props;
+    const {list} = this.state;
     const columns = [
       {title: '名称', dataIndex: 'name'},
       {title: '类别', dataIndex: 'type', render: (text)=>{
@@ -330,18 +334,18 @@ export default class Template extends React.PureComponent {
       },
     ];
     return (
-      <PageHeaderLayout>
+      <PageHeaderLayout content={
+        <OopSearch
+          placeholder="请输入"
+          enterButtonText="搜索"
+          onInputChange={this.handleInputChange}
+          ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
+        />
+      }>
         <Card bordered={false}>
-          <OopSearch
-            placeholder="请输入"
-            enterButtonText="搜索"
-            onInputChange={this.handleInputChange}
-            ref={(el) => { this.oopSearch = el && el.getWrappedInstance() }}
-          />
           <OopTable
             loading={loading}
-            grid={grid}
-            onLoad={this.onLoad}
+            grid={{list}}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}

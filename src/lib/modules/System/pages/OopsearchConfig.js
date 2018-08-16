@@ -43,6 +43,7 @@ const ModalForm = Form.create()((props) => {
       visible={visible}
       footer={footer}
       onCancel={cancelForm}
+      maskClosable={false}
       destroyOnClose={true}
     >
       <Form>

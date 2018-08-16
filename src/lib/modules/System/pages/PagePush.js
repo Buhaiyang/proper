@@ -629,6 +629,7 @@ export default class PagePush extends React.PureComponent {
           onOk={this.onSubmitForm}
           onDelete={this.onDelete}
           isCreate={isCreate}
+          maskClosable={false}
           loading={!!loading}
           tabs={[
             {

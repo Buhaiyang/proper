@@ -1,14 +1,10 @@
 import MongoService from '../../../../framework/utils/MongoService';
 
 const formTemplateService = new MongoService('PEP_FORM_TEMPLATE');
-const {fetchPagable, fetchById, update, save, deleteById, fetchByEqual} = formTemplateService;
+const {fetchById, update, save, deleteById, fetchByEqual} = formTemplateService;
 
 export async function queryFormTemplate(param) {
-  return fetchPagable(param);
-  // return MongoHandle.fetchByEqual(tableName, {
-  //   name: '1'
-  // });
-  // return request('/form/template');
+  return fetchByEqual(param);
 }
 export async function queryTemplateById(param) {
   return fetchById(param)

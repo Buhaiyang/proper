@@ -6,20 +6,18 @@ export default {
   state: {
     grid: {
       list: [],
-      pagination: {
-        pageNo: 1, pageSize: 10, showSizeChanger: true, showQuickJumper: true, count: 0
-      }
+      pagination: null
     },
     entity: {}
   },
   effects: {
-    *fetch({ payload = {} }, { call, put }) {
+    *fetch({ payload = {}, callback }, { call, put }) {
       const resp = yield call(queryFormTemplate, payload);
       yield put({
         type: 'saveGrid',
-        payload: resp,
-        pagination: payload.pagination
+        payload: resp
       })
+      if (callback) callback(resp)
     },
     *fetchById({ payload, callback }, { call, put }) {
       const resp = yield call(queryTemplateById, payload);
@@ -52,18 +50,12 @@ export default {
   },
 
   reducers: {
-    saveGrid(state, { payload, pagination = {} }) {
+    saveGrid(state, { payload}) {
       return {
         ...state,
         grid: {
           ...state.grid,
-          list: payload.result.data,
-          pagination: {
-            ...state.grid.pagination,
-            pageNo: pagination.pageNo,
-            pageSize: pagination.pageSize,
-            count: payload.result.count,
-          }
+          list: payload.result
         }
       }
     },
@@ -77,6 +69,15 @@ export default {
       return {
         ...state,
         entity: {}
+      }
+    },
+    refreshTable(state, action) {
+      return {
+        ...state,
+        grid: {
+          list: action.payload,
+          pagination: null
+        }
       }
     }
   }
