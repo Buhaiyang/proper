@@ -19,6 +19,9 @@ export default {
     },
     *getTreeData({ payload, callback }, { call, put }) {
       const resp = yield call(getTreeData, payload);
+      resp.result.forEach((item)=>{
+        item.parentId = null;
+      })
       yield put({
         type: 'treeList',
         payload: resp

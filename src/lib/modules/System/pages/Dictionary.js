@@ -1,10 +1,10 @@
 import React, {Fragment} from 'react';
-import { Modal, Card, Form, Spin, Input, Button, Radio, InputNumber, Select } from 'antd';
+import { Modal, Form, Spin, Input, Button, Radio, InputNumber, Select } from 'antd';
 import {connect} from 'dva';
 import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import { oopToast } from '../../../../framework/common/oopUtils';
-import OopTreeTable from '../../../components/OopTreeTable';
+import {OopTreeTable} from '../../../components/OopTreeTable';
 import DescriptionList from '../../../../framework/components/DescriptionList';
 
 const { Description } = DescriptionList;
@@ -34,7 +34,7 @@ const TreeForm = Form.create()((props) => {
     props.onCancel();
   }
   return (
-    <Form key="form" style={{ backgroundColor: '#fff', border: '1px solid #e8e8e8', padding: 15, borderRadius: 5}}>
+    <Form key="form" style={{ backgroundColor: '#fff', border: '1px solid #e8e8e8', padding: 15, borderRadius: 5, width: 300}}>
           <FormItem { ...formItemLayout } key="1" label="名称">
             {form.getFieldDecorator('catalogName', {
               initialValue: props.catalogName,
@@ -91,7 +91,6 @@ const TreeForm = Form.create()((props) => {
             })(<InputNumber min={0} max={100} />)}
           </FormItem>
           <FormItem key="5" style={{marginBottom: 0}}>
-            {/* <Button type="primary" htmlType="submit" size="small"> */}
             <Button style={{float: 'right'}} key="p" size="small" type="primary" onClick={handleSubmit} className="login-form-button">
               确认
             </Button>
@@ -101,7 +100,7 @@ const TreeForm = Form.create()((props) => {
   )
 });
 const ModalForm = Form.create()((props) => {
-  const { form, loading, visible, title, onModalCancel, onModalSubmit, formEntity } = props;
+  const { form, loading, visible, title, onModalCancel, onModalSubmit, formEntity, selectData, selectValue } = props;
   const submitForm = ()=>{
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -132,12 +131,27 @@ const ModalForm = Form.create()((props) => {
             })(<Input type="hidden" />)}
           </div>
           <FormItem {...formItemLayout} label="字典项">
-            {form.getFieldDecorator('catalog', {
+            {/* {form.getFieldDecorator('catalog', {
               initialValue: formEntity.catalog,
               rules: [
                 { required: true, whitespace: true, pattern: /^[^ \u4e00-\u9fa5]+$/, message: '字典项不能为空，且为非汉字', }
               ]
-            })(<Input placeholder="请输入字典项内容" />)}
+            })(<Input placeholder="请输入字典项内容" />)} */}
+            {form.getFieldDecorator('catalog', {
+              initialValue: selectValue ? selectValue.catalogCode : formEntity.catalog,
+              rules: [
+                { required: true, whitespace: true, message: '字典项不能为空', }
+              ]
+            })(
+            <Select placeholder="请选择字典项内容">
+              {selectData.map((item)=>{
+                return (
+                <Select.Option key={item.id} value={item.catalogCode}>{item.catalogName}</Select.Option>
+                  )
+              })}
+          </Select>
+            )
+            }
           </FormItem>
           <FormItem {...formItemLayout} label="字典编码">
             {form.getFieldDecorator('code', {
@@ -206,6 +220,7 @@ export default class Dictionary extends React.PureComponent {
     sort: '',
     newTableData: {},
     pageNumShow: 1,
+    handleSelect: null,
   }
   componentDidMount() {
     this.onLoad();
@@ -213,8 +228,6 @@ export default class Dictionary extends React.PureComponent {
     this.tableInit();
   }
   // componentWillUnmount(){
-
-
   //   // document.removeEventListener("click", documentClick);
   // }
   tableInit = (pagination) =>{
@@ -247,9 +260,6 @@ export default class Dictionary extends React.PureComponent {
   handlePopoverEditSub = (values) =>{
     const {catalogName, catalogCode, catalogType, sort} = values;
     const {id} = this.state;
-    // console.log(node)
-    // const {id} = node.props;
-    console.log(id)
     const param = [{
       catalogCode,
       catalogName,
@@ -313,6 +323,36 @@ export default class Dictionary extends React.PureComponent {
       payload: record.id,
       callback: (res)=>{
         oopToast(res, '删除成功', '删除失败');
+        this.handleTableTreeNodeSelect()
+      }
+    })
+  }
+  treeListAdd = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListAdd',
+      payload: record,
+      callback: (res)=>{
+        oopToast(res, '添加成功', '添加失败');
+        this.onLoad();
+      }
+    })
+  }
+  treeListEdit = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListEdit',
+      payload: record,
+      callback: (res)=>{
+        oopToast(res, '保存成功', '保存失败');
+        this.onLoad();
+      }
+    })
+  }
+  treeListDelete = (record) => {
+    this.props.dispatch({
+      type: 'systemDictionary/treeListDelete',
+      payload: record.id,
+      callback: (res)=>{
+        oopToast(res, '删除成功', '删除失败');
         this.onLoad();
       }
     })
@@ -364,7 +404,7 @@ export default class Dictionary extends React.PureComponent {
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
         this.handleModalCancel(form);
-        this.onLoad();
+        this.handleTableTreeNodeSelect()
       }
     });
   }
@@ -385,9 +425,18 @@ export default class Dictionary extends React.PureComponent {
   }
   handleTableTreeNodeSelect = ()=>{
     const treeNode = this.oopTreeTable.getCurrentSelectTreeNode();
-    this.setState({
-      tableTitle: treeNode.catalogName || treeNode.title || '所有',
-    })
+    if (treeNode.title === '所有') {
+      this.setState({
+        tableTitle: treeNode.catalogName || treeNode.title || '所有',
+        handleSelect: null,
+      })
+    } else {
+      this.setState({
+        tableTitle: treeNode.catalogName || treeNode.title || '所有',
+        handleSelect: treeNode,
+      })
+    }
+
     this.tableInit();
     this.props.dispatch({
       type: 'systemDictionary/getTableData',
@@ -407,9 +456,9 @@ export default class Dictionary extends React.PureComponent {
     const {systemDictionary: {entity, treeData, tableData, tableInitData},
       global: { size }, gridLoading } = this.props;
     const loading = false;
-    const { visible, info, tableTitle, newTableData, pageNumShow } = this.state;
+    const { visible, info, tableTitle, newTableData, pageNumShow, handleSelect } = this.state;
     const tableDataFinal = JSON.stringify(newTableData) !== '{}' ?
-      newTableData : tableData.length > 0 ? {list: tableData, pagination: {
+      newTableData : handleSelect && tableTitle !== '所有' ? {list: tableData, pagination: {
         pageNo: 1,
         pageSize: 10,
         count: tableData.length}} : {
@@ -509,7 +558,6 @@ export default class Dictionary extends React.PureComponent {
     ]
     return (
       <PageHeaderLayout>
-        <Card bordered={false}>
         <OopTreeTable
           ref={(el)=>{ this.oopTreeTable = el }}
           table={{
@@ -542,15 +590,15 @@ export default class Dictionary extends React.PureComponent {
             treeKey: 'id',
             treeRoot: {
               key: '-1',
-              title: '数据字典项',
-              // icon: 'laptop'
+              title: '所有',
             },
           }}
           size={size}
           onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
         />
-        </Card>
         <ModalForm
+          selectData={treeData}
+          selectValue={handleSelect}
           visible={this.state.modalFormVisible}
           title={entity.id ? editFrom : newForm}
           onModalCancel={this.handleModalCancel}
