@@ -1,3 +1,4 @@
+@import "~antd/lib/style/themes/default.less";
 
 .feedbackInfiniteContainer {
 
@@ -32,6 +33,12 @@
     overflow: hidden;
     cursor: pointer;
   }
+  .defaultColor {
+    border-top: 3px solid @primary-color;
+  }
+  .redColor {
+    border-top: 3px solid #f5222d;
+  }
 }
 
 .preViewModal {
@@ -50,4 +57,16 @@
       }
     }
   }
+}
+.redBg {
+  background-color: #f5222d;
+}
+.primaryBg {
+  background-color: @primary-color;
+}
+.redBorderLeftColor {
+  border-left-color: #f5222d;
+}
+.primaryBorderLeftColor {
+  border-left-color: @primary-color;
 }

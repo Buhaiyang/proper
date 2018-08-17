@@ -7,12 +7,13 @@ export default {
     entity: {},
   },
   effects: {
-    *fetch({ payload = {} }, { call, put }) {
+    *fetch({ payload = {}, callback }, { call, put }) {
       const resp = yield call(fetch, payload);
       yield put({
         type: 'saveList',
         payload: resp
       })
+      if (callback) callback(resp)
     },
     *fetchById({ payload, callback }, { call, put }) {
       const resp = yield call(fetchById, payload);
@@ -43,7 +44,7 @@ export default {
     saveList(state, action) {
       return {
         ...state,
-        list: action.payload.result.data
+        list: action.payload.result
       }
     },
     saveEntity(state, action) {

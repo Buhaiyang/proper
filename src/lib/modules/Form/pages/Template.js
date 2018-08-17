@@ -55,7 +55,7 @@ const ModalFormBasic = Form.create()((props) => {
     }];
   }
   return (
-    <Modal title={title} visible={visible} onOk={submitForm} onCancel={cancelForm}>
+    <Modal title={title} visible={visible} onOk={submitForm} onCancel={cancelForm} maskClosable={false}>
       <Spin spinning={loading}>
         <Form>
           <div>
@@ -224,6 +224,7 @@ export default class Template extends React.PureComponent {
         // 保留分页
         const {pagination} = this.props.formTemplate.grid
         this.onLoad({ pagination });
+        this.setFormBasicModalVisible(false);
       }
     });
   }

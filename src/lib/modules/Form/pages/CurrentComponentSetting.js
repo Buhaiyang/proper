@@ -9,17 +9,16 @@ import {inject} from '../../../../framework/common/inject';
 import { oopToast } from '../../../../framework/common/oopUtils';
 
 const ModalForm = Form.create()((props) => {
-  const {loading, visible, title, onModalCancel, onModalSubmit, formEntity} = props;
+  const { loading, visible, title, onModalCancel, onModalSubmit, formEntity, self } = props;
   const submitForm = ()=>{
-    const form = this.oopForm.getForm()
+    const form = self.oopForm.getForm()
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      onModalSubmit(fieldsValue, form);
+      onModalSubmit(fieldsValue);
     });
   }
   const cancelForm = ()=>{
-    const form = this.oopForm.getForm()
-    onModalCancel(form)
+    onModalCancel()
   }
   const footer = (
     <Fragment>
@@ -62,9 +61,9 @@ const ModalForm = Form.create()((props) => {
     }], formLayout: 'horizontal'
   }
   return (
-    <Modal title={title} visible={visible} footer={footer} onCancel={cancelForm}>
+    <Modal title={title} visible={visible} footer={footer} onCancel={cancelForm} maskClosable={false}>
       <Spin spinning={loading}>
-        <OopForm {...formConfig} ref={(el)=>{ this.oopForm = el }} defaultValue={formEntity} />
+        <OopForm {...formConfig} ref={(el)=>{ self.oopForm = el }} defaultValue={formEntity} />
       </Spin>
     </Modal>
   )
@@ -75,25 +74,22 @@ const ModalForm = Form.create()((props) => {
   formCurrentComponentSetting,
   global,
   loading: loading.models.formCurrentComponentSetting,
-  gridLoading: loading.effects['global/oopSearchResult']
 }))
 export default class CurrentComponentSetting extends React.PureComponent {
   state = {
     modalFormVisible: false,
+    list: []
   }
   componentDidMount() {
     this.onLoad();
   }
-  onLoad = (param = {})=>{
-    const {pagination, condition} = param;
-    // this.oopSearch.load({
-    //  pagination
-    // });
+  onLoad = ()=>{
     this.props.dispatch({
       type: 'formCurrentComponentSetting/fetch',
-      payload: {
-        pagination,
-        ...condition
+      callback: (resp)=>{
+        this.setState({
+          list: resp.result
+        })
       }
     });
   }
@@ -137,7 +133,8 @@ export default class CurrentComponentSetting extends React.PureComponent {
       }
     });
   }
-  handleModalCancel = (form)=>{
+  handleModalCancel = ()=>{
+    const form = this.oopForm.getForm();
     this.setModalFormVisible(false);
     setTimeout(()=>{
       form.resetFields();
@@ -152,6 +149,7 @@ export default class CurrentComponentSetting extends React.PureComponent {
       payload: values,
       callback: (res)=>{
         oopToast(res, '保存成功', '保存失败');
+        this.handleModalCancel();
         this.onLoad();
       }
     });
@@ -159,9 +157,17 @@ export default class CurrentComponentSetting extends React.PureComponent {
   setModalFormVisible = (flag) =>{
     this.setState({modalFormVisible: flag})
   }
+  handleInputChange = (inputValue, filter)=>{
+    const {formCurrentComponentSetting: {list}} = this.props;
+    const filterList = inputValue ? filter(list, ['name', 'code', 'url', 'showPropName']) : list;
+    this.setState({
+      list: filterList
+    })
+  }
   render() {
-    const {formCurrentComponentSetting: {entity, list}, loading,
-      global: { oopSearchGrid, size }, gridLoading } = this.props;
+    const {formCurrentComponentSetting: {entity}, loading,
+      global: { size } } = this.props;
+    const {list} = this.state;
     const {columns} = {
       columns: [
         {title: '名称', dataIndex: 'name'},
@@ -207,14 +213,14 @@ export default class CurrentComponentSetting extends React.PureComponent {
         <OopSearch
           placeholder="请输入"
           enterButtonText="搜索"
-          moduleName="formcurrentcomponentsetting"
+          onInputChange={this.handleInputChange}
           ref={(el)=>{ this.oopSearch = el && el.getWrappedInstance() }}
         />
       }>
         <Card bordered={false}>
           <OopTable
-            loading={loading === undefined ? gridLoading : loading}
-            grid={{list} || oopSearchGrid}
+            loading={!!loading}
+            grid={{list}}
             columns={columns}
             rowButtons={rowButtons}
             topButtons={topButtons}
@@ -223,6 +229,7 @@ export default class CurrentComponentSetting extends React.PureComponent {
           />
         </Card>
         <ModalForm
+          self={this}
           visible={this.state.modalFormVisible}
           title={entity.id ? '编辑' : '新建'}
           onModalCancel={this.handleModalCancel}

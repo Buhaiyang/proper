@@ -44,8 +44,8 @@ export default class OopTable extends PureComponent {
       )
     ));
     if (this.props.showExportButton !== false) {
-      const exportButton = (<Button key="export" icon="export" style={{float: 'right'}} onClick={this.handleExport}>导出</Button>);
-      btns.push(exportButton)
+      // const exportButton = (<Button key="export" icon="export" style={{float: 'right'}} onClick={this.handleExport}>导出</Button>);
+      // btns.push(exportButton)
     }
     return btns
   }

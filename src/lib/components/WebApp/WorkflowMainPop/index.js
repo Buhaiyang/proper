@@ -33,11 +33,12 @@ const PopPage = (props)=>{
 export default class WorkflowMainPop extends PureComponent {
   constructor(props) {
     super(props);
-    const { param } = getParamObj(this.props.location.search);
+    const { param, from } = getParamObj(this.props.location.search);
     const {isLaunch, taskOrProcDefKey, procInstId, name, businessObj, stateCode, processDefinitionId} = JSON.parse(decodeURIComponent(atob(param)));
     this.state = {
       buttonLoading: false,
       activeTabKey: 'handle',
+      from,
       isLaunch,
       taskOrProcDefKey,
       procInstId,
@@ -70,17 +71,35 @@ export default class WorkflowMainPop extends PureComponent {
       });
     }
   }
+  // app推送通知后的操作
+  afterSubmitByAppNotify = ()=>{
+    // 通知上层window此页面为h5的主页 root会触发返回按钮为原生的back事件
+    window.parent.postMessage('back', '*');
+    window.localStorage.setItem('If_Can_Back', 'back');
+  }
+  // 邮件推送通知后的操作
+  afterSubmitByEmailNotify = ()=>{
+    console.log('close web');
+    history.back();
+  }
   submitWorkflow = ()=>{
     this.setState({
       buttonLoading: true
     })
     this.oopWorkflowMain.submitWorkflow(()=>{
-      history.back()
-      this.setState({
-        buttonLoading: false
-      })
       message.success('流程提交成功');
-    })
+      // 如果从手机推送通知进来 点击办理之后 跟点击右上主页图标 逻辑一致
+      if (this.state.from === 'app') {
+        this.afterSubmitByAppNotify();
+      } else if (this.state.from === 'email') {
+        this.afterSubmitByEmailNotify();
+      } else {
+        history.back();
+        this.setState({
+          buttonLoading: false
+        })
+      }
+    });
   }
   launchWorkflow = ()=>{
     this.setButtonLoading(true)

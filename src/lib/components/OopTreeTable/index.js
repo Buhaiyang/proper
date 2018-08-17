@@ -315,7 +315,6 @@ export default class OopTreeTable extends PureComponent {
               </Dropdown>)
             }
                 <Tree
-                  showIcon
                   defaultExpandAll={true}
                   onExpand={this.onExpand}
                   expandedKeys={expandedKeys}

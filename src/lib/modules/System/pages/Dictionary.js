@@ -4,7 +4,7 @@ import {connect} from 'dva';
 import { inject } from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import { oopToast } from '../../../../framework/common/oopUtils';
-import {OopTreeTable} from '../../../components/OopTreeTable';
+import OopTreeTable from '../../../components/OopTreeTable';
 import DescriptionList from '../../../../framework/components/DescriptionList';
 
 const { Description } = DescriptionList;

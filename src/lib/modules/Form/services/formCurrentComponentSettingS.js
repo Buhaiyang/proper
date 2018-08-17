@@ -3,10 +3,12 @@
 import MongoService from '../../../../framework/utils/MongoService';
 
 const formCurrentComponentSettingService = new MongoService('PEP_FORM_CURRENTCOMPONENTSETTING');
-const {fetchPagable, update, save, deleteById, batchDelete} = formCurrentComponentSettingService;
+const {update, save, deleteById, batchDelete} = formCurrentComponentSettingService;
 
-export async function fetch(param) {
-  return fetchPagable(param)
+export async function fetch() {
+  return formCurrentComponentSettingService.fetch((query)=>{
+    query.addAscending('sort');
+  })
   // return request(`/form/currentComponentSetting/?${stringify(param)}`);
 }
 export async function fetchById(param) {

@@ -33,7 +33,7 @@ export default class Feedback extends React.Component {
     userId: '',
     feedbackContent: '',
     feedbackStatus: '',
-    btnColor: '#1da57a',
+    btnColor: 'primary',
     visibleBtn: true,
     preView: false,
     imgUrl: '',
@@ -97,6 +97,8 @@ export default class Feedback extends React.Component {
   changeSearchType = (val) => {
     this.setState({
       searchType: val
+    }, ()=>{
+      this.handleSearch('');
     });
   }
 
@@ -128,7 +130,7 @@ export default class Feedback extends React.Component {
           itemArray: res,
           userId: item.userId,
           feedbackStatus: item.statusCode,
-          btnColor: (item.statusCode === '0' ? '#f5222d' : '#1da57a'),
+          btnColor: (item.statusCode === '0' ? 'danger' : 'primary'),
           visibleBtn: item.statusCode !== '2'
         });
         setTimeout(() => {
@@ -231,7 +233,7 @@ export default class Feedback extends React.Component {
                   <Card
                     onDoubleClick={() => this.handleView(item)}
                     bordered={false}
-                    style={{borderTop: '3px solid', borderColor: (item.statusCode === '0' ? '#f5222d' : '#1da57a')}}
+                    className={item.statusCode === '0' ? styles.redColor : styles.defaultColor}
                     title={item.userName.substr(0, 11)}
                     extra={<Fragment>
                       <span>
@@ -299,7 +301,7 @@ export default class Feedback extends React.Component {
             <div>
               {visibleBtn ? <Button onClick={()=>this.closeFeedback()}>关闭此问题</Button> : ''}
               <Button
-                style={{backgroundColor: btnColor, borderColor: btnColor, color: '#fff'}}
+                type={btnColor}
                 onClick={()=>this.handleSubmit()}>
                 提交
               </Button>
@@ -359,18 +361,20 @@ export default class Feedback extends React.Component {
                   <div style={{width: '55%', float: 'right', margin: '5px 0'}}>
                     {item.feedback ? (<div style={{fontSize: '12px', marginLeft: '5px'}}>{item.feedbackTime} 管理员</div>) : null }
                     {item.feedback ? (
-                      <div style={{
+                      <div
+                        style={{
                         position: 'relative',
                         width: '100%',
-                        background: (feedbackStatus === '0' ? '#f5222d' : '#1da57a'),
                         color: '#fff',
                         float: 'right',
                         borderRadius: '5px',
                         padding: '8px 12px',
                         fontSize: '13px',
                         wordWrap: 'break-word',
-                        wordBreak: 'break-all'}}>
-                        <div style={{
+                        wordBreak: 'break-all'}}
+                        className={ feedbackStatus === '0' ? styles.redBg : styles.primaryBg }>
+                        <div
+                        style={{
                           position: 'absolute',
                           top: '30%',
                           right: '-16px',
@@ -381,8 +385,8 @@ export default class Feedback extends React.Component {
                           borderTopColor: 'transparent',
                           borderRightColor: 'transparent',
                           borderBottomColor: 'transparent',
-                          borderLeftColor: (feedbackStatus === '0' ? '#f5222d' : '#1da57a'),
-                        }} />
+                        }}
+                        className={ feedbackStatus === '0' ? styles.redBorderLeftColor : styles.primaryBorderLeftColor } />
                         {item.feedback}
                       </div>
                     ) : null}
@@ -391,9 +395,8 @@ export default class Feedback extends React.Component {
                 </div>
               ))}
             </div>
-            <div style={{maxHeight: '84px', padding: '16px 16px 0 16px', borderTop: '1px solid #e8e8e8'}}>
+            <div style={{padding: 16, borderTop: '1px solid #e8e8e8'}}>
               <TextArea
-                autosize={{ minRows: 1, maxRows: 3 }}
                 onChange={value => this.handleTextChange(value)} />
             </div>
           </div>

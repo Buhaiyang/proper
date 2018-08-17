@@ -604,6 +604,7 @@ export default class Func extends PureComponent {
             }
           }}
           tree={{
+            showIcon: true,
             title: '菜单列表',
             treeLoading: loading,
             treeData,
