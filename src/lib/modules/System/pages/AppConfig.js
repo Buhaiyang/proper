@@ -1,4 +1,5 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
+import classNames from 'classnames';
 import {connect} from 'dva';
 import { Form, Modal, Input, Button, Select, Spin } from 'antd';
 import {inject} from '../../../../framework/common/inject';
@@ -7,7 +8,6 @@ import OopTreeTable from '../../../components/OopTreeTable';
 import OopModal from '../../../components/OopModal';
 import { oopToast } from '../../../../framework/common/oopUtils';
 import styles from './AppConfig.less';
-import classNames from 'classnames';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -282,6 +282,18 @@ export default class AppConfig extends PureComponent {
     const {validateFieldsAndScroll} = form;
     validateFieldsAndScroll((err, value) => {
       if (err) return;
+      const reg = /\s|"|'/g
+      if (value.data) {
+        value.data = value.data.replace(reg, '')
+        const dataArr = value.data.substring(1, value.data.length - 1).split(',');
+        const obj = {};
+        dataArr.forEach((item)=>{
+          const arr = item.replace(':', ',').split(',');
+          // obj[arr[0]] = arr[1];
+          [, obj[arr[0]]] = arr;
+        })
+        value.data = obj;
+      }
       value.appId = value.id;
       value.data === '' ? delete value.data : '';
       delete value.id;
@@ -548,6 +560,7 @@ export default class AppConfig extends PureComponent {
             title: '应用类别',
             treeLoading: loading,
             treeData,
+            treeKey: 'id',
             treeRoot: {
               key: '-1',
               title: '全部',
