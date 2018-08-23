@@ -1,4 +1,4 @@
-import { queryWorkflowList, removeWorkflowList, createWorkflow, repositoryWorkflow } from '../services/workflowDesignerS';
+import { queryWorkflowList, removeWorkflowList, createWorkflow, repositoryWorkflow, queryByProcDefKey } from '../services/workflowDesignerS';
 import { formatDate } from '../../../../framework/utils/utils';
 
 export default {
@@ -8,7 +8,8 @@ export default {
     data: {},
     newId: null,
     changeList: [],
-    deployData: {}
+    deployData: {},
+    entity: {}
   },
 
   effects: {
@@ -54,6 +55,14 @@ export default {
       });
       if (callback) callback(response);
     },
+    *fetchByProcDefKey({ payload, callback }, { call, put }) {
+      const response = yield call(queryByProcDefKey, payload);
+      yield put({
+        type: 'saveEntity',
+        payload: response.result,
+      });
+      if (callback) callback(response);
+    },
   },
 
   reducers: {
@@ -86,6 +95,12 @@ export default {
       return {
         ...state,
         deployData: action.payload
+      };
+    },
+    saveEntity(state, action) {
+      return {
+        ...state,
+        entity: action.payload
       };
     },
   }

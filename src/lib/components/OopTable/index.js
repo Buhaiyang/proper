@@ -1,6 +1,18 @@
 import React, { PureComponent, Fragment } from 'react';
-import {Table, Button, Divider, Popconfirm, Tooltip, Icon} from 'antd';
+import {Table, Button, Divider, Popconfirm, Tooltip, Icon, Dropdown, Menu, message} from 'antd';
 import styles from './index.less';
+
+const downloadContext = (context)=>{
+  const url = 'data:text/csv;charset=UTF-8,\uFEFF'.concat(context);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'table.csv';
+  a.click();
+  a = null;
+  setTimeout(()=>{
+    message.success('数据导出成功！')
+  })
+}
 
 export default class OopTable extends PureComponent {
   state = {
@@ -43,9 +55,20 @@ export default class OopTable extends PureComponent {
         </Button>
       )
     ));
-    if (this.props.showExportButton !== false) {
-      // const exportButton = (<Button key="export" icon="export" style={{float: 'right'}} onClick={this.handleExport}>导出</Button>);
-      // btns.push(exportButton)
+    if (this.props.showExport === true) {
+      const menu = (
+        <Menu onClick={this.handleExport}>
+          <Menu.Item key="all"><Icon type="table" style={{marginRight: 4}} />导出所有</Menu.Item>
+          <Menu.Item key="selected"><Icon type="check-square-o" style={{marginRight: 4}} />导出选中</Menu.Item>
+        </Menu>
+      );
+      const exportButton = (
+      <Dropdown overlay={menu} key="export">
+        <Button style={{ paddingLeft: 8, paddingRight: 8, float: 'right'}} icon="export">
+          导出 <Icon type="down" />
+        </Button>
+      </Dropdown>);
+      btns.push(exportButton)
     }
     return btns
   }
@@ -130,9 +153,50 @@ export default class OopTable extends PureComponent {
     }
     this.rowSelectionChange(keys, lastCheck)
   }
-  handleExport = ()=>{
-    console.log('export table data');
-    console.log(this.props.grid);
+  handleExport = (event)=>{
+    const {key} = event;
+    if (key === 'selected') {
+      const exportData = this.state.selectedRowItems;
+      if (exportData.length === 0) {
+        message.warning('请选择想要导出的数据');
+        return
+      }
+      this.exportTableDataToCSV(exportData);
+    } else if (key === 'all') {
+      // 导出全部的情况 需要看是否是前端分页还是后台分页
+      const {list, pagination} = this.props.grid;
+      if (pagination === undefined && list.length) {
+        // 前端分页 静态数据导出
+        this.exportTableDataToCSV(list);
+      }
+      if (pagination) {
+        console.log('调用后台导出接口');
+      }
+    }
+  }
+  exportTableDataToCSV = (data)=> {
+    const {columns} = this.props;
+    const titles = columns.map(it=>it.title);
+    const titleForKey = columns.map(it=>it.dataIndex);
+    const str = [titles.join(',').concat('\n')];
+    for (let i = 0; i < data.length; i++) {
+      const temp = [];
+      for (let j = 0; j < titleForKey.length; j++) {
+        let value = data[i][titleForKey[j]];
+        if (value) {
+          // console.log(value)
+          value = value.toString();
+          if (value.includes(',')) {
+            // 把英文的,转换成中文的，
+            value = value.replace(new RegExp(',', 'gm'), '，');
+          }
+        }
+        temp.push(value);
+      }
+      str.push(temp.join(',').concat('\n'));
+    }
+    console.log(str);
+    downloadContext(str);
   }
   componentWillReceiveProps(props) {
     if (props.dataDefaultSelectedRowKeys) {

@@ -295,6 +295,7 @@ export default class Template extends React.PureComponent {
     const {list} = this.state;
     const columns = [
       {title: '名称', dataIndex: 'name'},
+      {title: '表单编码', dataIndex: 'formkeydefinition'},
       {title: '类别', dataIndex: 'type', render: (text)=>{
         return TYPE_ENUM.filter(item=>item.value === text)[0].label
       }},

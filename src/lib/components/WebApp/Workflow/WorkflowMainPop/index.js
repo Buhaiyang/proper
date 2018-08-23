@@ -11,10 +11,10 @@
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
 import { Input, Button, Popover, Alert, message } from 'antd';
-import OopWorkflowMain from '../../OopWorkflowMain';
-import {getParamObj} from '../../../../framework/utils/utils';
+import OopWorkflowMain from '../../../OopWorkflowMain';
+import {getParamObj} from '../../../../../framework/utils/utils';
 import styles from './index.less';
-import {inject} from '../../../../framework/common/inject';
+import {inject} from '../../../../../framework/common/inject';
 
 const { TextArea } = Input;
 const PopPage = (props)=>{
@@ -56,7 +56,9 @@ export default class WorkflowMainPop extends PureComponent {
         type: 'workflowManager/findBusinessObjByTaskId',
         payload: taskOrProcDefKey,
         callback: (res) => {
-          const obj = res.length ? res[0] : null;
+          // TODO 多个forms情况先不予考虑
+          const {forms} = res;
+          const obj = forms.length ? forms[0] : null;
           // HACK 兼容后台数据结构的问题
           if (obj.formData[obj.formKey]) {
             obj.formData = obj.formData[obj.formKey]

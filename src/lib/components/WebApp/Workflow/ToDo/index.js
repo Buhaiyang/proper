@@ -5,7 +5,7 @@ import {routerRedux} from 'dva/router';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
-import {inject} from '../../../../framework/common/inject';
+import {inject} from '../../../../../framework/common/inject';
 import styles from './index.less';
 
 const { TabPane } = Tabs;
@@ -100,7 +100,7 @@ export default class ToDo extends React.PureComponent {
       },
       name: '流程发起'
     })));
-    this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+    this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
   }
   // 待办
   handleProcessSubmit = (record)=>{
@@ -114,7 +114,7 @@ export default class ToDo extends React.PureComponent {
       businessObj: {formTitle: processTitle},
       stateCode: undefined
     })));
-    this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+    this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
   }
   // 发起历史
   handleProcessView = (record)=>{
@@ -125,7 +125,9 @@ export default class ToDo extends React.PureComponent {
       payload: procInstId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         const param = btoa(encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
@@ -135,7 +137,7 @@ export default class ToDo extends React.PureComponent {
           processDefinitionId,
           stateCode
         })));
-        this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+        this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
       }
     });
   }
@@ -148,7 +150,9 @@ export default class ToDo extends React.PureComponent {
       payload: procInstId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         const param = btoa(encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
@@ -158,7 +162,7 @@ export default class ToDo extends React.PureComponent {
           processDefinitionId,
           stateCode
         })));
-        this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+        this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
       }
     });
   }
@@ -215,7 +219,7 @@ export default class ToDo extends React.PureComponent {
                             <List.Item actions={[<Icon type="right" />]}>
                               <List.Item.Meta
                                 description={<Fragment>
-                                  <div><Icon type="clock-circle-o" className={styles.icon} /><span>到达时间 : </span><span>{moment(item.pepProcInst.createTime).format('YYYY-MM-DD HH:mm')}</span></div>
+                                  <div><Icon type="clock-circle-o" className={styles.icon} /><span>到达时间 : </span><span>{moment(item.createTime).format('YYYY-MM-DD HH:mm')}</span></div>
                                   <div style={{marginTop: 12}}><Icon type="user" className={styles.icon} /><span>发起人 : </span><span>{item.pepProcInst.startUserName}</span></div>
                                 </Fragment>}
                               />

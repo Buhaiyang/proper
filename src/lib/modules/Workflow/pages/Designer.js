@@ -439,9 +439,10 @@ export default class Designer extends PureComponent {
                           <Ellipsis className={styles.item} lines={1}>
                             <Tooltip placement="bottom" title="编辑">
                               <a onClick={() => this.goActivity(item.id)} style={{textDecoration: 'underline', cursor: 'pointer'}}>
-                                {item.name}
+                                <span>流程名称 : {item.name}</span>
                               </a>
                             </Tooltip>
+                            <div style={{color: '#333', cursor: 'text'}}>流程定义ID : {item.key}</div>
                           </Ellipsis>
                           <Ellipsis className={styles.item} lines={4}>
                             <Badge

@@ -111,8 +111,6 @@ export default class OopWorkflowMain extends PureComponent {
           this.isComplete = true
         }
       })
-    } else {
-      this.handleTabsChange('progress');
     }
   }
   // 清空表单对象
@@ -145,6 +143,9 @@ export default class OopWorkflowMain extends PureComponent {
   // 获取流程处理tab
   getHandleTabComponent = ()=>{
     const { name = null, baseWorkflow: {formEntity}, businessObj: {formData, formTitle}, formLoading, isLaunch, taskOrProcDefKey} = this.props;
+    if (formEntity === undefined || formEntity.formDetails === undefined) {
+      return null;
+    }
     const { formDetails } = formEntity;
     const formConfig = formDetails ? JSON.parse(formDetails) : {};
     const title = (<h2>{name}</h2>);
@@ -201,6 +202,9 @@ export default class OopWorkflowMain extends PureComponent {
     const context = getApplicationContextUrl();
     let imgUrl = null;
     if (stateCode === 'DONE') {
+      if (!processDefinitionId) {
+        return null
+      }
       imgUrl = `/repository/process-definitions/${processDefinitionId}/diagram?access_token=${token}`;
     } else {
       if (!procInstId) {
@@ -256,13 +260,13 @@ export default class OopWorkflowMain extends PureComponent {
     const handleTab = this.getHandleTabComponent();
     const panes = [
       {title: '流程处理', key: 'handle', content: handleTab},
-      {title: '流程进度', key: 'progress', content: processProgressTab, disabled: isLaunch},
-      {title: '流程图', key: 'image', content: processImageTab, disabled: isLaunch},
+      (!isLaunch ? {title: '流程进度', key: 'progress', content: processProgressTab} : null),
+      {title: '流程图', key: 'image', content: processImageTab},
     ]
     const tabs = (
       <Tabs defaultActiveKey={panes[0].key} onChange={this.handleTabsChange}>
         {panes.map(tab=>(
-          <TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>{tab.content}</TabPane>
+          tab && <TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>{tab.content}</TabPane>
         ))
         }
       </Tabs>);

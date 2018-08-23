@@ -1,9 +1,12 @@
 module.exports = {
-  "GET:/auth/login/user": {
-    "name": "Serati Ma",
-    "avatar": "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
-    "userId": "00000001",
-    "notifyCount": 12
+  "GET:/auth/current/user": {
+    "id": "b672f5ba-f91b-f10e-08b3-ce77b9885d8e",
+    "data": {
+      "avatar": "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
+      "userId": "00000001",
+      "name": "超级管理员",
+      "username": "admin"
+    }
   },
   "POST:/auth/login": (req, res)=>{
     const { pwd, username } = req.body;
@@ -71,7 +74,7 @@ module.exports = {
   },
   'GET:/auth/users/:id/roles':[
     {"id":"1",
-    "name":"普通管理员", 
+    "name":"普通管理员",
     "description": "普通权限管理员",
     "enable": true,
     "parentId": "1",

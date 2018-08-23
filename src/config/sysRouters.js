@@ -18,16 +18,18 @@ const routers = {
   '/webapp': {
     component: ()=>import('../framework/layouts/WebAppLayout')
   },
-  '/webapp/workflow': {
-    component: ()=>import('../lib/components/WebApp/Workflow'),
+  '/webapp/workflow/todo': {
+    component: ()=>import('../lib/components/WebApp/Workflow/ToDo'),
     main: true
   },
-  '/webapp/todo': {
-    component: ()=>import('../lib/components/WebApp/ToDo'),
-    main: true
+  '/webapp/workflow/launch': {
+    component: ()=>import('../lib/components/WebApp/Workflow/Launch')
   },
-  '/webapp/workflowMainPop': {
-    component: ()=>import('../lib/components/WebApp/WorkflowMainPop')
+  '/webapp/workflow/history': {
+    component: ()=>import('../lib/components/WebApp/Workflow/History')
+  },
+  '/webapp/workflow/workflowMainPop': {
+    component: ()=>import('../lib/components/WebApp/Workflow/WorkflowMainPop')
   },
   '/main': {
     component: ()=>import('../framework/modules/Base/pages/Main')

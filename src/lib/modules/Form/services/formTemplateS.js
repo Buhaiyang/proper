@@ -3,8 +3,10 @@ import MongoService from '../../../../framework/utils/MongoService';
 const formTemplateService = new MongoService('PEP_FORM_TEMPLATE');
 const {fetchById, update, save, deleteById, fetchByEqual} = formTemplateService;
 
-export async function queryFormTemplate(param) {
-  return fetchByEqual(param);
+export async function queryFormTemplate() {
+  return formTemplateService.fetch((query)=>{
+    query.addAscending('CT').addAscending('name');
+  })
 }
 export async function queryTemplateById(param) {
   return fetchById(param)

@@ -4,9 +4,12 @@ import {connect} from 'dva';
 import {routerRedux} from 'dva/router';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {inject} from '../../../../framework/common/inject';
+import {inject} from '../../../../../framework/common/inject';
+
 import styles from './index.less';
+import {getParamObj} from '../../../../../framework/utils/utils';
 
 const { TabPane } = Tabs;
 
@@ -38,16 +41,47 @@ function getActiveIndex(children, activeKey) {
   loading: loading.models.workflowManager,
   gridLoading: loading.effects['global/oopSearchResult']
 }))
-export default class Workflow extends React.PureComponent {
-  state = {
-    activeKey: 'design',
-    activeIndex: 0,
-    design: {data: [], pagination: {}},
-    process: {data: [], pagination: {}},
+export default class History extends React.PureComponent {
+  static contextTypes = {
+    setState: PropTypes.func,
+    goHome: PropTypes.func,
+  }
+  constructor(props) {
+    super(props);
+    const {atob, decodeURIComponent, JSON} = window;
+    const { param } = getParamObj(this.props.location.search);
+    const { name } = JSON.parse(decodeURIComponent(atob(param)));
+    this.state = {
+      activeKey: 'process',
+      activeIndex: 1,
+      design: {data: [], pagination: {}},
+      process: {data: [], pagination: {}},
+      name
+    }
+  }
+  componentWillMount() {
+    this.context.setState({
+      headerLeftButton: {
+        text: '返回',
+        icon: 'left',
+        onClick: ()=>{
+          this.context.setState({
+            title: this.state.name
+          });
+          history.go(-2);
+        }
+      },
+      headerRightButton: {
+        icon: 'home',
+        onClick: ()=>{
+          this.context.goHome();
+        }
+      },
+    });
   }
 
   componentDidMount() {
-    this.fetchDesign();
+    this.fetchData();
   }
 
   fetchDesign = () => {
@@ -69,7 +103,7 @@ export default class Workflow extends React.PureComponent {
 
   fetchData = (page) => {
     const self = this;
-    const { activeKey } = this.state;
+    const { activeKey, name } = this.state;
     const {[activeKey]: {pagination} } = this.state
     this.props.dispatch({
       type: 'global/oopSearchResult',
@@ -77,6 +111,7 @@ export default class Workflow extends React.PureComponent {
         moduleName: `workflow_${activeKey}`,
         pageNo: page || 1,
         pageSize: pagination.pageSize || 10,
+        req: JSON.stringify([{key: 'processDefinitionName', value: name, operate: 'like', table: 'act_re_procdef '}])
       },
       callback: () => {
         const { global } = self.props;
@@ -122,7 +157,7 @@ export default class Workflow extends React.PureComponent {
       },
       name: '流程发起'
     })));
-    this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+    this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
   }
   handleProcessView = (record)=>{
     console.log('handleProcessView', record);
@@ -132,7 +167,9 @@ export default class Workflow extends React.PureComponent {
       payload: procInstId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         const param = btoa(encodeURIComponent(JSON.stringify({
           isLaunch: false,
           taskOrProcDefKey: null,
@@ -142,7 +179,16 @@ export default class Workflow extends React.PureComponent {
           processDefinitionId,
           stateCode
         })));
-        this.props.dispatch(routerRedux.push(`/webapp/workflowMainPop?param=${param}`));
+        this.context.setState({
+          headerLeftButton: {
+            text: '返回',
+            icon: 'left',
+            onClick: ()=>{
+              history.go(-1);
+            }
+          },
+        });
+        this.props.dispatch(routerRedux.push(`/webapp/workflow/workflowMainPop?param=${param}`));
       }
     });
   }
@@ -165,9 +211,10 @@ export default class Workflow extends React.PureComponent {
       <div className={styles.container}>
         <Tabs
           animated={false}
-          defaultActiveKey="design"
+          defaultActiveKey="process"
           className={styles.tabs}
           onChange={this.handleTabsChange}
+          style={{display: 'none'}}
           ref={(el)=>{ this.tabs = el }}>
             <TabPane key="design" tab="发起" />
             <TabPane key="process" tab="发起历史" />

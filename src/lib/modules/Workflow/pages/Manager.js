@@ -1,8 +1,6 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import { Tabs,
-  Card,
-  Badge } from 'antd';
+import { Tabs, Card, Badge, message } from 'antd';
 import classNames from 'classnames';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import OopSearch from '../../../components/OopSearch';
@@ -138,16 +136,28 @@ export default class Manager extends React.PureComponent {
   }
   handleProcessLaunch = (record)=>{
     console.log('handleProcessLaunch', record);
-    const {key, startFormKey} = record;
-    this.setState({
-      wfVisible: true,
-      isLaunch: true,
-      taskOrProcDefKey: key,
-      businessObj: {
-        formKey: startFormKey
-      },
-      name: '流程发起'
-    })
+    this.props.dispatch({
+      type: 'workflowDesigner/fetchByProcDefKey',
+      payload: record.key,
+      callback: (res)=>{
+        const { result: {key, name, startFormKey, id} } = res;
+        if (key && name && startFormKey && id) {
+          this.setState({
+            wfVisible: true,
+            isLaunch: true,
+            taskOrProcDefKey: key,
+            businessObj: {
+              formKey: startFormKey
+            },
+            name,
+            processDefinitionId: id,
+            stateCode: 'DONE'
+          })
+        } else {
+          message.error('该流程未部署或参数解析错误');
+        }
+      }
+    });
   }
   handleProcessSubmit = (record)=>{
     console.log('handleProcessSubmit', record)
@@ -157,7 +167,9 @@ export default class Manager extends React.PureComponent {
       payload: taskId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         // HACK 兼容后台数据结构的问题
         if (businessObj.formData[businessObj.formKey]) {
           businessObj.formData = businessObj.formData[businessObj.formKey]
@@ -193,7 +205,9 @@ export default class Manager extends React.PureComponent {
       payload: procInstId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         this.setState({
           wfVisible: true,
           isLaunch: false,
@@ -216,7 +230,9 @@ export default class Manager extends React.PureComponent {
       payload: procInstId,
       callback: (res) => {
         console.log(res);
-        const businessObj = res.length ? res[0] : null;
+        // TODO 多个forms情况先不予考虑
+        const {forms} = res;
+        const businessObj = forms.length ? forms[0] : null;
         this.setState({
           wfVisible: true,
           isLaunch: false,

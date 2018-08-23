@@ -30,3 +30,7 @@ export async function repositoryWorkflow(params) {
     method: 'POST'
   });
 }
+
+export async function queryByProcDefKey(params) {
+  return request(`/repository/process-definitions/${params}/latest`);
+}
