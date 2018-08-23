@@ -1,11 +1,13 @@
 import React, { PureComponent, Fragment } from 'react';
 import {connect} from 'dva';
-import { Form, Modal, Input, Button, Select } from 'antd';
+import { Form, Modal, Input, Button, Select, Spin } from 'antd';
 import {inject} from '../../../../framework/common/inject';
 import PageHeaderLayout from '../../../../framework/components/PageHeaderLayout';
 import OopTreeTable from '../../../components/OopTreeTable';
+import OopModal from '../../../components/OopModal';
 import { oopToast } from '../../../../framework/common/oopUtils';
 import styles from './AppConfig.less';
+import classNames from 'classnames';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -62,56 +64,29 @@ const TreeForm = Form.create()((props) => {
     </Form>
   )
 });
-
-const ModalForm = Form.create()((props) => {
-  const { form, loading, visible, title, onModalCancel, onModalSubmit, entity, treeData, selectValue } = props;
-  const { getFieldDecorator } = form;
-  const submitForm = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      const reg = /\s|"|'/g
-      if (fieldsValue.data) {
-        fieldsValue.data = fieldsValue.data.replace(reg, '')
-        const dataArr = fieldsValue.data.substring(1, fieldsValue.data.length - 1).split(',');
-        const obj = {};
-        dataArr.forEach((item)=>{
-          const arr = item.replace(':', ',').split(',');
-          // obj[arr[0]] = arr[1];
-          [, obj[arr[0]]] = arr;
-        })
-        fieldsValue.data = obj;
+function onValuesChange(props, changedValues, allValues) {
+  const { funcBasicInfo, conductValuesChange } = props;
+  if (conductValuesChange) {
+    const warningField = {};
+    for (const k in allValues) {
+      if (Object.keys(funcBasicInfo).length === 0) {
+        if (allValues[k]) {
+          warningField[k] = {hasChanged: true, prevValue: allValues[k]};
+        }
+      } else if (Object.prototype.hasOwnProperty.call(funcBasicInfo, k) &&
+      allValues[k] !== funcBasicInfo[k]) {
+        warningField[k] = {hasChanged: true, prevValue: funcBasicInfo[k]};
       }
-      console.log(fieldsValue.data)
-      onModalSubmit(fieldsValue);
-    });
+    }
+    conductValuesChange(warningField);
   }
-  const cancelForm = () => {
-    onModalCancel();
-  }
-  // const validateJson = (rule, value, callback)=>{
-  //   if (value) {
-  //     try {
-  //       JSON.parse(value)
-  //     } catch (e) {
-  //       callback('应用数据应为json格式');
-  //     }
-  //   }
-  //   callback();
-  // }
-  const footer = (
-    <Fragment>
-      <Button onClick={cancelForm}>取消</Button>
-      <Button type="primary" onClick={submitForm} loading={loading}>保存</Button>
-    </Fragment>);
+}
+const FuncBasicInfoForm = Form.create({onValuesChange})((props) => {
+  const { form, loading, warningWrapper, entity, treeData, selectValue } = props;
+  const { getFieldDecorator } = form;
   return (
-    <Modal
-      title={title}
-      visible={visible}
-      footer={footer}
-      onCancel={cancelForm}
-      destroyOnClose={true}
-    >
-      <Form>
+    <Spin spinning={loading}>
+      <Form key="form" className={ classNames({[styles.warningWrapper]: warningWrapper})} style={{marginTop: 24}}>
         <div>
           {getFieldDecorator('id', {
             initialValue: entity.id,
@@ -188,6 +163,7 @@ const ModalForm = Form.create()((props) => {
         <FormItem
           {...formItemLayout}
           label="应用数据"
+          extra='请输入应用数据，格式如下：{"questionnaireNo":"qnnre1","url":"https://icmp2.propersoft.cn/icmp/web/#/webapp/workflow"}'
         >
           {getFieldDecorator('data', {
             initialValue: entity.data,
@@ -200,7 +176,7 @@ const ModalForm = Form.create()((props) => {
           )}
         </FormItem>
       </Form>
-    </Modal>
+    </Spin>
   )
 });
 
@@ -216,13 +192,15 @@ export default class AppConfig extends PureComponent {
     tableTitle: '全部',
     entity: {},
     modalVisible: false,
-
-
     treeMenuVisible: false,
     typeName: '',
     code: '',
     handleSelect: null,
-    // sort: '',
+    isCreate: true,
+    warningWrapper: false,
+    closeConfirmConfig: {
+      visible: false
+    },
   }
   componentDidMount() {
     this.getTreeData();
@@ -249,8 +227,11 @@ export default class AppConfig extends PureComponent {
 
   // tree组件select事件
   handleTableTreeNodeSelect = ()=>{
+    this.oopTreeTable.oopSearch.setState({
+      inputValue: ''
+    });
     const treeNode = this.oopTreeTable.getCurrentSelectTreeNode();
-    if (treeNode.title === '全部') {
+    if (treeNode.key === '-1') {
       this.setState({
         handleSelect: null,
         tableTitle: treeNode.typeName || '全部'
@@ -264,14 +245,18 @@ export default class AppConfig extends PureComponent {
   }
   // 新建或编辑应用配置
   createOrEditApp = (entity) => {
+    console.log(entity)
     if (entity) {
       this.setState({
         entity,
-        modalVisible: true
+        modalVisible: true,
+        isCreate: false,
       });
     } else {
       this.setState({
-        modalVisible: true
+        isCreate: true,
+        modalVisible: true,
+        entity: {}
       });
     }
   }
@@ -281,35 +266,62 @@ export default class AppConfig extends PureComponent {
       entity: {},
       modalVisible: false
     });
+    setTimeout(() => {
+      this.setState({
+        closeConfirmConfig: {visible: false},
+        warningWrapper: false,
+      });
+      // this.props.dispatch({
+      //   type: 'authFunc/clear'
+      // });
+    }, 300);
   }
   // 提交应用数据
-  handleModalSubmit = (value) => {
-    // let { data } = values;
-    // if (data) {
-    //   data = data.replace(/\s+/g, '');
-    // }
-    // const value = {
-    //   ...values,
-    //   data
-    // };
-
-    value.appId = value.id;
-    value.data === '' ? delete value.data : '';
-    delete value.id;
-    this.props.dispatch({
-      type: 'systemAppConfig/saveOrUpdate',
-      payload: value,
-      callback: (res)=>{
-        oopToast(res, '保存成功', '保存失败');
-        this.handleModalCancel();
-        this.onLoad();
-      }
+  handleModalSubmit = () => {
+    const form = this.basic.getForm();
+    const {validateFieldsAndScroll} = form;
+    validateFieldsAndScroll((err, value) => {
+      if (err) return;
+      value.appId = value.id;
+      value.data === '' ? delete value.data : '';
+      delete value.id;
+      this.props.dispatch({
+        type: 'systemAppConfig/saveOrUpdate',
+        payload: value,
+        callback: (res)=>{
+          oopToast(res, '保存成功', '保存失败');
+          this.handleModalCancel();
+          this.onLoad();
+        }
+      });
     });
   }
 
   // 删除应用配置
-  deleteApp = (record) => {
+  deleteApp = (record, items) => {
+    record = items.map((item)=>{
+      return item.id
+    })
     const ids = Array.isArray(record) ? record.join(',') : record.id;
+    Modal.confirm({
+      title: '提示',
+      content: `确定删除选中的${items.length}条数据吗`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        this.props.dispatch({
+          type: 'systemAppConfig/deleteApp',
+          payload: {ids},
+          callback: (res) => {
+            oopToast(res, '删除成功', '删除失败');
+            this.onLoad();
+          }
+        });
+      }
+    });
+  }
+  deleteAppRow = (record) => {
+    const ids = record.id;
     this.props.dispatch({
       type: 'systemAppConfig/deleteApp',
       payload: {ids},
@@ -318,6 +330,23 @@ export default class AppConfig extends PureComponent {
         this.onLoad();
       }
     });
+  }
+  onDeleteFromEdit = () => {
+    // console.log(this.state.entity)
+    const ids = this.state.entity.id
+    console.log(ids)
+    this.props.dispatch({
+      type: 'systemAppConfig/deleteApp',
+      payload: {ids},
+      callback: (res)=>{
+        oopToast(res, '删除成功', '删除失败');
+        this.handleTableTreeNodeSelect()
+        this.onLoad();
+        this.setState({
+          modalVisible: false
+        });
+      }
+    })
   }
   setVisible = (state) => {
     this.setState({
@@ -405,10 +434,11 @@ export default class AppConfig extends PureComponent {
       const { data } = item;
       if (typeof data === 'object') {
         item.data = JSON.stringify(item.data, null, 2);
-        item.data = item.data === 'null' ? '' : item.data
+        item.data = item.data === '{}' ? '' : item.data
       }
     });
-    const { tableTitle, entity, modalVisible, handleSelect } = this.state;
+    const { tableTitle, entity, modalVisible, handleSelect,
+      closeConfirmConfig, warningWrapper, warningField } = this.state;
     const columns = [
       {title: '应用名称', dataIndex: 'name'},
       {title: '应用图标', dataIndex: 'icon'},
@@ -427,7 +457,7 @@ export default class AppConfig extends PureComponent {
         text: '删除',
         name: 'delete',
         icon: 'delete',
-        onClick: (items)=>{ this.deleteApp(items) },
+        onClick: (items, record)=>{ this.deleteApp(items, record) },
         display: items=>(items.length),
       }
     ];
@@ -442,7 +472,7 @@ export default class AppConfig extends PureComponent {
         name: 'delete',
         icon: 'delete',
         confirm: '是否要删除此行',
-        onClick: (record)=>{ this.deleteApp(record) },
+        onClick: (record)=>{ this.deleteAppRow(record) },
       },
     ];
     const menuList = [
@@ -493,7 +523,7 @@ export default class AppConfig extends PureComponent {
           table={{
             title: `${tableTitle}应用配置`,
             grid: oopSearchGrid,
-            rowKey: 'appId',
+            // rowKey: 'appId',
             columns,
             gridLoading,
             onLoad: this.onLoad,
@@ -526,15 +556,37 @@ export default class AppConfig extends PureComponent {
           size={size}
           onTableTreeNodeSelect={this.handleTableTreeNodeSelect}
         />
-        <ModalForm
-          selectValue={handleSelect}
-          visible={modalVisible}
+        <OopModal
           title={entity.id ? '编辑应用配置' : '新建应用配置'}
-          onModalCancel={this.handleModalCancel}
-          onModalSubmit={this.handleModalSubmit}
-          entity={entity}
+          visible={modalVisible}
+          destroyOnClose={true}
+          width={800}
+          closeConfirm={closeConfirmConfig}
+          closeConfirmCancel={this.handleCloseConfirmCancel}
+          onCancel={this.handleModalCancel}
+          onOk={this.handleModalSubmit}
+          onDelete={this.onDeleteFromEdit}
+          isCreate={this.state.isCreate}
           loading={!!loading}
-          treeData={treeData}
+          tabs={[
+            {
+              key: 'basic',
+              title: '基本信息',
+              tips: (<div>新建时，需要<a>填写完基本信息的必填项并保存</a>后，滚动页面或点击左上角的导航来完善其他信息</div>),
+              main: true,
+              content: <FuncBasicInfoForm
+                ref={(el) => {
+                  this.basic = el;
+                }}
+                entity={entity}
+                treeData={treeData}
+                warningWrapper={warningWrapper}
+                warningField={warningField}
+                loading={loading}
+                selectValue={handleSelect}
+              />
+            },
+          ]}
         />
       </PageHeaderLayout>
     )
