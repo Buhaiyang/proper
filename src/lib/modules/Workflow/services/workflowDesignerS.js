@@ -32,5 +32,11 @@ export async function repositoryWorkflow(params) {
 }
 
 export async function queryByProcDefKey(params) {
-  return request(`/repository/process-definitions/${params}/latest`);
+  // hack url bug
+  let arg = params;
+  if (params.includes('?')) {
+    const [first] = [...params.split('?')];
+    arg = first;
+  }
+  return request(`/repository/process-definitions/${arg}/latest`);
 }

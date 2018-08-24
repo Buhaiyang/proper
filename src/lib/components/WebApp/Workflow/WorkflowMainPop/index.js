@@ -85,9 +85,7 @@ export default class WorkflowMainPop extends PureComponent {
     history.back();
   }
   submitWorkflow = ()=>{
-    this.setState({
-      buttonLoading: true
-    })
+    this.setButtonLoading(true);
     this.oopWorkflowMain.submitWorkflow(()=>{
       message.success('流程提交成功');
       // 如果从手机推送通知进来 点击办理之后 跟点击右上主页图标 逻辑一致
@@ -97,18 +95,25 @@ export default class WorkflowMainPop extends PureComponent {
         this.afterSubmitByEmailNotify();
       } else {
         history.back();
-        this.setState({
-          buttonLoading: false
-        })
+        this.setButtonLoading(false);
       }
     });
   }
   launchWorkflow = ()=>{
-    this.setButtonLoading(true)
+    this.setButtonLoading(true);
     this.oopWorkflowMain.launchWorkflow(()=>{
       history.back()
       this.setButtonLoading(false)
-      message.success('流程提交成功');
+      message.success('流程发起成功');
+      // 移动端手机 发起流程之后关闭页面
+      if (this.state.from === 'app') {
+        this.afterSubmitByAppNotify();
+      } else if (this.state.from === 'email') {
+        this.afterSubmitByEmailNotify();
+      } else {
+        history.back();
+        this.setButtonLoading(false);
+      }
     })
   }
   setButtonLoading = (flag)=>{
