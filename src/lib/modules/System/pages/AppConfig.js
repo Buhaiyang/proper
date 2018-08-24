@@ -558,9 +558,11 @@ export default class AppConfig extends PureComponent {
             },
             showLine: true,
             title: '应用类别',
+            treeTitle: 'name',
             treeLoading: loading,
             treeData,
             treeKey: 'id',
+            defaultSelectedKeys: ['-1'],
             treeRoot: {
               key: '-1',
               title: '全部',

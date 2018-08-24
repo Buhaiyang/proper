@@ -245,7 +245,7 @@ export default class OopTreeTable extends PureComponent {
                 const {name} = item;
                 if (!item.confirm) {
                   return (
-                    <Menu.Item key={name} onClick={(nameParam)=>{ this.handelPopover(nameParam) }}>
+                    <Menu.Item key={name} className="popoverLine" onClick={(nameParam)=>{ this.handelPopover(nameParam) }}>
                     <div style={{paddingLeft: 5}}>
                       <Icon type={item.icon} style={{fontSize: 16}} />
                           <span style={{paddingLeft: 8}}>{item.text}</span>
